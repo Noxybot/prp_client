@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/">
+        <file>images/worldwide-location.png</file>
+        <file>main.qml</file>
+        <file>profile.qml</file>
+    </qresource>
+</RCC>

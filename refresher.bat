@@ -1,0 +1,1 @@
+copy qml.qrc /B+ ,,/Y
