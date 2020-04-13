@@ -3,5 +3,9 @@
         <file>images/worldwide-location.png</file>
         <file>main.qml</file>
         <file>profile.qml</file>
+        <file>images/vane4ka.jpg</file>
+        <file>login.qml</file>
+        <file>signin.qml</file>
+        <file>map.qml</file>
     </qresource>
 </RCC>

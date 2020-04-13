@@ -21,7 +21,8 @@ android: include(C:\Qt\Android_stuff\android_openssl\openssl.pri)
 SOURCES += \
         main.cpp
 
-RESOURCES += qml.qrc
+RESOURCES += \
+    qml.qrc
 
 # Additional import path used to resolve QML modules in Qt Creator's code model
 QML_IMPORT_PATH =
@@ -35,12 +36,15 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 DISTFILES += \
+    login.qml \
     main.qml \
+    map.qml \
     profile.qml \
     qml/main.qml \
     qml/profile.qml \
     qml_main/main.qml \
-    qml_main/profile.qml
+    qml_main/profile.qml \
+    signin.qml
 
 #update qml
 qml_scenes.depends = $$PWD/resources/main.qml $$PWD/resources/profe.qml
