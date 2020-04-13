@@ -6,8 +6,6 @@ import QtQuick.LocalStorage 2.0
 ApplicationWindow {
     id: mainWindow
     visible: true
-    width: 640
-    height: 480
     title: qsTr("Come together")
     property var db
     StackView {

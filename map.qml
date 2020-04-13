@@ -7,8 +7,9 @@ import QtLocation 5.14
 Page {
     id: mainWindow
     visible: true
-    width: 640
-    height: 480
+    anchors.fill: parent
+//    width: 640
+//    height: 480
     title: qsTr("Come together")
 
     header: ToolBar {

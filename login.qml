@@ -2,48 +2,47 @@ import QtQuick 2.14
 import QtQuick.Window 2.14
 import QtQuick.Controls 2.12
 import QtGraphicalEffects 1.0
+import QtQuick.Layouts 1.12
 
 Page {
     id: mainWindow
-
-    Column {
-        topPadding: mainWindow.height/100
-        anchors.horizontalCenter: parent.horizontalCenter
-        spacing: mainWindow.height/50
-        Rectangle{
-            anchors.horizontalCenter: parent.horizontalCenter
-            width: mainWindow.width*0.3
-            height: mainWindow.width*0.3
-                Text{
+    anchors.fill: parent
+    ColumnLayout {
+       anchors.fill: parent
+       Layout.alignment: Qt.AlignHCenter
+     Rectangle {
+          Layout.alignment: Qt.AlignHCenter
+          Layout.preferredWidth: mainWindow.width * 0.3
+          Layout.preferredHeight: mainWindow.width * 0.3
+                Text {
+                    Layout.alignment: Qt.AlignHCenter
+                    horizontalAlignment: Text.AlignHCenter
                     text: qsTr("\u36BE")
-                    font.pointSize: 100
-                    minimumPointSize: 10
+                    font.pointSize: parent.width * 0.75
                     fontSizeMode: Text.Fit
                     anchors.centerIn: parent
             }
-
         }
-
         TextField {
             id: login_
-            anchors.horizontalCenter: parent.horizontalCenter
+            Layout.alignment: Qt.AlignHCenter
             placeholderText: qsTr("Логин")
-            width: mainWindow.width/2
+            Layout.preferredWidth: mainWindow.width / 2
         }
         TextField {
             id: password
-            anchors.horizontalCenter: parent.horizontalCenter
+            Layout.alignment: Qt.AlignHCenter
             placeholderText: qsTr("Пароль")
-            width: mainWindow.width/2
+            Layout.preferredWidth: mainWindow.width / 2
         }
         Button {
-            anchors.horizontalCenter: parent.horizontalCenter
+            Layout.alignment: Qt.AlignHCenter
             text: qsTr("Войти")
-            height: mainWindow.height/10
-            width: mainWindow.width/4
+            Layout.preferredHeight: mainWindow.height / 10
+            Layout.preferredWidth: mainWindow.width / 4
             onClicked: {
                 console.log("Login")
-                if(confirmLogin(login_.text, password.text) == true) {
+                if (confirmLogin(login_.text, password.text) === true) {
                   console.log("Login complete")
                    stack.push("map.qml")
                 }
@@ -57,10 +56,10 @@ Page {
             }
         }
         Button {
-            anchors.horizontalCenter: parent.horizontalCenter
+            Layout.alignment: Qt.AlignHCenter
             text: qsTr("Зарегистрироваться")
-            height: mainWindow.height/10
-            width: mainWindow.width/4
+            Layout.preferredHeight: mainWindow.height / 10
+            Layout.preferredWidth: mainWindow.width / 4
             onClicked: {
                 console.log("Registration")
                 stack.push("signin.qml")
@@ -71,13 +70,13 @@ Page {
             }
         }
         Button {
-            anchors.horizontalCenter: parent.horizontalCenter
+            Layout.alignment: Qt.AlignHCenter
             text: qsTr("Войти с Facebook")
             font.underline: true
             onClicked: {
                 console.log("FB")
             }
-            width: mainWindow.width/4
+            Layout.preferredWidth: mainWindow.width / 4
             background: Rectangle {
                 color: "white"
             }

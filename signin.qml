@@ -30,9 +30,9 @@ Page {
 
     }
     Column {
-        topPadding: mainWindow.height/50
+        topPadding: mainWindow.height / 50
         anchors.horizontalCenter: parent.horizontalCenter
-        spacing: mainWindow.height/50
+        spacing: mainWindow.height / 50
         TextField {
             id: name
             anchors.horizontalCenter: parent.horizontalCenter
@@ -43,25 +43,25 @@ Page {
             id: surname
             anchors.horizontalCenter: parent.horizontalCenter
             placeholderText: qsTr("Фамилия")
-            width: mainWindow.width/2
+            width: mainWindow.width / 2
         }
         TextField {
             id: login_
             anchors.horizontalCenter: parent.horizontalCenter
             placeholderText: qsTr("Логин")
-            width: mainWindow.width/2
+            width: mainWindow.width / 2
         }
         TextField {
             id: password
             anchors.horizontalCenter: parent.horizontalCenter
             placeholderText: qsTr("Пароль")
-            width: mainWindow.width/2
+            width: mainWindow.width / 2
         }
         Button {
             anchors.horizontalCenter: parent.horizontalCenter
             text: qsTr("Зарегистрироваться")
-            height: mainWindow.height/10
-            width: mainWindow.width/4
+            height: mainWindow.height / 10
+            width: mainWindow.width / 4
             onClicked: {
                 console.log("Registration")
                 addUser(name.text, surname.text, login_.text, password.text)

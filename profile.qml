@@ -2,12 +2,12 @@ import QtQuick 2.14
 import QtQuick.Window 2.14
 import QtQuick.Controls 2.12
 import QtGraphicalEffects 1.0
+import QtQuick.Layouts 1.12
 
 Page {
     id: mainWindow
     visible: true
-    width: 640
-    height: 480
+    anchors.fill: parent
     title: qsTr("Come together")
 
     header: ToolBar {
@@ -54,17 +54,18 @@ Page {
     }
 
     Column {
-        topPadding: mainWindow.height/100
+        //Layout.alignment: Qt.AlignHCenter
+        topPadding: mainWindow.height / 100
         anchors.horizontalCenter: parent.horizontalCenter
-        spacing: mainWindow.height/50
+        spacing: mainWindow.height / 50
         Rectangle{
             anchors.horizontalCenter: mainWindow.horizontalCenter
-            width: mainWindow.width*0.6
-            height: mainWindow.width*0.3
+            width: mainWindow.width * 0.6
+            height: mainWindow.width * 0.3
             Rectangle {
                 id: call2
-                width: parent.width*0.2
-                height: parent.width*0.2
+                width: parent.width * 0.2
+                height: parent.width * 0.2
                 anchors.left: parent.left
                 anchors.verticalCenter: parent.verticalCenter
 
@@ -80,8 +81,8 @@ Page {
                 id: img
                 anchors.centerIn: parent
                 source: 'images/vane4ka.jpg'
-                width: mainWindow.width*0.3
-                height: mainWindow.width*0.3
+                width: mainWindow.width * 0.3
+                height: mainWindow.width * 0.3
                 fillMode: Image.PreserveAspectCrop
                 layer.enabled: true
                 layer.effect: OpacityMask {
