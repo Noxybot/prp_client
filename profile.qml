@@ -5,10 +5,14 @@ import QtGraphicalEffects 1.0
 import QtQuick.Layouts 1.12
 
 Page {
-    id: mainWindow
+    id: profilePage
     visible: true
     anchors.fill: parent
     title: qsTr("Come together")
+    property var userInfo
+    Component.onCompleted: {
+        userInfo = getUserInfoByLogin(mainWindow.currentUserLogin)
+    }
 
     header: ToolBar {
         ToolButton {
@@ -55,13 +59,13 @@ Page {
 
     Column {
         //Layout.alignment: Qt.AlignHCenter
-        topPadding: mainWindow.height / 100
+        topPadding: profilePage.height / 100
         anchors.horizontalCenter: parent.horizontalCenter
-        spacing: mainWindow.height / 50
+        spacing: profilePage.height / 50
         Rectangle{
-            anchors.horizontalCenter: mainWindow.horizontalCenter
-            width: mainWindow.width * 0.6
-            height: mainWindow.width * 0.3
+            anchors.horizontalCenter: profilePage.horizontalCenter
+            width: profilePage.width * 0.6
+            height: profilePage.width * 0.3
             Rectangle {
                 id: call2
                 width: parent.width * 0.2
@@ -80,9 +84,9 @@ Page {
             Image {
                 id: img
                 anchors.centerIn: parent
-                source: 'images/vane4ka.jpg'
-                width: mainWindow.width * 0.3
-                height: mainWindow.width * 0.3
+                source: userInfo["pathToImage"]
+                width: profilePage.width * 0.3
+                height: profilePage.width * 0.3
                 fillMode: Image.PreserveAspectCrop
                 layer.enabled: true
                 layer.effect: OpacityMask {
@@ -92,8 +96,8 @@ Page {
 
             Rectangle {
                 id: mask
-                width: mainWindow.width*0.3
-                height: mainWindow.width*0.3
+                width: profilePage.width*0.3
+                height: profilePage.width*0.3
                 radius: width*0.5
                 visible: false
 
@@ -116,26 +120,26 @@ Page {
         }
         Text {
             anchors.horizontalCenter: parent.horizontalCenter
-            text: qsTr("Ванечка")
+            text: userInfo["displayName"]
         }
 
         Button {
             anchors.horizontalCenter: parent.horizontalCenter
             text: qsTr("Изменить имя")
-            height: mainWindow.height/8
-            width: mainWindow.width/4
+            height: profilePage.height/8
+            width: profilePage.width/4
         }
         Button {
             anchors.horizontalCenter: parent.horizontalCenter
             text: qsTr("Изменить фото")
-            height: mainWindow.height/8
-            width: mainWindow.width/4
+            height: profilePage.height/8
+            width: profilePage.width/4
         }
         Button {
             anchors.horizontalCenter: parent.horizontalCenter
             text: qsTr("Отзывы")
-            height: mainWindow.height/8
-            width: mainWindow.width/4
+            height: profilePage.height/8
+            width: profilePage.width/4
         }
     }
 }

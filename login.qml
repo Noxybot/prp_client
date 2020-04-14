@@ -5,15 +5,15 @@ import QtGraphicalEffects 1.0
 import QtQuick.Layouts 1.12
 
 Page {
-    id: mainWindow
+    id: loginPage
     anchors.fill: parent
     ColumnLayout {
        anchors.fill: parent
        Layout.alignment: Qt.AlignHCenter
      Rectangle {
           Layout.alignment: Qt.AlignHCenter
-          Layout.preferredWidth: mainWindow.width * 0.3
-          Layout.preferredHeight: mainWindow.width * 0.3
+          Layout.preferredWidth: loginPage.width * 0.3
+          Layout.preferredHeight: loginPage.width * 0.3
                 Text {
                     Layout.alignment: Qt.AlignHCenter
                     horizontalAlignment: Text.AlignHCenter
@@ -27,23 +27,24 @@ Page {
             id: login_
             Layout.alignment: Qt.AlignHCenter
             placeholderText: qsTr("Логин")
-            Layout.preferredWidth: mainWindow.width / 2
+            Layout.preferredWidth: loginPage.width / 2
         }
         TextField {
             id: password
             Layout.alignment: Qt.AlignHCenter
             placeholderText: qsTr("Пароль")
-            Layout.preferredWidth: mainWindow.width / 2
+            Layout.preferredWidth: loginPage.width / 2
         }
         Button {
             Layout.alignment: Qt.AlignHCenter
             text: qsTr("Войти")
-            Layout.preferredHeight: mainWindow.height / 10
-            Layout.preferredWidth: mainWindow.width / 4
+            Layout.preferredHeight: loginPage.height / 10
+            Layout.preferredWidth: loginPage.width / 4
             onClicked: {
                 console.log("Login")
                 if (confirmLogin(login_.text, password.text) === true) {
                   console.log("Login complete")
+                   mainWindow.currentUserLogin = login_.text
                    stack.push("map.qml")
                 }
                 else {
@@ -58,8 +59,8 @@ Page {
         Button {
             Layout.alignment: Qt.AlignHCenter
             text: qsTr("Зарегистрироваться")
-            Layout.preferredHeight: mainWindow.height / 10
-            Layout.preferredWidth: mainWindow.width / 4
+            Layout.preferredHeight: loginPage.height / 10
+            Layout.preferredWidth: loginPage.width / 4
             onClicked: {
                 console.log("Registration")
                 stack.push("signin.qml")
@@ -75,8 +76,9 @@ Page {
             font.underline: true
             onClicked: {
                 console.log("FB")
+                stack.push("loginFB.qml")
             }
-            Layout.preferredWidth: mainWindow.width / 4
+            Layout.preferredWidth: loginPage.width / 4
             background: Rectangle {
                 color: "white"
             }

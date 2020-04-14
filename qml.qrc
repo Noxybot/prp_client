@@ -7,5 +7,6 @@
         <file>login.qml</file>
         <file>signin.qml</file>
         <file>map.qml</file>
+        <file>loginFB.qml</file>
     </qresource>
 </RCC>

@@ -5,7 +5,7 @@ import QtPositioning 5.14
 import QtLocation 5.14
 
 Page {
-    id: mainWindow
+    id: mapPage
     visible: true
     anchors.fill: parent
 //    width: 640
@@ -164,11 +164,11 @@ Page {
            Image {
                id: locationImage
                source: "images/worldwide-location.png"
-               sourceSize.width: mainWindow.width*0.3
+               sourceSize.width: mapPage.width*0.3
                sourceSize.height: bottomProfile.height
            }
            Column {
-               width: mainWindow.width * 0.7
+               width: mapPage.width * 0.7
                id: description
                spacing: 8
                Text {

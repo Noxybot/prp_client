@@ -1,9 +1,11 @@
 import QtQuick 2.14
 import QtQuick.Window 2.14
 import QtQuick.Controls 2.12
+import QtQuick.Dialogs 1.3
 
 Page {
-    id: mainWindow
+    id: signinPage
+    property string pathToFile
     header: ToolBar {
         ToolButton {
             id: backButton
@@ -30,38 +32,38 @@ Page {
 
     }
     Column {
-        topPadding: mainWindow.height / 50
+        topPadding: signinPage.height / 50
         anchors.horizontalCenter: parent.horizontalCenter
-        spacing: mainWindow.height / 50
+        spacing: signinPage.height / 50
         TextField {
             id: name
             anchors.horizontalCenter: parent.horizontalCenter
             placeholderText: qsTr("Имя")
-            width: mainWindow.width/2
+            width: signinPage.width/2
         }
         TextField {
             id: surname
             anchors.horizontalCenter: parent.horizontalCenter
             placeholderText: qsTr("Фамилия")
-            width: mainWindow.width / 2
+            width: signinPage.width / 2
         }
         TextField {
             id: login_
             anchors.horizontalCenter: parent.horizontalCenter
             placeholderText: qsTr("Логин")
-            width: mainWindow.width / 2
+            width: signinPage.width / 2
         }
         TextField {
             id: password
             anchors.horizontalCenter: parent.horizontalCenter
             placeholderText: qsTr("Пароль")
-            width: mainWindow.width / 2
+            width: signinPage.width / 2
         }
         Button {
             anchors.horizontalCenter: parent.horizontalCenter
             text: qsTr("Зарегистрироваться")
-            height: mainWindow.height / 10
-            width: mainWindow.width / 4
+            height: signinPage.height / 10
+            width: signinPage.width / 4
             onClicked: {
                 addUser(name.text, surname.text, login_.text, password.text, "")
 
@@ -72,6 +74,32 @@ Page {
                 radius: 20
                 color: "light grey"
             }
+        }
+        Button {
+            anchors.horizontalCenter: parent.horizontalCenter
+            text: qsTr("фото")
+            height: signinPage.height / 10
+            width: signinPage.width / 4
+            onClicked: {
+                fileOpenDialog.open()
+            }
+            background: Rectangle {
+                radius: 20
+                color: "light grey"
+            }
+        }
+    }
+    FileDialog {
+        id: fileOpenDialog
+        title: "Select an image file"
+        folder: shortcuts.documents
+        nameFilters: [ "Image files (*.png *.jpeg *.jpg)" ]
+        onAccepted: {
+            pathToFile = fileOpenDialog.fileUrl
+            console.log("Path to file: "+pathToFile)
+            addUser(name.text, surname.text, login_.text, password.text, pathToFile)
+            mainWindow.currentUserLogin = login_.text
+            stack.push("map.qml")
         }
     }
 }

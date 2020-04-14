@@ -12,7 +12,7 @@ CONFIG += c++11
 # depend on your compiler). Refer to the documentation for the
 # deprecated API to know how to port your code away from it.
 DEFINES += QT_DEPRECATED_WARNINGS
-android: include(C:\Qt\Android_stuff\android_openssl\openssl.pri)
+android: include(C:\android_openssl123\openssl.pri)
 # You can also make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
@@ -37,6 +37,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 DISTFILES += \
     login.qml \
+    loginFB.qml \
     main.qml \
     map.qml \
     profile.qml \
@@ -51,4 +52,4 @@ qml_scenes.depends = $$PWD/resources/main.qml $$PWD/resources/profe.qml
 qml_scenes.commands =
 QMAKE_EXTRA_TARGETS += qml_scenes
 
-ANDROID_EXTRA_LIBS = C:/Qt/Android_stuff/android_openssl/latest/arm/libcrypto_1_1.so C:/Qt/Android_stuff/android_openssl/latest/arm/libssl_1_1.so C:/Qt/Android_stuff/android_openssl/latest/arm64/libcrypto_1_1.so C:/Qt/Android_stuff/android_openssl/latest/arm64/libssl_1_1.so
+#ANDROID_EXTRA_LIBS = C:/Qt/Android_stuff/android_openssl/latest/arm/libcrypto_1_1.so C:/Qt/Android_stuff/android_openssl/latest/arm/libssl_1_1.so C:/Qt/Android_stuff/android_openssl/latest/arm64/libcrypto_1_1.so C:/Qt/Android_stuff/android_openssl/latest/arm64/libssl_1_1.so
