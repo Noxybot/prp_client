@@ -17,19 +17,21 @@ ApplicationWindow {
         db = LocalStorage.openDatabaseSync("LoginDB", "1.0", "Example!", 1000000);
         db.transaction(
                     function(tx) {
-                        tx.executeSql('CREATE TABLE IF NOT EXISTS user(name TEXT, surname TEXT, login TEXT, password TEXT)');
+                        tx.executeSql('CREATE TABLE IF NOT EXISTS user(name TEXT, surname TEXT, login TEXT, password TEXT, BLOB image)');
                     })
     }
 
-    function addUser(name, surname, login, password) {
+    function addUser(name, surname, login, password, image) {
         db.transaction(function(tx) {
+                    console.log("BLOB SIZE: ")
                     var results = tx.executeSql('SELECT password FROM user WHERE name=?;', name);
                     if(results.rows.length !== 0)
                     {
                         console.log("User already exist!")
                         return
                     }
-                    tx.executeSql('INSERT INTO user VALUES(?, ?, ?, ?)', [ name, surname, login, password]);
+                    console.log("BLOB SIZE: " + image.size)
+                    tx.executeSql('INSERT INTO user VALUES(?, ?, ?, ?, ?)', [ name, surname, login, password, image]);
                     console.log("Done")
                 })
     }
@@ -38,7 +40,7 @@ ApplicationWindow {
         var ret = false
         db.transaction(function(tx) {
                     var results = tx.executeSql('SELECT password FROM user WHERE login=?;', login);
-                    if(results.rows.length == 1 && results.rows.item(0).password == password)
+                    if(results.rows.length === 1 && results.rows.item(0).password === password)
                     {
                         console.log("Correct!")
                         ret = true

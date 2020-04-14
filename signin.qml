@@ -64,7 +64,27 @@ Page {
             width: mainWindow.width / 4
             onClicked: {
                 console.log("Registration")
-                addUser(name.text, surname.text, login_.text, password.text)
+                function loadXHR(url) {
+                    return new Promise(function(resolve, reject) {
+                        try {
+                            var xhr = new XMLHttpRequest();
+                            xhr.open("GET", url);
+                            xhr.responseType = "blob";
+                            xhr.onerror = function() {reject("Network error.")};
+                            xhr.onload = function() {
+                                if (xhr.status === 200) {resolve(xhr.response)}
+                                else {reject("Loading error:" + xhr.statusText)}
+                            };
+                            xhr.send();
+                        }
+                        catch(err) {reject(err.message)}
+                    });
+                }
+                loadXHR("D:\\Projects\\prp_client\\images\\vane4ka.jpg").then(function(blob) {
+                  // here the image is a blob
+                    addUser(name.text, surname.text, login_.text, password.text, blob)
+                });
+
                 stack.push("map.qml")
             }
             background: Rectangle {
