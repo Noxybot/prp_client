@@ -3,13 +3,11 @@ import QtQuick.Window 2.14
 import QtQuick.Controls 2.12
 import QtPositioning 5.14
 import QtLocation 5.14
+import QtQuick.Layouts 1.12
 
 Page {
     id: mapPage
     visible: true
-    anchors.fill: parent
-//    width: 640
-//    height: 480
     title: qsTr("Come together")
 
     header: ToolBar {
@@ -21,7 +19,7 @@ Page {
 
             Text {
                 id: menuButtonName
-                text: qsTr("\u2661")
+                text: qsTr("\u2630")
                 width: parent.width * 0.7
                 height: parent.height * 0.7
                 font.pointSize: 100
@@ -47,7 +45,8 @@ Page {
     Drawer {
 
         id: drawer
-        width: parent.width * 0.7
+        property var max: 300
+        width: (parent.width * 0.7 < max) ? parent.width * 0.7 : max
         height: parent.height
 
         Column {
@@ -154,21 +153,22 @@ Page {
        id: bottomProfile
        width: parent.width
        radius: 10
-       height: parent.width*0.25
+       property var max: 200
+       height: (parent.width * 0.4 < max) ? parent.width * 0.4 : max
        anchors.bottom: parent.bottom
        border.width: 1
        border.color: "light gray"
-       Row {
+       RowLayout {
            anchors.centerIn: parent
            spacing: 8
            Image {
                id: locationImage
                source: "images/worldwide-location.png"
-               sourceSize.width: mapPage.width*0.3
-               sourceSize.height: bottomProfile.height
+               Layout.preferredWidth:  bottomProfile.height
+               Layout.preferredHeight: bottomProfile.height
            }
-           Column {
-               width: mapPage.width * 0.7
+           ColumnLayout{
+               Layout.preferredWidth: mapPage.width * 0.6
                id: description
                spacing: 8
                Text {

@@ -7,13 +7,12 @@ import QtQuick.Layouts 1.12
 Page {
     id: profilePage
     visible: true
-    anchors.fill: parent
     title: qsTr("Come together")
     property var userInfo
     Component.onCompleted: {
         userInfo = getUserInfoByLogin(mainWindow.currentUserLogin)
+        console.log(userInfo["pathToImage"])
     }
-
     header: ToolBar {
         ToolButton {
             id: menuButton
@@ -46,7 +45,7 @@ Page {
 
             Text {
                 id: likeButtonName
-                text: qsTr("\u2665")
+                text: qsTr("\u2661")
                 width: parent.width * 0.7
                 height: parent.height * 0.7
                 font.pointSize: 100
@@ -56,20 +55,22 @@ Page {
             }
         }
     }
-
-    Column {
-        //Layout.alignment: Qt.AlignHCenter
-        topPadding: profilePage.height / 100
-        anchors.horizontalCenter: parent.horizontalCenter
-        spacing: profilePage.height / 50
-        Rectangle{
-            anchors.horizontalCenter: profilePage.horizontalCenter
-            width: profilePage.width * 0.6
-            height: profilePage.width * 0.3
+    Item {
+        id: top_
+        height: parent.height / 50
+        width: parent.width
+        //visible: true
+    }
+        RowLayout {
+            id: row_
+            anchors.top: top_.bottom
+            Layout.alignment: Qt.AlignHCenter
+            Layout.preferredWidth: profilePage.width*0.6
+            Layout.preferredHeight: profilePage.width*0.3
             Rectangle {
                 id: call2
-                width: parent.width * 0.2
-                height: parent.width * 0.2
+                Layout.preferredWidth: parent.width*0.2
+                Layout.preferredHeight: parent.width*0.2
                 anchors.left: parent.left
                 anchors.verticalCenter: parent.verticalCenter
 
@@ -85,8 +86,9 @@ Page {
                 id: img
                 anchors.centerIn: parent
                 source: userInfo["pathToImage"]
-                width: profilePage.width * 0.3
-                height: profilePage.width * 0.3
+                Layout.preferredWidth: profilePage.width*0.3
+                Layout.preferredHeight: profilePage.width*0.3
+                Layout.
                 fillMode: Image.PreserveAspectCrop
                 layer.enabled: true
                 layer.effect: OpacityMask {
@@ -96,16 +98,16 @@ Page {
 
             Rectangle {
                 id: mask
-                width: profilePage.width*0.3
-                height: profilePage.width*0.3
+                Layout.preferredWidth: profilePage.width*0.3
+                Layout.preferredHeight: profilePage.width*0.3
                 radius: width*0.5
                 visible: false
 
             }
             Rectangle {
                 id: call
-                width: parent.width*0.2
-                height: parent.width*0.2
+                Layout.preferredWidth: parent.width*0.2
+                Layout.preferredHeight: parent.width*0.2
                 anchors.right: parent.right
                 anchors.verticalCenter: parent.verticalCenter
                 Text{
@@ -118,28 +120,55 @@ Page {
                 }
             }
         }
+        ColumnLayout {
+            anchors.top: row_.bottom
+            width: parent.width
+            spacing: profilePage.height / 100
+        Rectangle {
+            Layout.alignment: Qt.AlignHCenter
+            Layout.preferredHeight: profilePage.height/18
+            Layout.preferredWidth: profilePage.width/4
+            visible: true
+        }
         Text {
-            anchors.horizontalCenter: parent.horizontalCenter
+            Layout.alignment: Qt.AlignHCenter
             text: userInfo["displayName"]
         }
 
+        Rectangle {
+            Layout.alignment: Qt.AlignHCenter
+            Layout.preferredHeight: profilePage.height/18
+            Layout.preferredWidth: profilePage.width/4
+            visible: true
+        }
         Button {
-            anchors.horizontalCenter: parent.horizontalCenter
+            Layout.alignment: Qt.AlignHCenter
             text: qsTr("Изменить имя")
-            height: profilePage.height/8
-            width: profilePage.width/4
+            Layout.maximumWidth: 200
+            Layout.preferredHeight: profilePage.height/10
+            Layout.preferredWidth: profilePage.width/2
         }
         Button {
-            anchors.horizontalCenter: parent.horizontalCenter
+            Layout.alignment: Qt.AlignHCenter
             text: qsTr("Изменить фото")
-            height: profilePage.height/8
-            width: profilePage.width/4
+            Layout.maximumWidth: 200
+            Layout.preferredHeight: profilePage.height/10
+            Layout.preferredWidth: profilePage.width/2
         }
         Button {
-            anchors.horizontalCenter: parent.horizontalCenter
+            Layout.alignment: Qt.AlignHCenter
             text: qsTr("Отзывы")
-            height: profilePage.height/8
-            width: profilePage.width/4
+            Layout.maximumWidth: 200
+            Layout.preferredHeight: profilePage.height/10
+            Layout.preferredWidth: profilePage.width/2
         }
+        Rectangle {
+            Layout.alignment: Qt.AlignHCenter
+            Layout.maximumWidth: 200
+            Layout.preferredHeight: profilePage.height/10
+            Layout.preferredWidth: profilePage.width/2
+            visible: true
+        }
+
     }
 }

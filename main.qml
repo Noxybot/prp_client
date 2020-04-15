@@ -8,6 +8,7 @@ ApplicationWindow {
     id: mainWindow
     visible: true
     title: qsTr("Come together")
+    minimumWidth: Screen.width/1.5; minimumHeight: Screen.height/1.5
     property var db
     property string currentUserLogin: ""
     StackView {
@@ -62,7 +63,7 @@ ApplicationWindow {
                         userInfo["pathToImage"] = results.rows.item(0).path_to_image
                     }
                 })
-        console.log(userInfo["displayName"] + userInfo["pathToImage"])
+        console.log(userInfo["displayName"] + " " + userInfo["pathToImage"])
         return userInfo
     }
 }

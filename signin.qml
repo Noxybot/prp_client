@@ -2,6 +2,7 @@ import QtQuick 2.14
 import QtQuick.Window 2.14
 import QtQuick.Controls 2.12
 import QtQuick.Dialogs 1.3
+import QtQuick.Layouts 1.12
 
 Page {
     id: signinPage
@@ -31,39 +32,50 @@ Page {
         }
 
     }
-    Column {
-        topPadding: signinPage.height / 50
-        anchors.horizontalCenter: parent.horizontalCenter
+    Rectangle {
+        id: top_
+        height: signinPage.height / 50
+        width: parent.width
+        visible: true
+    }
+    ColumnLayout {
+        anchors.top: top_.bottom
+        width: parent.width
         spacing: signinPage.height / 50
         TextField {
             id: name
-            anchors.horizontalCenter: parent.horizontalCenter
+            Layout.alignment: Qt.AlignHCenter
             placeholderText: qsTr("Имя")
-            width: signinPage.width/2
+            Layout.maximumWidth: 300
+            Layout.preferredWidth: signinPage.width / 1.5
         }
         TextField {
             id: surname
-            anchors.horizontalCenter: parent.horizontalCenter
+            Layout.alignment: Qt.AlignHCenter
             placeholderText: qsTr("Фамилия")
-            width: signinPage.width / 2
+            Layout.maximumWidth: 300
+            Layout.preferredWidth: signinPage.width / 1.5
         }
         TextField {
             id: login_
-            anchors.horizontalCenter: parent.horizontalCenter
+            Layout.alignment: Qt.AlignHCenter
             placeholderText: qsTr("Логин")
-            width: signinPage.width / 2
+            Layout.maximumWidth: 300
+            Layout.preferredWidth: signinPage.width / 1.5
         }
         TextField {
             id: password
-            anchors.horizontalCenter: parent.horizontalCenter
+            Layout.alignment: Qt.AlignHCenter
             placeholderText: qsTr("Пароль")
-            width: signinPage.width / 2
+            Layout.maximumWidth: 300
+            Layout.preferredWidth: signinPage.width / 1.5
         }
         Button {
-            anchors.horizontalCenter: parent.horizontalCenter
+            Layout.alignment: Qt.AlignHCenter
             text: qsTr("Зарегистрироваться")
-            height: signinPage.height / 10
-            width: signinPage.width / 4
+            Layout.maximumWidth: 200
+            Layout.preferredHeight: signinPage.height / 10
+            Layout.preferredWidth: signinPage.width / 2
             onClicked: {
                 addUser(name.text, surname.text, login_.text, password.text, "")
 
@@ -76,10 +88,11 @@ Page {
             }
         }
         Button {
-            anchors.horizontalCenter: parent.horizontalCenter
+            Layout.alignment: Qt.AlignHCenter
             text: qsTr("фото")
-            height: signinPage.height / 10
-            width: signinPage.width / 4
+            Layout.maximumWidth: 200
+            Layout.preferredHeight: signinPage.height / 10
+            Layout.preferredWidth: signinPage.width / 2
             onClicked: {
                 fileOpenDialog.open()
             }
@@ -89,10 +102,11 @@ Page {
             }
         }
     }
+
     FileDialog {
         id: fileOpenDialog
         title: "Select an image file"
-        folder: shortcuts.documents
+        folder: shortcuts.pictures
         nameFilters: [ "Image files (*.png *.jpeg *.jpg)" ]
         onAccepted: {
             pathToFile = fileOpenDialog.fileUrl
