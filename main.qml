@@ -25,29 +25,46 @@ ApplicationWindow {
     }
 
     function addUser(name, surname, login, password, path_to_image) {
-        db.transaction(function(tx) {
-                    var results = tx.executeSql('SELECT password FROM user WHERE name=?;', name);
-                    if(results.rows.length !== 0)
-                    {
-                        console.log("User already exist!")
-                        return
-                    }
-                    //console.log("BLOB SIZE: " + image.size)
-                    tx.executeSql('INSERT INTO user VALUES(?, ?, ?, ?, ?)', [ name, surname, login, password, path_to_image]);
-                    console.log("Done")
-                })
+//        db.transaction(function(tx) {
+//                    var results = tx.executeSql('SELECT password FROM user WHERE name=?;', name);
+//                    if(results.rows.length !== 0)
+//                    {
+//                        console.log("User already exist!")
+//                        return
+//                    }
+//                    //console.log("BLOB SIZE: " + image.size)
+//                    tx.executeSql('INSERT INTO user VALUES(?, ?, ?, ?, ?)', [ name, surname, login, password, path_to_image]);
+//                    console.log("Done")
+//                })
+        var xhr = new XMLHttpRequest();
+        //let request =
+        xhr.open("POST", "http://localhost:1337", true)
+        xhr.setRequestHeader("Content-type", "application/json")
+        xhr.onreadystatechange = function () {
+                       if (xhr.readyState === 4 && xhr.status === 200) {
+
+                           // Print received data from server
+                           result.innerHTML = this.responseText;
+
+                       }
+                   };
+
+        xhr.send(JSON.stringify({"method": "register_user", "login": login, "password": password, "display_name": name +  surname}));
+        console.log("SENEDE")
+
     }
 
     function confirmLogin(login, password) {
         var ret = false
-        db.transaction(function(tx) {
-                    var results = tx.executeSql('SELECT password FROM user WHERE login=?;', login);
-                    if(results.rows.length === 1 && results.rows.item(0).password === password)
-                    {
-                        console.log("Correct!")
-                        ret = true
-                    }
-                })
+//        db.transaction(function(tx) {
+//                    var results = tx.executeSql('SELECT password FROM user WHERE login=?;', login);
+//                    if(results.rows.length === 1 && results.rows.item(0).password === password)
+//                    {
+//                        console.log("Correct!")
+//                        ret = true
+//                    }
+//                })
+
         return ret
     }
 
