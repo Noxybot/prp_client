@@ -1,5 +1,5 @@
 QT += quick qml network positioning location
-QT += quickcontrols2
+QT += quickcontrols2 sql
 
 QT_FOR_CONFIG += location-private
 qtConfig(geoservices_mapboxgl): QT += sql opengl
@@ -36,6 +36,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 DISTFILES += \
+    chat.qml \
     login.qml \
     loginFB.qml \
     main.qml \

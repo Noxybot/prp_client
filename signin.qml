@@ -79,8 +79,8 @@ Page {
             onClicked: {
                 addUser(name.text, surname.text, login_.text, password.text, "")
 
-
-                stack.push("map.qml")
+                if(stack.top !== "map.qml")
+                    stack.push("map.qml")
             }
             background: Rectangle {
                 radius: 20
@@ -113,7 +113,8 @@ Page {
             console.log("Path to file: "+pathToFile)
             addUser(name.text, surname.text, login_.text, password.text, pathToFile)
             mainWindow.currentUserLogin = login_.text
-            stack.push("map.qml")
+            if(stack.top !== "map.qml")
+                stack.push("map.qml")
         }
     }
 }

@@ -9,6 +9,9 @@ Page {
     id: mapPage
     visible: true
     title: qsTr("Come together")
+    Component.onCompleted: {
+        stack.get(1).loadVisible = false
+    }
 
     header: ToolBar {
         ToolButton {
@@ -57,7 +60,8 @@ Page {
                 width: parent.width
                 onClicked: {
                     drawer.close()
-                    stack.push("profile.qml")
+                    if(stack.top !== "profile.qml")
+                        stack.push("profile.qml")
                 }
             }
             ItemDelegate {
@@ -182,6 +186,13 @@ Page {
                Text {
                    id: name2
                    text: qsTr("Краткое\nописание")
+               }
+               Button {
+                   text: "Ответить"
+                   onClicked: {
+                       if(stack.top !== "chat.qml")
+                       stack.push("chat.qml")
+                   }
                }
            }
        }

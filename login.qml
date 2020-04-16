@@ -6,6 +6,24 @@ import QtQuick.Layouts 1.12
 
 Page {
     id: loginPage
+    property var loadVisible: false
+    StackView.onDeactivated: {
+        loadVisible = false
+    }
+
+    Rectangle {
+        id: load
+        anchors.fill: parent
+        color: "white"
+        opacity: 0.5
+        visible: loadVisible
+        z: 10
+        BusyIndicator {
+            anchors.centerIn: parent
+            running: true
+        }
+    }
+
     Rectangle {
         id: icon
         width: parent.width
@@ -59,12 +77,18 @@ Page {
             Layout.preferredWidth: loginPage.width / 2
             onClicked: {
                 console.log("Login")
+                loadVisible =  true
                 if (confirmLogin(login_.text, password.text) === true) {
                     console.log("Login complete")
+
                     mainWindow.currentUserLogin = login_.text
-                    stack.push("map.qml")
+                    //loadVisible =  false
+                    if(stack.depth === 1 )//|| stack.top() !== "map.qml")
+                        stack.push("map.qml")
+
                 }
                 else {
+                    loadVisible =  false
                     console.log("Wrong credentials")
                 }
             }
@@ -89,7 +113,8 @@ Page {
             }
             onClicked: {
                 console.log("Registration")
-                stack.push("signin.qml")
+                if(stack.depth === 1) //top() !== "signin.qml")
+                    stack.push("signin.qml")
             }
             background: Rectangle {
                 radius: 20
@@ -109,6 +134,7 @@ Page {
             font.underline: true
             onClicked: {
                 console.log("FB")
+                if(stack.depth === 1)// || stack.top() !== "loginFB.qml")
                 stack.push("loginFB.qml")
             }
             Layout.preferredWidth: loginPage.width / 2

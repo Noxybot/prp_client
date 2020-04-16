@@ -8,5 +8,6 @@
         <file>signin.qml</file>
         <file>map.qml</file>
         <file>loginFB.qml</file>
+        <file>chat.qml</file>
     </qresource>
 </RCC>
