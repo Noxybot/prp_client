@@ -17,7 +17,7 @@ ApplicationWindow {
         initialItem: Qt.resolvedUrl("login.qml")
     }
     Component.onCompleted: {
-        db = LocalStorage.openDatabaseSync("LoginDB", "1.0", "Example!", 1000000);
+        db = LocalStorage.openDatabaseSync("LoginDB1", "1.0", "Example!", 1000000);
         db.transaction(
                     function(tx) {
                         tx.executeSql('CREATE TABLE IF NOT EXISTS user(name TEXT, surname TEXT, login TEXT, password TEXT, path_to_image TEXT)');
@@ -36,26 +36,28 @@ ApplicationWindow {
 //                    tx.executeSql('INSERT INTO user VALUES(?, ?, ?, ?, ?)', [ name, surname, login, password, path_to_image]);
 //                    console.log("Done")
 //                })
+        let ret = false
+        if (login.length < 4 || password.length < 6)
+            return ret
         var xhr = new XMLHttpRequest();
-        //let request =
-        xhr.open("POST", "http://localhost:1337", true)
+        xhr.open("POST", "http://192.168.0.105:1337", false)
         xhr.setRequestHeader("Content-type", "application/json")
         xhr.onreadystatechange = function () {
-                       if (xhr.readyState === 4 && xhr.status === 200) {
-
-                           // Print received data from server
-                           result.innerHTML = this.responseText;
-
+                       if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 201) {
+                           ret = true
+                           console.log("success registration response")
                        }
+                       else if (xhr.readyState === XMLHttpRequest.HEADERS_RECEIVED)
+                           console.log('HEADERS_RECEIVED')
+                       else
+                           console.log("failure")
                    };
-
-        xhr.send(JSON.stringify({"method": "register_user", "login": login, "password": password, "display_name": name +  surname}));
-        console.log("SENEDE")
-
+        xhr.send(JSON.stringify({"method": "register_user", "login": login, "password": password, "display_name": name + surname}));
+        return ret
     }
 
     function confirmLogin(login, password) {
-        var ret = false
+        let ret = false
 //        db.transaction(function(tx) {
 //                    var results = tx.executeSql('SELECT password FROM user WHERE login=?;', login);
 //                    if(results.rows.length === 1 && results.rows.item(0).password === password)
@@ -65,6 +67,22 @@ ApplicationWindow {
 //                    }
 //                })
 
+        if (login.length < 4 || password.length < 6)
+            return ret
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "http://192.168.0.105:1337", false)
+        xhr.setRequestHeader("Content-type", "application/json")
+        xhr.onreadystatechange = function () {
+                       if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+                           ret = true
+                           console.log("success login response")
+                       }
+                       else if (xhr.readyState === XMLHttpRequest.HEADERS_RECEIVED)
+                           console.log('HEADERS_RECEIVED')
+                       else
+                           console.log("failure")
+                   };
+        xhr.send(JSON.stringify({"method": "login_user", "login": login, "password": password}));
         return ret
     }
 

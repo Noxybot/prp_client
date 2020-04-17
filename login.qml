@@ -10,7 +10,6 @@ Page {
     StackView.onDeactivated: {
         loadVisible = false
     }
-
     Rectangle {
         id: load
         anchors.fill: parent
@@ -83,7 +82,7 @@ Page {
 
                     mainWindow.currentUserLogin = login_.text
                     //loadVisible =  false
-                    if(stack.depth === 1 )//|| stack.top() !== "map.qml")
+                    if (stack.depth === 1 )//|| stack.top() !== "map.qml") //ALISA PLEASE MAKE OTHER CHECK AND USE IT IN ALL PLACES
                         stack.push("map.qml")
 
                 }

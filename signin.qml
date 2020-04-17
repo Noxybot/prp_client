@@ -7,6 +7,24 @@ import QtQuick.Layouts 1.12
 Page {
     id: signinPage
     property string pathToFile
+
+    property var loadVisible: false
+    StackView.onDeactivated: {
+        loadVisible = false
+    }
+
+    Rectangle {
+        id: load
+        anchors.fill: parent
+        color: "white"
+        opacity: 0.5
+        visible: loadVisible
+        z: 10
+        BusyIndicator {
+            anchors.centerIn: parent
+            running: true
+        }
+    }
     header: ToolBar {
         ToolButton {
             id: backButton
@@ -77,10 +95,16 @@ Page {
             Layout.preferredHeight: signinPage.height / 10
             Layout.preferredWidth: signinPage.width / 2
             onClicked: {
-                addUser(name.text, surname.text, login_.text, password.text, "")
-
-                if(stack.top !== "map.qml")
+                loadVisible = true
+                if (addUser(name.text, surname.text, login_.text, password.text, "") && stack.top !== "map.qml")
+                {
+                    console.log("adduser returned true")
                     stack.push("map.qml")
+                }
+
+                else
+                    console.log ("user was not registered") // todo: popup
+
             }
             background: Rectangle {
                 radius: 20
@@ -89,7 +113,7 @@ Page {
         }
         Button {
             Layout.alignment: Qt.AlignHCenter
-            text: qsTr("фото")
+            text: qsTr("Фото")
             Layout.maximumWidth: 200
             Layout.preferredHeight: signinPage.height / 10
             Layout.preferredWidth: signinPage.width / 2
@@ -110,8 +134,8 @@ Page {
         nameFilters: [ "Image files (*.png *.jpeg *.jpg)" ]
         onAccepted: {
             pathToFile = fileOpenDialog.fileUrl
-            console.log("Path to file: "+pathToFile)
-            addUser(name.text, surname.text, login_.text, password.text, pathToFile)
+                console.log("Path to file: "+pathToFile)
+                addUser(name.text, surname.text, login_.text, password.text, pathToFile)
             mainWindow.currentUserLogin = login_.text
             if(stack.top !== "map.qml")
                 stack.push("map.qml")

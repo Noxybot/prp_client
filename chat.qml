@@ -59,9 +59,6 @@ Page {
             displayMarginEnd: 40
             verticalLayoutDirection: ListView.BottomToTop
             spacing: 12
-            model: SqlConversationModel {
-                recipient: inConversationWith
-            }
             delegate: Column {
                 anchors.right: sentByMe ? parent.right : undefined
                 spacing: 6
