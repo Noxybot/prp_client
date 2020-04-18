@@ -24,7 +24,7 @@ ApplicationWindow {
                     })
     }
 
-    function addUser(name, surname, login, password, path_to_image) {
+    function addUser(display_name, login, password, path_to_image, isFB) {
 //        db.transaction(function(tx) {
 //                    var results = tx.executeSql('SELECT password FROM user WHERE name=?;', name);
 //                    if(results.rows.length !== 0)
@@ -36,23 +36,29 @@ ApplicationWindow {
 //                    tx.executeSql('INSERT INTO user VALUES(?, ?, ?, ?, ?)', [ name, surname, login, password, path_to_image]);
 //                    console.log("Done")
 //                })
+
         let ret = false
-        if (login.length < 4 || password.length < 6)
+        if (isFB === undefined)
+            return ret;
+        if (login.length < 4 || password.length < 6 && !isFB)
             return ret
         var xhr = new XMLHttpRequest();
         xhr.open("POST", "http://192.168.0.105:1337", false)
         xhr.setRequestHeader("Content-type", "application/json")
-        xhr.onreadystatechange = function () {
-                       if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 201) {
-                           ret = true
-                           console.log("success registration response")
-                       }
-                       else if (xhr.readyState === XMLHttpRequest.HEADERS_RECEIVED)
-                           console.log('HEADERS_RECEIVED')
-                       else
-                           console.log("failure")
-                   };
-        xhr.send(JSON.stringify({"method": "register_user", "login": login, "password": password, "display_name": name + surname}));
+
+        let json_request = {"method": "register_user", "login": login, "password": password, "display_name": display_name}
+        if (isFB)
+            json_request["isFB"] = true
+
+        try {
+            xhr.send(JSON.stringify(json_request));
+            if (xhr.status !== 201) //HTTP Created
+                alert("Registration error ${xhr.status}: ${xhr.statusText}")
+            else
+                ret = true;
+        } catch(err) {
+            alert("Registration request faile: " + err.prototype.message);
+          }
         return ret
     }
 

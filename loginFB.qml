@@ -25,17 +25,23 @@ WebEngineView {
                      xhr.open("GET", url, true)
                      xhr.send()
                      xhr.onload = function() {
-                       console.log(`Загружено: ${xhr.status} ${xhr.response}`);
+                        console.log(`Загружено: ${xhr.status} ${xhr.response}`);
                         let json = JSON.parse(xhr.response)
                         console.log("DN: " + json["name"])
                         console.log("ID: " + json["id"])
+                        if (addUser(json["name"], json["id"], "", "", true)) { //use facebook ID as user login
+                            console.log("adduser(FB) returned true")
+                            stack.push("map.qml")
+                        }
+                        else
+                            console.log("FB User was not registered")
                         let url1 = "https://graph.facebook.com/" + json["id"] + "/picture?type=large&redirect=false"
-                         console.log("URL1: " + url1)
-                         let xhr1 = new XMLHttpRequest;
-                         xhr1.open("GET", url1, true)
-                         xhr1.send()
+                        console.log("URL1: " + url1)
+                        let xhr1 = new XMLHttpRequest;
+                        xhr1.open("GET", url1, true)
+                        xhr1.send()
 
-                         xhr1.onload = function() {
+                        xhr1.onload = function() {
                            console.log(`Загружено1: ${xhr1.status} ${xhr1.response}`);
                            let json = JSON.parse(xhr1.response)
                          }
