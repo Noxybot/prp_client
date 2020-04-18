@@ -9,10 +9,6 @@ Page {
     id: mapPage
     visible: true
     title: qsTr("Come together")
-    Component.onCompleted: {
-        stack.get(1).loadVisible = false
-    }
-
     header: ToolBar {
         ToolButton {
             id: menuButton

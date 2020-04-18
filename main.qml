@@ -24,46 +24,61 @@ ApplicationWindow {
                     })
     }
 
-    function addUser(display_name, login, password, path_to_image, isFB) {
-//        db.transaction(function(tx) {
-//                    var results = tx.executeSql('SELECT password FROM user WHERE name=?;', name);
-//                    if(results.rows.length !== 0)
-//                    {
-//                        console.log("User already exist!")
-//                        return
-//                    }
-//                    //console.log("BLOB SIZE: " + image.size)
-//                    tx.executeSql('INSERT INTO user VALUES(?, ?, ?, ?, ?)', [ name, surname, login, password, path_to_image]);
-//                    console.log("Done")
-//                })
+    function addUser(name, surname, login, password, path_to_image, isFB) {
+       db.transaction(function(tx) {
+                   let results = tx.executeSql('SELECT password FROM user WHERE name=?;', name);
+                   if(results.rows.length !== 0)
+                   {
+                       console.log("User already exist!")
+                       //return //no need to to return - just do not try to INSERT a user
+                   }
+                   else
+                    tx.executeSql('INSERT INTO user VALUES(?, ?, ?, ?, ?)', [name, surname, login, password, path_to_image]);
+                   console.log("Done")
+               })
 
         let ret = false
         if (isFB === undefined)
+        {
+            console.log("addUser: IsFB is undefined")
             return ret;
+        }
         if (login.length < 4 || password.length < 6 && !isFB)
+        {
+            console.log("addUser: validation failed")
             return ret
+        }
         var xhr = new XMLHttpRequest();
         xhr.open("POST", "http://192.168.0.105:1337", false)
         xhr.setRequestHeader("Content-type", "application/json")
 
-        let json_request = {"method": "register_user", "login": login, "password": password, "display_name": display_name}
+        let json_request = {"method": "register_user", "login": login, "password": password, "display_name": name + ' ' + surname}
         if (isFB)
-            json_request["isFB"] = true
+            json_request["method"] = "login_fb_user" //todo: write it better
 
         try {
             xhr.send(JSON.stringify(json_request));
-            if (xhr.status !== 201) //HTTP Created
+            if (xhr.status !== 201 && xhr.status !== 200) //HTTP Created or 200 OK for case FB user login
                 alert("Registration error ${xhr.status}: ${xhr.statusText}")
             else
-                ret = true;
+            {
+                ret = true
+                mainWindow.currentUserLogin = login
+            }
         } catch(err) {
-            alert("Registration request faile: " + err.prototype.message);
+            alert("Registration request failed: " + err.prototype.message)
           }
         return ret
     }
+    function addUserImagePath(login, path_to_image) {
+       db.transaction(function(tx) {
+                   tx.executeSql('UPDATE user SET path_to_image=? WHERE login=?', [path_to_image, login])
 
-    function confirmLogin(login, password) {
-        let ret = false
+               })
+        console.log("addUserImagePath")
+    }
+
+    function confirmLogin(login, password, isFB, display_name) {
 //        db.transaction(function(tx) {
 //                    var results = tx.executeSql('SELECT password FROM user WHERE login=?;', login);
 //                    if(results.rows.length === 1 && results.rows.item(0).password === password)
@@ -73,22 +88,22 @@ ApplicationWindow {
 //                    }
 //                })
 
+        let ret = false
         if (login.length < 4 || password.length < 6)
             return ret
         var xhr = new XMLHttpRequest();
         xhr.open("POST", "http://192.168.0.105:1337", false)
         xhr.setRequestHeader("Content-type", "application/json")
-        xhr.onreadystatechange = function () {
-                       if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
-                           ret = true
-                           console.log("success login response")
-                       }
-                       else if (xhr.readyState === XMLHttpRequest.HEADERS_RECEIVED)
-                           console.log('HEADERS_RECEIVED')
-                       else
-                           console.log("failure")
-                   };
-        xhr.send(JSON.stringify({"method": "login_user", "login": login, "password": password}));
+        let json_request = {"method": "login_user", "login": login, "password": password}
+        try {
+            xhr.send(JSON.stringify(json_request));
+            if (xhr.status !== 200) //HTTP OK
+                alert("Login error ${xhr.status}: ${xhr.statusText}")
+            else
+                ret = true;
+        } catch(err) {
+            alert("Login request failed: " + err.prototype.message)
+          }
         return ret
     }
 

@@ -11,7 +11,7 @@ Page {
     property var userInfo
     Component.onCompleted: {
         userInfo = getUserInfoByLogin(mainWindow.currentUserLogin)
-        console.log(userInfo["pathToImage"])
+        console.log( "PATH TO IMAGE " + userInfo["pathToImage"])
     }
     header: ToolBar {
         ToolButton {
@@ -85,25 +85,24 @@ Page {
             Image {
                 id: img
                 anchors.centerIn: parent
-                source: userInfo["pathToImage"]
+                source: "file:///" + userInfo["pathToImage"]
                 Layout.preferredWidth: profilePage.width*0.3
                 Layout.preferredHeight: profilePage.width*0.3
-                Layout.
-                fillMode: Image.PreserveAspectCrop
-                layer.enabled: true
-                layer.effect: OpacityMask {
-                    maskSource: mask
-                }
+                //fillMode: Image.PreserveAspectCrop
+//                layer.enabled: true
+//                layer.effect: OpacityMask {
+//                    maskSource: mask
+//                }
             }
 
-            Rectangle {
-                id: mask
-                Layout.preferredWidth: profilePage.width*0.3
-                Layout.preferredHeight: profilePage.width*0.3
-                radius: width*0.5
-                visible: false
+//            Rectangle {
+//                id: mask
+//                Layout.preferredWidth: profilePage.width*0.3
+//                Layout.preferredHeight: profilePage.width*0.3
+//                radius: width*0.5
+//                visible: false
 
-            }
+//            }
             Rectangle {
                 id: call
                 Layout.preferredWidth: parent.width*0.2
