@@ -33,8 +33,8 @@ ApplicationWindow {
                        //return //no need to to return - just do not try to INSERT a user
                    }
                    else
-                    tx.executeSql('INSERT INTO user VALUES(?, ?, ?, ?, ?)', [name, surname, login, password, path_to_image]);
-                   console.log("Done")
+                       tx.executeSql('INSERT INTO user VALUES(?, ?, ?, ?, ?)', [name, surname, login, password, path_to_image]);
+                       console.log("Done")
                })
 
         let ret = false

@@ -96,7 +96,7 @@ Page {
             Layout.preferredWidth: signinPage.width / 2
             onClicked: {
                 loadVisible = true
-                if (addUser(name.text + " " + surname.text, login_.text, password.text, "", false) && stack.top !== "map.qml")
+                if (addUser(name.text, surname.text, login_.text, password.text, "", false) && stack.top !== "map.qml")
                 {
                     console.log("adduser returned true")
                     stack.push("map.qml")
