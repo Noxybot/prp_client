@@ -11,7 +11,6 @@ Page {
     property var userInfo
     Component.onCompleted: {
         userInfo = getUserInfoByLogin(mainWindow.currentUserLogin)
-        console.log( "PATH TO IMAGE " + userInfo["pathToImage"])
     }
     header: ToolBar {
         ToolButton {
@@ -67,8 +66,10 @@ Page {
             Layout.alignment: Qt.AlignHCenter
             Layout.preferredWidth: profilePage.width*0.6
             Layout.preferredHeight: profilePage.width*0.3
+            spacing: parent.width*0.1
             Rectangle {
                 id: call2
+                Layout.alignment: Qt.AlignHCenter
                 Layout.preferredWidth: parent.width*0.2
                 Layout.preferredHeight: parent.width*0.2
                 anchors.left: parent.left
@@ -85,7 +86,7 @@ Page {
             Image {
                 id: img
                 anchors.centerIn: parent
-                source: "file:///" + userInfo["pathToImage"]
+                source: userInfo["pathToImage"].substring(0, 8) === "file:///" ? userInfo["pathToImage"]  : "file:///" + userInfo["pathToImage"]
                 Layout.preferredWidth: profilePage.width*0.3
                 Layout.preferredHeight: profilePage.width*0.3
                 //fillMode: Image.PreserveAspectCrop

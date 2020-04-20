@@ -28,7 +28,7 @@ WebView {
                  if (access_token.length !== 0)
                  {
                      console.log("TOKEN:" + access_token)
-                     let url = "https://graph.facebook.com/me?fields=name,picture.type(large)&access_token=" + access_token
+                     let url = "https://graph.facebook.com/me?fields=name,picture.width(200).height(200)&access_token=" + access_token
                      console.log("URL: " + url)
                      let xhr = new XMLHttpRequest;
                      xhr.open("GET", url, true)

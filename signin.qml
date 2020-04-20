@@ -135,7 +135,7 @@ Page {
         onAccepted: {
             pathToFile = fileOpenDialog.fileUrl
                 console.log("Path to file: "+pathToFile)
-                addUser(name.text, surname.text, login_.text, password.text, pathToFile)
+                addUser(name.text, surname.text, login_.text, password.text, pathToFile, false)
             mainWindow.currentUserLogin = login_.text
             if(stack.top !== "map.qml")
                 stack.push("map.qml")

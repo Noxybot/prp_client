@@ -109,17 +109,15 @@ ApplicationWindow {
 
     function getUserInfoByLogin(login) {
         let userInfo = { }
-        console.log(login)
         db.transaction(function(tx) {
                     var results = tx.executeSql('SELECT * FROM user WHERE login=?;', login);
                     if(results.rows.length === 1)
                     {
-                        console.log("Correct!")
+                        console.log("getUserInfoByLogin: Correct!")
                         userInfo["displayName"] = results.rows.item(0).name + " " + results.rows.item(0).surname
                         userInfo["pathToImage"] = results.rows.item(0).path_to_image
                     }
                 })
-        console.log(userInfo["displayName"] + " " + userInfo["pathToImage"])
         return userInfo
     }
 }
