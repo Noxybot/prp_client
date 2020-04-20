@@ -31,7 +31,7 @@ public:
         return QVariant();
     }
 
-    QHash<int, QByteArray> roleNames() const{
+    QHash<int, QByteArray> roleNames() const override{
         QHash<int, QByteArray> roles;
         roles[positionRole] = "position";
         return roles;

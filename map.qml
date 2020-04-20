@@ -148,7 +148,48 @@ Page {
     center: QtPositioning.coordinate(49.9885475, 36.2329460)
     zoomLevel: 14
 
+    MapItemView {
+
+        anchors.fill: parent
+                model: markerModel
+                delegate: MapQuickItem {
+                    id: marker
+                    anchorPoint.x: image.width / 4
+                    anchorPoint.y: image.height
+                    coordinate: position
+                    enabled: true
+                    MouseArea {
+                        id:nested
+                       // preventStealing: true;
+                        anchors.fill: parent;
+                        onClicked: console.log("inner clicked" )
+                        }
+
+
+                    sourceItem: Image {
+                        id: image
+                        source: "http://maps.gstatic.com/mapfiles/ridefinder-images/mm_20_red.png"
+
+                    }
+
+                }
+            }
+        MouseArea {
+        anchors.fill: parent
+        onClicked: { console.log("outer clicked"); mouse.accepted = false;}
+        propagateComposedEvents: true
+
+        onPressAndHold:  {
+            var coordinate = map.toCoordinate(Qt.point(mouse.x,mouse.y))
+            markerModel.addMarker(coordinate)
+        }
     }
+
+
+
+    }
+
+
     Rectangle {
        id: bottomProfile
        width: parent.width
