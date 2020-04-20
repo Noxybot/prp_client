@@ -3,7 +3,10 @@
 #include <QLocale>
 #include <QDebug>
 #include <QQmlEngine>
+#include <QQmlContext>
 #include "qdownloader.h"
+#include "markermodel.h"
+
 
 int main(int argc, char *argv[])
 {
@@ -16,6 +19,9 @@ int main(int argc, char *argv[])
     QQmlApplicationEngine engine;
     qDebug() << engine.offlineStoragePath();
     const QUrl url(QStringLiteral("qrc:/main.qml"));
+
+    MarkerModel model;
+    engine.rootContext()->setContextProperty("markerModel", &model);
 
     qmlRegisterType<QDownloader>("Cometogether.downloader", 1, 0, "BackendFileDonwloader");
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,
