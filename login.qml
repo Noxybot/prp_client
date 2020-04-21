@@ -77,7 +77,7 @@ Page {
             onClicked: {
                 console.log("Login")
                 loadVisible =  true
-                if (confirmLogin(login_.text, password.text) === true) {
+               // if (confirmLogin(login_.text, password.text) === true) {
                     console.log("Login complete")
 
                     mainWindow.currentUserLogin = login_.text
@@ -85,11 +85,11 @@ Page {
                     if (stack.depth === 1 )//|| stack.top() !== "map.qml") //ALISA PLEASE MAKE OTHER CHECK AND USE IT IN ALL PLACES
                         stack.push("map.qml")
 
-                }
-                else {
-                    loadVisible =  false
-                    console.log("Wrong credentials")
-                }
+                //}
+                //else {
+                   // loadVisible =  false
+                //    console.log("Wrong credentials")
+                //}
             }
             background: Rectangle {
                 radius: 20

@@ -13,8 +13,8 @@ Page {
         ToolButton {
             id: menuButton
             onClicked: {
-                    drawer.open()
-                }
+                drawer.open()
+            }
 
             Text {
                 id: menuButtonName
@@ -93,8 +93,8 @@ Page {
         MapParameter {type: "layout";property var layer:"road-label-small";property var textField: ["get", "name_ru"]}
         MapParameter {type: "layout";property var layer:"road-label-medium";property var textField: ["get", "name_ru"]}
         MapParameter {type: "layout";property var layer:"road-label-large";property var textField: ["get", "name_ru"]}
-       // MapParameter {type: "layout";property var layer:"road-shields-black";property var textField: ["get", "name_ru"]}
-       // MapParameter {type: "layout";property var layer:"road-shields-white";property var textField: ["get", "name_ru"]}
+        // MapParameter {type: "layout";property var layer:"road-shields-black";property var textField: ["get", "name_ru"]}
+        // MapParameter {type: "layout";property var layer:"road-shields-white";property var textField: ["get", "name_ru"]}
         MapParameter {type: "layout";property var layer:"motorway-junction";property var textField: ["get", "name_ru"]}
         MapParameter {type: "layout";property var layer:"poi-scalerank2";property var textField: ["get", "name_ru"]}
         MapParameter {type: "layout";property var layer:"poi-parks-scalerank2";property var textField: ["get", "name_ru"]}
@@ -130,60 +130,66 @@ Page {
         MapParameter {type: "layout";property var layer:"country-label-lg";property var textField: ["get", "name_ru"]}
 
         plugin: Plugin {
-        id: myPlugin
-        name: "mapboxgl"
+            id: myPlugin
+            name: "mapboxgl"
 
-        PluginParameter {
-        name: "mapboxgl.access_token"
-        value: "pk.eyJ1Ijoibm94eWJvdCIsImEiOiJjazdqZmt6YmUwYm83M2Vyd2Y2aWg3Zzd1In0.bKgawEt5mBOd0eGgGNCO5g"
+            PluginParameter {
+                name: "mapboxgl.access_token"
+                value: "pk.eyJ1Ijoibm94eWJvdCIsImEiOiJjazdqZmt6YmUwYm83M2Vyd2Y2aWg3Zzd1In0.bKgawEt5mBOd0eGgGNCO5g"
             }
 
-        PluginParameter {
-            name: "mapboxgl.mapping.use_fbo"
-            value: false
+            PluginParameter {
+                name: "mapboxgl.mapping.use_fbo"
+                value: false
             }
         }
-    id: map
-    anchors.fill: parent
-    center: QtPositioning.coordinate(49.9885475, 36.2329460)
-    zoomLevel: 14
-
-    MapItemView {
-
+        id: map
         anchors.fill: parent
-                model: markerModel
-                delegate: MapQuickItem {
-                    id: marker
-                    anchorPoint.x: image.width / 4
-                    anchorPoint.y: image.height
-                    coordinate: position
-                    enabled: true
-                    MouseArea {
-                        id:nested
-                       // preventStealing: true;
-                        anchors.fill: parent;
-                        onClicked: console.log("inner clicked" )
-                        }
+        center: QtPositioning.coordinate(49.9885475, 36.2329460)
+        zoomLevel: 14
 
+        MapItemView {
 
-                    sourceItem: Image {
-                        id: image
-                        source: "http://maps.gstatic.com/mapfiles/ridefinder-images/mm_20_red.png"
-
+            anchors.fill: parent
+            model: markerModel
+            delegate: MapQuickItem {
+                id: marker
+                anchorPoint.x: image.width / 4
+                anchorPoint.y: image.height
+                coordinate: position
+                enabled: true
+                MouseArea {
+                    id:nested
+                    // preventStealing: true;
+                    anchors.fill: parent;
+                    onClicked:
+                    {
+                        console.log(index);
+                        bottomProfile.visible = true;
+                        name_.text = markerId;
+                        console.log("inner clicked" )
                     }
+                }
+
+                sourceItem: Image {
+                    id: image
+                    source: "http://maps.gstatic.com/mapfiles/ridefinder-images/mm_20_red.png"
 
                 }
-            }
-        MouseArea {
-        anchors.fill: parent
-        onClicked: { console.log("outer clicked"); mouse.accepted = false;}
-        propagateComposedEvents: true
 
-        onPressAndHold:  {
-            var coordinate = map.toCoordinate(Qt.point(mouse.x,mouse.y))
-            markerModel.addMarker(coordinate)
+            }
         }
-    }
+        MouseArea {
+            anchors.fill: parent
+            onClicked: { console.log("outer clicked"); mouse.accepted = false;}
+            propagateComposedEvents: true
+
+            onPressAndHold:  {
+                var coordinate = map.toCoordinate(Qt.point(mouse.x,mouse.y))
+                stack.push("markerDescription.qml", { "coordinates" : coordinate})
+                //markerModel.addMarker(coordinate, "","")
+            }
+        }
 
 
 
@@ -191,47 +197,57 @@ Page {
 
 
     Rectangle {
-       id: bottomProfile
-       width: parent.width
-       radius: 10
-       property var max: 200
-       height: (parent.width * 0.4 < max) ? parent.width * 0.4 : max
-       anchors.bottom: parent.bottom
-       border.width: 1
-       border.color: "light gray"
-       RowLayout {
-           anchors.centerIn: parent
-           spacing: 8
-           Image {
-               id: locationImage
-               source: "images/worldwide-location.png"
-               Layout.preferredWidth:  bottomProfile.height
-               Layout.preferredHeight: bottomProfile.height
-           }
-           ColumnLayout{
-               Layout.preferredWidth: mapPage.width * 0.6
-               id: description
-               spacing: 8
-               Text {
-                   id: name
-                   text: qsTr("Название объявления")
-               }
-               Text {
-                   id: name1
-                   text: qsTr("Тип")
-               }
-               Text {
-                   id: name2
-                   text: qsTr("Краткое\nописание")
-               }
-               Button {
-                   text: "Ответить"
-                   onClicked: {
-                       if(stack.top !== "chat.qml")
-                       stack.push("chat.qml")
-                   }
-               }
-           }
-       }
+        id: bottomProfile
+        visible: false
+        width: parent.width
+        radius: 10
+        property var max: 200
+        height: (parent.width * 0.4 < max) ? parent.width * 0.4 : max
+        anchors.bottom: parent.bottom
+        border.width: 1
+        border.color: "light gray"
+        RowLayout {
+            anchors.centerIn: parent
+            spacing: 8
+            Image {
+                id: locationImage
+                source: "images/worldwide-location.png"
+                Layout.preferredWidth:  bottomProfile.height
+                Layout.preferredHeight: bottomProfile.height
+            }
+            ColumnLayout{
+                Layout.preferredWidth: mapPage.width * 0.6
+                id: description
+                spacing: 8
+                Text {
+                    id: name_
+                    text: qsTr("Название объявления")
+                }
+                Text {
+                    id: name1
+                    text: qsTr("Тип")
+                }
+                Text {
+                    id: name2
+                    text: qsTr("Краткое\nописание")
+                }
+                Button {
+                    text: "Ответить"
+                    onClicked: {
+                        if(stack.top !== "chat.qml")
+                            stack.push("chat.qml")
+                    }
+                }
+            }
+
+        }
+        Button {
+            text: qsTr("X");
+            anchors.right: parent.right;
+            anchors.top: parent.top;
+            onClicked: {
+                parent.visible = false;
+            }
+        }
     }
 }

@@ -4,17 +4,21 @@
 #include <QAbstractListModel>
 #include <QGeoCoordinate>
 
+
 class MarkerModel : public QAbstractListModel
 {
     Q_OBJECT
 
 public:
     using QAbstractListModel::QAbstractListModel;
-    enum MarkerRoles{positionRole = Qt::UserRole + 1};
+    enum MarkerRoles{
+        positionRole = Qt::UserRole + 1,
+        idRole = positionRole+1
+    };
 
-    Q_INVOKABLE void addMarker(const QGeoCoordinate &coordinate){
+    Q_INVOKABLE void addMarker(const QGeoCoordinate &coordinate, int id){
         beginInsertRows(QModelIndex(), rowCount(), rowCount());
-        m_coordinates.append(coordinate);
+        m_coordinates[id] = coordinate;
         endInsertRows();
     }
 
@@ -27,18 +31,21 @@ public:
         if (index.row() < 0 || index.row() >= m_coordinates.count())
             return QVariant();
         if(role== MarkerModel::positionRole)
-            return QVariant::fromValue(m_coordinates[index.row()]);
+            return QVariant::fromValue((m_coordinates.begin() + index.row()).value());
+        if(role==MarkerModel::idRole)
+            return QVariant::fromValue((m_coordinates.begin() + index.row()).key());
         return QVariant();
     }
 
     QHash<int, QByteArray> roleNames() const override{
         QHash<int, QByteArray> roles;
         roles[positionRole] = "position";
+        roles[idRole] = "markerId";
         return roles;
     }
 
 private:
-    QList<QGeoCoordinate> m_coordinates;
+    QMap<int, QGeoCoordinate> m_coordinates;
 };
 
 #endif // MARKERMODEL_H
