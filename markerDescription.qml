@@ -7,9 +7,6 @@ import QtQuick.Layouts 1.12
 Page {
     id: loginPage
     property var coordinates;
-    //property var name;
-    //property var type;
-    //property var description;
     header: ToolBar {
         ToolButton {
             id: menuButton
@@ -53,21 +50,118 @@ Page {
         }
     }
     ColumnLayout {
+        width: parent.width
+        spacing: parent.height/50
+        TextField {
+            id: name
+            Layout.maximumWidth: 300
+            Layout.alignment: Qt.AlignHCenter
+            placeholderText: qsTr("Название")
+            Layout.preferredWidth: loginPage.width / 1.5
+        }
+        ComboBox {
+            id: type
+            Layout.maximumWidth: 300
+            Layout.alignment: Qt.AlignHCenter
+            Layout.preferredWidth: loginPage.width / 1.5
+            model: ["Спорт", "Культурный отдых", "Ночная жизнь", "Развлечения"]
+            onCurrentIndexChanged:
+            {
+                switch(type.currentIndex)
+                {
+                case 0:
+                    subtype.model = ["Велоспорт", "Футбол", "Бег", "Баскетбол", "Спортзал"];
+                    break;
+                case 1:
+                    subtype.model = ["Музей", "Галерея", "Экскурсия", "Театр", "Кинотеатр"];
+                    break;
+                case 2:
+                    subtype.model = ["Бар", "Ресторан", "Клуб", "Кальян"];
+                    break;
+                case 3:
+                    subtype.model = ["Цирк", "Парк развлечений", "Концерт", "Развлекательный центр", "Квест", "Лазертаг\Пейнтбол", "Зоопарк"];
+                    break;
+                }
+            }
+        }
+        ComboBox {
+            id: subtype
+            Layout.maximumWidth: 300
+            Layout.alignment: Qt.AlignHCenter
+            Layout.preferredWidth: loginPage.width / 1.5
+            model: ["Велоспорт", "Футбол", "Бег", "Баскетбол", "Спортзал"]
+        }
+        RowLayout
+        {
+            Layout.alignment: Qt.AlignHCenter
+            Text {
+                id: time
+                text: qsTr("Время")
+            }
+            TextField {
+                id: from
+                placeholderText: "С"
+            }
+            TextField {
+                id: to
+                placeholderText: "До"
+            }
+        }
 
-        TextField {
-            id: name_
+        ComboBox {
+            id: peopleCount
+            Layout.maximumWidth: 300
+            Layout.alignment: Qt.AlignHCenter
+            Layout.preferredWidth: loginPage.width / 1.5
+            model: ["Ожидаемое количество участников", "1 - 3", "4 - 6", "7 - 10", "11 - 20", "21 - 30"]
         }
-        TextField {
-            id: type_
+        ComboBox {
+            id: expenses
+            Layout.maximumWidth: 300
+            Layout.alignment: Qt.AlignHCenter
+            Layout.preferredWidth: loginPage.width / 1.5
+            model: ["Ожидаемы траты с человека", "0 - 100", "100 - 200", "200 - 500", "500 - 1000", "1000 - 5000"]
         }
-        TextField {
+        TextArea {
             id: description_
+            Layout.maximumWidth: 300
+            Layout.alignment: Qt.AlignHCenter
+            Layout.preferredWidth: loginPage.width / 1.5
+            //lineCount: 6
+            Layout.maximumHeight: 50
+            Layout.preferredHeight: loginPage.height / 6
+            background: Rectangle
+            {
+                border.color: "black"
+            }
+
+            placeholderText: "Опишите свое мероприятие"
         }
         Button {
-            text: qsTr("Ок")
+            Layout.maximumWidth: 200
+            Layout.alignment: Qt.AlignHCenter
+            Layout.preferredWidth: loginPage.width / 1.5
+            text: qsTr("Фото")
             onClicked: {
-                //markerModel.addMarker(coordinate, name_.text)
+                stack.push("camera.qml")
+            }
+        }
+        Button {
+            Layout.maximumWidth: 200
+            Layout.alignment: Qt.AlignHCenter
+            Layout.preferredWidth: loginPage.width / 1.5
+            text: qsTr("Сохранить")
+            onClicked: {
                 markerModel.addMarker(coordinates, 1)
+                stack.pop()
+            }
+        }
+        Button {
+            Layout.maximumWidth: 200
+            Layout.alignment: Qt.AlignHCenter
+            Layout.preferredWidth: loginPage.width / 1.5
+            text: qsTr("Отмена")
+            onClicked: {
                 stack.pop()
             }
         }
