@@ -3,6 +3,8 @@ import QtQuick.Window 2.14
 import QtQuick.Controls 2.12
 import QtQuick.LocalStorage 2.0
 
+import QtWebSockets 1.14
+import QtPositioning 5.14
 
 ApplicationWindow {
     id: mainWindow
@@ -11,6 +13,23 @@ ApplicationWindow {
     minimumWidth: Screen.width/1.5; minimumHeight: Screen.height/1.5
     property var db
     property string currentUserLogin: ""
+
+    WebSocket {
+        id: mainWebsocket
+        url: "ws://178.150.141.36:1337"
+        active: true
+        onTextMessageReceived: {
+            console.log("onTextMessageReceived: " + message)
+            let json_msg = JSON.parse(message)
+            if (json_msg["method"] === "draw_marker") {
+                let latitude = parseFloat(json_msg["latitude"])
+                let longitude = parseFloat(json_msg["longitude"])
+                let id = parseInt(json_msg["id"])
+                markerModel.addMarker(QtPositioning.coordinate(latitude, longitude), id);
+            }
+        }
+    }
+
     StackView {
         anchors.fill: parent
         id: stack

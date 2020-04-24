@@ -152,7 +152,35 @@ Page {
             Layout.preferredWidth: loginPage.width / 1.5
             text: qsTr("Сохранить")
             onClicked: {
-                markerModel.addMarker(coordinates, 1)
+                let add_place_request = {}
+                add_place_request["method"] = "add_place"
+                add_place_request["latitude"] = coordinates.latitude
+                add_place_request["longitude"] = coordinates.longitude
+
+                var xhr = new XMLHttpRequest();
+                xhr.open("POST", "http://178.150.141.36:1337", false)
+                xhr.setRequestHeader("Content-type", "application/json")
+
+
+                try {
+                    xhr.send(JSON.stringify(add_place_request));
+                    if (xhr.status !== 200) //HTTP 200 OK means place added
+                        alert("Registration error ${xhr.status}: ${xhr.statusText}")
+                    else
+                       console.log(xhr.statusText)
+                } catch(err) {
+                    alert("add_place request failed: " + err.prototype.message)
+                  }
+                //add_place_request["name"] = "add_place"
+                //add_place_request["category"] = "add_place"
+                //add_place_request["expected_parts_num"] = "add_place"
+                //add_place_request["expected_expenses"] = "add_place"
+                //add_place_request["description"] = "add_place"
+
+
+
+                //markerModel.addMarker(coordinate, name_.text)
+                //markerModel.addMarker(coordinates, 1)
                 stack.pop()
             }
         }

@@ -3,11 +3,11 @@ import QtQuick.Window 2.14
 import QtQuick.Controls 2.12
 import QtGraphicalEffects 1.0
 import QtQuick.Layouts 1.12
-//import QtWebEngine 1.10
+import QtWebEngine 1.10
 import Cometogether.downloader 1.0
-import QtWebView 1.1
+//import QtWebView 1.1
 
-WebView {
+WebEngineView {
     BackendFileDonwloader {
          id: downloader
          onDownloaded: {
