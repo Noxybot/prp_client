@@ -33,7 +33,7 @@ Page {
 
         ToolButton {
             id: likeButton
-            anchors.right:  parent.right
+            anchors.right: parent.right
             onClicked: {
             }
 
@@ -99,11 +99,11 @@ Page {
                 text: qsTr("Время")
             }
             TextField {
-                id: from
+                id: from_time
                 placeholderText: "С"
             }
             TextField {
-                id: to
+                id: to_time
                 placeholderText: "До"
             }
         }
@@ -156,9 +156,19 @@ Page {
                 add_place_request["method"] = "add_place"
                 add_place_request["latitude"] = coordinates.latitude
                 add_place_request["longitude"] = coordinates.longitude
+                add_place_request["creator_login"] = mainWindow.currentUserLogin
+                add_place_request["name"] = name.text
+                add_place_request["category"] = type.currentText
+                add_place_request["subcategory"] = subtype.currentText
+                add_place_request["from_time"] = from_time.text
+                add_place_request["to_time"] = to_time.text
+                add_place_request["expected_people_amount"] = peopleCount.currentText
+                add_place_request["expected_expenses"] = expenses.currentText
+                add_place_request["description"] = description_.text
+
 
                 var xhr = new XMLHttpRequest();
-                xhr.open("POST", "http://178.150.141.36:1337", false)
+                xhr.open("POST", "http://" + serverIP, false)
                 xhr.setRequestHeader("Content-type", "application/json")
 
 
@@ -171,16 +181,8 @@ Page {
                 } catch(err) {
                     alert("add_place request failed: " + err.prototype.message)
                   }
-                //add_place_request["name"] = "add_place"
-                //add_place_request["category"] = "add_place"
-                //add_place_request["expected_parts_num"] = "add_place"
-                //add_place_request["expected_expenses"] = "add_place"
-                //add_place_request["description"] = "add_place"
 
 
-
-                //markerModel.addMarker(coordinate, name_.text)
-                //markerModel.addMarker(coordinates, 1)
                 stack.pop()
             }
         }

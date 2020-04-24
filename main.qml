@@ -13,10 +13,11 @@ ApplicationWindow {
     minimumWidth: Screen.width/1.5; minimumHeight: Screen.height/1.5
     property var db
     property string currentUserLogin: ""
+    property string serverIP: "178.150.141.36:1337"
 
     WebSocket {
         id: mainWebsocket
-        url: "ws://178.150.141.36:1337"
+        url: "ws://" + serverIP
         active: true
         onTextMessageReceived: {
             console.log("onTextMessageReceived: " + message)
@@ -68,7 +69,7 @@ ApplicationWindow {
             return ret
         }
         var xhr = new XMLHttpRequest();
-        xhr.open("POST", "http://192.168.0.105:1337", false)
+        xhr.open("POST", "http://" + serverIP, false)
         xhr.setRequestHeader("Content-type", "application/json")
 
         let json_request = {"method": "register_user", "login": login, "password": password, "display_name": name + ' ' + surname}
@@ -111,7 +112,7 @@ ApplicationWindow {
         if (login.length < 4 || password.length < 6)
             return ret
         var xhr = new XMLHttpRequest();
-        xhr.open("POST", "http://192.168.0.105:1337", false)
+        xhr.open("POST", "http://" + serverIP, false)
         xhr.setRequestHeader("Content-type", "application/json")
         let json_request = {"method": "login_user", "login": login, "password": password}
         try {
