@@ -169,6 +169,7 @@ Page {
                         name_.text = name;
                         info.text = from_time + " - " + to_time + '\t' + expected_expenses + '\t' + expected_people_number
                         description_.text = description
+                        bottomProfile.receipient = creator_login
                         console.log("inner clicked" )
                     }
                 }
@@ -200,6 +201,7 @@ Page {
 
     Rectangle {
         id: bottomProfile
+        property string receipient: ""
         visible: false
         width: parent.width
         radius: 10
@@ -236,7 +238,7 @@ Page {
                     text: "Ответить"
                     onClicked: {
                         if(stack.top !== "chat.qml")
-                            stack.push("chat.qml")
+                            stack.push("chat.qml", {"inConversationWith" : bottomProfile.receipient})
                     }
                 }
             }

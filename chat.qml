@@ -1,9 +1,11 @@
 import QtQuick 2.12
 import QtQuick.Layouts 1.12
 import QtQuick.Controls 2.12
+import io.qt.examples.chattutorial 1.0
 
 Page {
     visible: true
+    property string inConversationWith: ""
     header: ToolBar {
         ToolButton {
             id: menuButton
@@ -24,7 +26,7 @@ Page {
         }
 
         Label {
-            text: qsTr("Диалог")
+            text: inConversationWith
             anchors.centerIn: parent
         }
 
@@ -59,6 +61,9 @@ Page {
             displayMarginEnd: 40
             verticalLayoutDirection: ListView.BottomToTop
             spacing: 12
+            model: SqlConversationModel {
+                recipient: inConversationWith
+            }
             delegate: Column {
                 anchors.right: sentByMe ? parent.right : undefined
                 spacing: 6
