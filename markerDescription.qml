@@ -151,6 +151,13 @@ Page {
             Layout.preferredWidth: loginPage.width / 1.5
             text: qsTr("Сохранить")
             onClicked: {
+                function get_milliseconds_from_hours(time_str) {
+                    let date_obj = new Date()
+                    let time_splited = time_str.split(':')
+                    date_obj.setHours(parseInt(time_splited[0]), parseInt(time_splited[1]))
+                    return date_obj.getTime()
+                }
+
                 let add_place_request = {}
                 add_place_request["method"] = "add_place"
                 add_place_request["latitude"] = coordinates.latitude
@@ -159,8 +166,8 @@ Page {
                 add_place_request["name"] = name.text
                 add_place_request["category"] = type.currentText
                 add_place_request["subcategory"] = subtype.currentText
-                add_place_request["from_time"] = from_time.text
-                add_place_request["to_time"] = to_time.text
+                add_place_request["from_time"] = get_milliseconds_from_hours(from_time.text)
+                add_place_request["to_time"] = get_milliseconds_from_hours(to_time.text)
                 add_place_request["expected_people_number"] = peopleCount.currentText
                 add_place_request["expected_expenses"] = expenses.currentText
                 add_place_request["description"] = description_.text
