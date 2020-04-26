@@ -166,7 +166,9 @@ Page {
                     {
                         console.log(index);
                         bottomProfile.visible = true;
-                        name_.text = markerId;
+                        name_.text = name;
+                        info.text = from_time + " - " + to_time + '\t' + expected_expenses + '\t' + expected_people_number
+                        description_.text = description
                         console.log("inner clicked" )
                     }
                 }
@@ -217,18 +219,17 @@ Page {
             }
             ColumnLayout{
                 Layout.preferredWidth: mapPage.width * 0.6
-                id: description
                 spacing: 8
                 Text {
                     id: name_
                     text: qsTr("Название объявления")
                 }
                 Text {
-                    id: name1
-                    text: qsTr("Тип")
+                    id: info
+                    text: qsTr("Информация")
                 }
                 Text {
-                    id: name2
+                    id: description_
                     text: qsTr("Краткое\nописание")
                 }
                 Button {

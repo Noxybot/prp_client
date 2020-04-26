@@ -127,7 +127,6 @@ Page {
             Layout.maximumWidth: 300
             Layout.alignment: Qt.AlignHCenter
             Layout.preferredWidth: loginPage.width / 1.5
-            //lineCount: 6
             Layout.maximumHeight: 50
             Layout.preferredHeight: loginPage.height / 6
             background: Rectangle
@@ -162,10 +161,10 @@ Page {
                 add_place_request["subcategory"] = subtype.currentText
                 add_place_request["from_time"] = from_time.text
                 add_place_request["to_time"] = to_time.text
-                add_place_request["expected_people_amount"] = peopleCount.currentText
+                add_place_request["expected_people_number"] = peopleCount.currentText
                 add_place_request["expected_expenses"] = expenses.currentText
                 add_place_request["description"] = description_.text
-
+                add_place_request["creation_time"] = Date.now()
 
                 var xhr = new XMLHttpRequest();
                 xhr.open("POST", "http://" + serverIP, false)

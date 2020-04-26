@@ -25,8 +25,21 @@ ApplicationWindow {
             if (json_msg["method"] === "draw_marker") {
                 let latitude = parseFloat(json_msg["latitude"])
                 let longitude = parseFloat(json_msg["longitude"])
+                let creator_login = json_msg["creator_login"]
+                let name = json_msg["name"]
+                let category = json_msg["category"]
+                let subcategory = json_msg["subcategory"]
+                let from_time = new Date(parseInt(json_msg["from_time"]))
+                let to_time = new Date(parseInt(json_msg["to_time"]))
+                let creation_time = new Date(parseInt(json_msg["creation_time"]))
+                let expected_people_number = json_msg["expected_people_number"]
+                let expected_expenses = json_msg["expected_expenses"]
+                let description = json_msg["description"]
                 let id = parseInt(json_msg["id"])
-                markerModel.addMarker(QtPositioning.coordinate(latitude, longitude), id);
+                markerModel.addMarker(QtPositioning.coordinate(latitude, longitude), creator_login, name,
+                                      category, subcategory, from_time, to_time,
+                                      expected_people_number, expected_expenses,
+                                      description, creation_time, id);
             }
         }
     }
@@ -45,17 +58,17 @@ ApplicationWindow {
     }
 
     function addUser(name, surname, login, password, path_to_image, isFB) {
-       db.transaction(function(tx) {
-                   let results = tx.executeSql('SELECT password FROM user WHERE name=?;', name);
-                   if(results.rows.length !== 0)
-                   {
-                       console.log("User already exist!")
-                       //return //no need to to return - just do not try to INSERT a user
-                   }
-                   else
-                       tx.executeSql('INSERT INTO user VALUES(?, ?, ?, ?, ?)', [name, surname, login, password, path_to_image]);
-                       console.log("Done")
-               })
+        db.transaction(function(tx) {
+            let results = tx.executeSql('SELECT password FROM user WHERE name=?;', name);
+            if(results.rows.length !== 0)
+            {
+                console.log("User already exist!")
+                //return //no need to to return - just do not try to INSERT a user
+            }
+            else
+                tx.executeSql('INSERT INTO user VALUES(?, ?, ?, ?, ?)', [name, surname, login, password, path_to_image]);
+            console.log("Done")
+        })
 
         let ret = false
         if (isFB === undefined)
@@ -87,26 +100,26 @@ ApplicationWindow {
             }
         } catch(err) {
             alert("Registration request failed: " + err.prototype.message)
-          }
+        }
         return ret
     }
     function addUserImagePath(login, path_to_image) {
-       db.transaction(function(tx) {
-                   tx.executeSql('UPDATE user SET path_to_image=? WHERE login=?', [path_to_image, login])
+        db.transaction(function(tx) {
+            tx.executeSql('UPDATE user SET path_to_image=? WHERE login=?', [path_to_image, login])
 
-               })
+        })
         console.log("addUserImagePath")
     }
 
     function confirmLogin(login, password, isFB, display_name) {
-//        db.transaction(function(tx) {
-//                    var results = tx.executeSql('SELECT password FROM user WHERE login=?;', login);
-//                    if(results.rows.length === 1 && results.rows.item(0).password === password)
-//                    {
-//                        console.log("Correct!")
-//                        ret = true
-//                    }
-//                })
+        //        db.transaction(function(tx) {
+        //                    var results = tx.executeSql('SELECT password FROM user WHERE login=?;', login);
+        //                    if(results.rows.length === 1 && results.rows.item(0).password === password)
+        //                    {
+        //                        console.log("Correct!")
+        //                        ret = true
+        //                    }
+        //                })
 
         let ret = false
         if (login.length < 4 || password.length < 6)
@@ -123,21 +136,21 @@ ApplicationWindow {
                 ret = true;
         } catch(err) {
             alert("Login request failed: " + err.prototype.message)
-          }
+        }
         return ret
     }
 
     function getUserInfoByLogin(login) {
         let userInfo = { }
         db.transaction(function(tx) {
-                    var results = tx.executeSql('SELECT * FROM user WHERE login=?;', login);
-                    if(results.rows.length === 1)
-                    {
-                        console.log("getUserInfoByLogin: Correct!")
-                        userInfo["displayName"] = results.rows.item(0).name + " " + results.rows.item(0).surname
-                        userInfo["pathToImage"] = results.rows.item(0).path_to_image
-                    }
-                })
+            var results = tx.executeSql('SELECT * FROM user WHERE login=?;', login);
+            if(results.rows.length === 1)
+            {
+                console.log("getUserInfoByLogin: Correct!")
+                userInfo["displayName"] = results.rows.item(0).name + " " + results.rows.item(0).surname
+                userInfo["pathToImage"] = results.rows.item(0).path_to_image
+            }
+        })
         return userInfo
     }
 }

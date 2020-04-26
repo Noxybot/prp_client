@@ -23,6 +23,7 @@ Page {
             imageCapture {
                 onImageCaptured: {
                     photoPreview.source = preview  // Show the preview in an Image
+                    console.log("Path to image: " + preview)
                 }
             }
         }
@@ -52,6 +53,11 @@ Page {
       Button {
           anchors.top: pos.bottom
           text: qsTr("Сделать фото")
-          onClicked: camera.imageCapture.capture();
+          onClicked:
+          {
+
+              camera.imageCapture.capture();
+
+          }
       }
 }
