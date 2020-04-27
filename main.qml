@@ -18,11 +18,19 @@ ApplicationWindow {
     WebSocket {
         id: mainWebsocket
         url: "ws://" + serverIP
-        active: true
+        onStatusChanged: {
+            if (status == WebSocket.Open){
+                let login_user_msg = {}
+                login_user_msg["method"] = "login_user"
+                login_user_msg["login"] = currentUserLogin
+                mainWebsocket.sendTextMessage(JSON.stringify(login_user_msg))
+            }
+        }
+
         onTextMessageReceived: {
-            console.log("onTextMessageReceived: " + message)
             let json_msg = JSON.parse(message)
-            if (json_msg["method"] === "draw_marker") {
+            let method = json_msg["method"]
+            if (method === "draw_marker") {
                 let latitude = parseFloat(json_msg["latitude"])
                 let longitude = parseFloat(json_msg["longitude"])
                 let creator_login = json_msg["creator_login"]
@@ -40,6 +48,12 @@ ApplicationWindow {
                                       category, subcategory, from_time, to_time,
                                       expected_people_number, expected_expenses,
                                       description, creation_time, id);
+            }
+            else if (method === "send_message"){
+                console.log("onTextMessageReceived: " + message)
+                let from_login = json_msg["to"] //todo: fix it
+                let msg_text = json_msg["text"]
+                stack.currentItem.listView_.model.sendMessage(from_login, msg_text);
             }
         }
     }

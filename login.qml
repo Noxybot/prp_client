@@ -3,6 +3,7 @@ import QtQuick.Window 2.14
 import QtQuick.Controls 2.12
 import QtGraphicalEffects 1.0
 import QtQuick.Layouts 1.12
+import QtWebSockets 1.14
 
 Page {
     id: loginPage
@@ -77,19 +78,21 @@ Page {
             onClicked: {
                 console.log("Login")
                 loadVisible =  true
-               // if (confirmLogin(login_.text, password.text) === true) {
+                if (confirmLogin(login_.text, password.text) === true) {
                     console.log("Login complete")
 
-                    mainWindow.currentUserLogin = login_.text
-                    //loadVisible =  false
+                    currentUserLogin = login_.text
+
+                    mainWebsocket.active = true
+                    loadVisible = false
                     if (stack.depth === 1 )//|| stack.top() !== "map.qml") //ALISA PLEASE MAKE OTHER CHECK AND USE IT IN ALL PLACES
                         stack.push("map.qml")
 
-                //}
-                //else {
-                   // loadVisible =  false
-                //    console.log("Wrong credentials")
-                //}
+                }
+                else {
+                    loadVisible =  false
+                    console.log("Wrong credentials")
+                }
             }
             background: Rectangle {
                 radius: 20

@@ -66,6 +66,7 @@ Page {
                 onClicked: {
                     drawer.close()
                     stack.pop()
+                    mainWebsocket.active = false
                 }
             }
         }
@@ -201,7 +202,7 @@ Page {
 
     Rectangle {
         id: bottomProfile
-        property string receipient: ""
+        property string receipient
         visible: false
         width: parent.width
         radius: 10
@@ -237,6 +238,7 @@ Page {
                 Button {
                     text: "Ответить"
                     onClicked: {
+                        console.log("onClicked: receip: " + bottomProfile.receipient)
                         if(stack.top !== "chat.qml")
                             stack.push("chat.qml", {"inConversationWith" : bottomProfile.receipient})
                     }

@@ -5,7 +5,8 @@ import io.qt.examples.chattutorial 1.0
 
 Page {
     visible: true
-    property string inConversationWith: ""
+    property string inConversationWith
+    property alias listView_: listView
     header: ToolBar {
         ToolButton {
             id: menuButton
@@ -126,7 +127,12 @@ Page {
                     text: qsTr("Send")
                     enabled: messageField.length > 0
                     onClicked: {
-                        listView.model.sendMessage(inConversationWith, messageField.text);
+                        let send_message_request = {}
+                        send_message_request["method"] = "send_message"
+                        send_message_request["from"] = currentUserLogin
+                        send_message_request["to"] = inConversationWith
+                        send_message_request["text"] = messageField.text
+                        mainWebsocket.sendTextMessage(JSON.stringify(send_message_request))
                         messageField.text = "";
                     }
                 }
