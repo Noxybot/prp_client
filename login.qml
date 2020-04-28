@@ -109,7 +109,7 @@ Page {
                 text: qsTr("Зарегистрироваться")
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
-                height: parent.height*0.7
+                height: parent.height * 0.7
                 font.pointSize: 100
                 fontSizeMode: Text.Fit
             }

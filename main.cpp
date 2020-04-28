@@ -11,24 +11,10 @@
 #include "qdownloader.h"
 #include "markermodel.h"
 #include "sqlconversationmodel.h"
+#include "sqlcontactmodel.h"
 
-int main(int argc, char *argv[])
+static void connectToDatabase()
 {
-
-    //QLocale::setDefault(QLocale::system());
-    QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-
-    QGuiApplication app(argc, argv);
-
-    QQmlApplicationEngine engine;
-    qDebug() << engine.offlineStoragePath();
-    const QUrl url(QStringLiteral("qrc:/main.qml"));
-
-    MarkerModel model;
-    engine.rootContext()->setContextProperty("markerModel", &model);
-
-    qmlRegisterType<QDownloader>("Cometogether.downloader", 1, 0, "BackendFileDonwloader");
-    qmlRegisterType<SqlConversationModel>("io.qt.examples.chattutorial", 1, 0, "SqlConversationModel");
     QSqlDatabase database = QSqlDatabase::database();
     if (!database.isValid()) {
         database = QSqlDatabase::addDatabase("QSQLITE");
@@ -48,6 +34,31 @@ int main(int argc, char *argv[])
         qFatal("Cannot open database: %s", qPrintable(database.lastError().text()));
         QFile::remove(fileName);
     }
+}
+
+int main(int argc, char *argv[])
+{
+
+    //QLocale::setDefault(QLocale::system());
+    QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+
+    QGuiApplication app(argc, argv);
+
+    QQmlApplicationEngine engine;
+    qDebug() << engine.offlineStoragePath();
+    const QUrl url(QStringLiteral("qrc:/main.qml"));
+
+    MarkerModel model;
+    engine.rootContext()->setContextProperty("markerModel", &model);
+
+    connectToDatabase();
+
+    SqlContactModel contact_model;
+    engine.rootContext()->setContextProperty("contactModel", &contact_model);
+
+    qmlRegisterType<QDownloader>("Cometogether.downloader", 1, 0, "BackendFileDonwloader");
+    qmlRegisterType<SqlConversationModel>("io.qt.examples.chattutorial", 1, 0, "SqlConversationModel");
+
 
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,
                      &app, [url](QObject *obj, const QUrl &objUrl) {

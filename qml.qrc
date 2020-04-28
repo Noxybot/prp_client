@@ -11,5 +11,6 @@
         <file>chat.qml</file>
         <file>markerDescription.qml</file>
         <file>camera.qml</file>
+        <file>contacts.qml</file>
     </qresource>
 </RCC>

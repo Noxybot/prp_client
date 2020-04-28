@@ -31,6 +31,9 @@ ApplicationWindow {
             let json_msg = JSON.parse(message)
             let method = json_msg["method"]
             if (method === "draw_marker") {
+                let id = parseInt(json_msg["id"])
+                if (markerModel.containtsMarker(id))
+                    return
                 let latitude = parseFloat(json_msg["latitude"])
                 let longitude = parseFloat(json_msg["longitude"])
                 let creator_login = json_msg["creator_login"]
@@ -43,7 +46,6 @@ ApplicationWindow {
                 let expected_people_number = json_msg["expected_people_number"]
                 let expected_expenses = json_msg["expected_expenses"]
                 let description = json_msg["description"]
-                let id = parseInt(json_msg["id"])
                 markerModel.addMarker(QtPositioning.coordinate(latitude, longitude), creator_login, name,
                                       category, subcategory, from_time, to_time,
                                       expected_people_number, expected_expenses,
@@ -54,6 +56,11 @@ ApplicationWindow {
                 let from_login = json_msg["to"] //todo: fix it
                 let msg_text = json_msg["text"]
                 stack.currentItem.listView_.model.sendMessage(from_login, msg_text);
+            }
+            else if (method === "delete_marker"){
+                let marker_id = parseInt(json_msg["id"])
+                console.log("Deleting marker: " + marker_id)
+                markerModel.removeMarker(marker_id)
             }
         }
     }

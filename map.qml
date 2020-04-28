@@ -6,6 +6,7 @@ import QtLocation 5.14
 import QtQuick.Layouts 1.12
 
 Page {
+    Component.onCompleted: contactModel.addContact("TEST")
     id: mapPage
     visible: true
     title: qsTr("Come together")
@@ -58,6 +59,14 @@ Page {
                     drawer.close()
                     if(stack.top !== "profile.qml")
                         stack.push("profile.qml")
+                }
+            }
+            ItemDelegate {
+                text: qsTr("Чаты")
+                width: parent.width
+                onClicked: {
+                    drawer.close()
+                    stack.push("contacts.qml")
                 }
             }
             ItemDelegate {
@@ -165,13 +174,12 @@ Page {
                     anchors.fill: parent;
                     onClicked:
                     {
-                        console.log(index);
                         bottomProfile.visible = true;
                         name_.text = name;
                         info.text = from_time + " - " + to_time + '\t' + expected_expenses + '\t' + expected_people_number
                         description_.text = description
                         bottomProfile.receipient = creator_login
-                        console.log("inner clicked" )
+                        bottomProfile.placeId = marker_id
                     }
                 }
 
@@ -185,7 +193,7 @@ Page {
         }
         MouseArea {
             anchors.fill: parent
-            onClicked: { console.log("outer clicked"); mouse.accepted = false;}
+            onClicked: mouse.accepted = false
             propagateComposedEvents: true
 
             onPressAndHold:  {
@@ -203,6 +211,7 @@ Page {
     Rectangle {
         id: bottomProfile
         property string receipient
+        property int placeId
         visible: false
         width: parent.width
         radius: 10
@@ -236,11 +245,31 @@ Page {
                     text: qsTr("Краткое\nописание")
                 }
                 Button {
-                    text: "Ответить"
+                    text: bottomProfile.receipient === currentUserLogin ? "Удалить" : "Ответить"
                     onClicked: {
                         console.log("onClicked: receip: " + bottomProfile.receipient)
-                        if(stack.top !== "chat.qml")
+                        if (text == "Удалить")
+                        {
+                            var xhr = new XMLHttpRequest();
+                            xhr.open("POST", "http://" + serverIP, false)
+                            xhr.setRequestHeader("Content-type", "application/json")
+                            let json_request = {"method": "delete_marker", "user_login": currentUserLogin, "id": bottomProfile.placeId}
+                            try {
+                                xhr.send(JSON.stringify(json_request));
+                                if (xhr.status !== 200) // HTTP OK
+                                    console.log("Delete marker error ${xhr.status}: ${xhr.statusText}")
+                                else {
+                                    bottomProfile.visible = false
+                                    console.log("Delete marker success")
+                                }
+                            } catch(err) {
+                                console.log("Delete marker request failed: " + err.prototype.message)
+                            }
+                        }
+                        else {
+                        if (stack.top !== "chat.qml")
                             stack.push("chat.qml", {"inConversationWith" : bottomProfile.receipient})
+                        }
                     }
                 }
             }

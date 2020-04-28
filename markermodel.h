@@ -4,9 +4,12 @@
 #include <QAbstractListModel>
 #include <QGeoCoordinate>
 #include <QTime>
+#include <QDebug>
+#include <unordered_set>
 
 struct PlaceInfo
 {
+    int id;
     QGeoCoordinate coordinates;
     QString creator_login;
     QString name;
@@ -46,36 +49,61 @@ public:
                                QString expected_people_number, QString expected_expenses,
                                QString description, const QTime &creation_time, int id)
     {
+        qDebug() << "addMarker id : " << id;
         beginInsertRows(QModelIndex(), rowCount(), rowCount());
-        m_coordinates[id].coordinates = coordinate;
-        m_coordinates[id].creation_time = creation_time;
-        m_coordinates[id].creator_login = std::move(creator_login);
-        m_coordinates[id].name = std::move(name);
-        m_coordinates[id].category = std::move(category);
-        m_coordinates[id].subcategory = std::move(subcategory);
-        m_coordinates[id].from_time = from_time;
-        m_coordinates[id].to_time = to_time;
-        m_coordinates[id].expected_people_number = std::move(expected_people_number);
-        m_coordinates[id].expected_expenses = std::move(expected_expenses);
-        m_coordinates[id].description = std::move(description);
+        PlaceInfo info;
+        info.id = id;
+        info.coordinates = coordinate;
+        info.creation_time = creation_time;
+        info.creator_login = std::move(creator_login);
+        info.name = std::move(name);
+        info.category = std::move(category);
+        info.subcategory = std::move(subcategory);
+        info.from_time = from_time;
+        info.to_time = to_time;
+        info.expected_people_number = std::move(expected_people_number);
+        info.expected_expenses = std::move(expected_expenses);
+        info.description = std::move(description);
+        m_coordinates.push_back(std::move(info));
+        m_current_markers.insert(id);
         endInsertRows();
+    }
+    Q_INVOKABLE void removeMarker(int id)
+    {
+        for (int i = 0; i < m_coordinates.size(); ++i)
+        {
+            if (m_coordinates[i].id == id)
+            {
+                beginRemoveRows(QModelIndex(), i, i);
+                m_coordinates.remove(i);
+                m_current_markers.erase(m_coordinates[i].id);
+                endRemoveRows();
+                return;
+            }
+        }
+
     }
 
     int rowCount(const QModelIndex &parent = QModelIndex()) const override
     {
         Q_UNUSED(parent)
-        return m_coordinates.count();
+        return m_coordinates.size();
+    }
+    int columnCount(const QModelIndex &parent) const override
+    {
+        Q_UNUSED(parent)
+        return 1;
     }
 
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override
     {
-        if (index.row() < 0 || index.row() >= m_coordinates.count())
+        if (index.row() < 0 || index.row() >= m_coordinates.size())
             return QVariant();
         const auto role_ = static_cast<MarkerRoles>(role);
-        const auto &element = (m_coordinates.begin() + index.row()).value();
+        const auto &element = m_coordinates[index.row()];
         switch (role_)
         {
-            case MarkerRoles::idRole: return QVariant::fromValue((m_coordinates.begin() + index.row()).key());
+            case MarkerRoles::idRole: return QVariant::fromValue(element.id);
             case MarkerRoles::positionRole: return QVariant::fromValue(element.coordinates);
             case MarkerRoles::creationTimeRole: return QVariant::fromValue(element.creation_time);
             case MarkerRoles::creatorLoginRole: return QVariant::fromValue(element.creator_login);
@@ -109,8 +137,14 @@ public:
         return roles;
     }
 
+    Q_INVOKABLE bool containtsMarker(int id)
+    {
+        return m_current_markers.find(id) != std::end(m_current_markers);
+    }
+
 private:
-    QMap<int, PlaceInfo> m_coordinates;
+    std::unordered_set<int> m_current_markers;
+    QVector<PlaceInfo> m_coordinates;
 };
 
 #endif // MARKERMODEL_H
