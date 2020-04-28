@@ -113,14 +113,14 @@ ApplicationWindow {
         try {
             xhr.send(JSON.stringify(json_request));
             if (xhr.status !== 201 && xhr.status !== 200) //HTTP Created or 200 OK for case FB user login
-                alert("Registration error ${xhr.status}: ${xhr.statusText}")
+                console.log("Registration error ${xhr.status}: ${xhr.statusText}")
             else
             {
                 ret = true
                 mainWindow.currentUserLogin = login
             }
         } catch(err) {
-            alert("Registration request failed: " + err.prototype.message)
+            console.log("Registration request failed: " + err.prototype.message)
         }
         return ret
     }
@@ -152,11 +152,11 @@ ApplicationWindow {
         try {
             xhr.send(JSON.stringify(json_request));
             if (xhr.status !== 200) //HTTP OK
-                alert("Login error ${xhr.status}: ${xhr.statusText}")
+                console.log("Login error ${xhr.status}: ${xhr.statusText}")
             else
                 ret = true;
         } catch(err) {
-            alert("Login request failed: " + err.prototype.message)
+            console.log("Login request failed: " + err.prototype.message)
         }
         return ret
     }

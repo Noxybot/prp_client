@@ -181,11 +181,11 @@ Page {
                 try {
                     xhr.send(JSON.stringify(add_place_request));
                     if (xhr.status !== 200) //HTTP 200 OK means place added
-                        alert("Registration error ${xhr.status}: ${xhr.statusText}")
+                        console.log("Registration error ${xhr.status}: ${xhr.statusText}")
                     else
                        console.log(xhr.statusText)
                 } catch(err) {
-                    alert("add_place request failed: " + err.prototype.message)
+                    console.log("add_place request failed: " + err.prototype.message)
                   }
 
 
