@@ -1,6 +1,5 @@
 import QtQuick 2.0
 import QtQuick.Controls 2.12
-import io.qt.examples.chattutorial 1.0
 
 Page {
     visible: true
@@ -42,7 +41,7 @@ ListView {
                 width: listView.width - listView.leftMargin - listView.rightMargin
                 height: avatar.implicitHeight
                 leftPadding: avatar.implicitWidth + 32
-                onClicked: stack.push("chat.qml", {"inConversationWith" : name})
+                onClicked: {conversationModel.setRecipient(name); stack.push("chat.qml", {"inConversationWith" : name}) }
                 Rectangle {
                     color: "red"
                     visible: true

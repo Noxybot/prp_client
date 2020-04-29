@@ -53,9 +53,18 @@ ApplicationWindow {
             }
             else if (method === "send_message"){
                 console.log("onTextMessageReceived: " + message)
-                let from_login = json_msg["to"] //todo: fix it
+                let to_login = json_msg["to"] //todo: fix it
+                let from_login = json_msg["from"]
                 let msg_text = json_msg["text"]
-                stack.currentItem.listView_.model.sendMessage(from_login, msg_text);
+                if (from_login === currentUserLogin){
+                    conversationModel.sendMessage("Me", to_login, msg_text)
+                    contactModel.addContact(to_login)
+                }
+                else {
+                    conversationModel.sendMessage(from_login, "Me", msg_text)
+                    contactModel.addContact(from_login)
+                }
+                contactModel.updateContacts()
             }
             else if (method === "delete_marker"){
                 let marker_id = parseInt(json_msg["id"])

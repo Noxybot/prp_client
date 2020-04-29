@@ -56,8 +56,11 @@ int main(int argc, char *argv[])
     SqlContactModel contact_model;
     engine.rootContext()->setContextProperty("contactModel", &contact_model);
 
+    SqlConversationModel conversation_model;
+    engine.rootContext()->setContextProperty("conversationModel", &conversation_model);
+
+
     qmlRegisterType<QDownloader>("Cometogether.downloader", 1, 0, "BackendFileDonwloader");
-    qmlRegisterType<SqlConversationModel>("io.qt.examples.chattutorial", 1, 0, "SqlConversationModel");
 
 
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,

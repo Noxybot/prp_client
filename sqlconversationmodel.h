@@ -12,12 +12,12 @@ public:
     SqlConversationModel(QObject *parent = 0);
 
     QString recipient() const;
-    void setRecipient(const QString &recipient);
+    Q_INVOKABLE void setRecipient(const QString &recipient);
 
     QVariant data(const QModelIndex &index, int role) const override;
     QHash<int, QByteArray> roleNames() const override;
 
-    Q_INVOKABLE void sendMessage(const QString &recipient, const QString &message);
+    Q_INVOKABLE void sendMessage(const QString &author, const QString &recipient, const QString &message);
 
 signals:
     void recipientChanged();

@@ -8,8 +8,10 @@ class SqlContactModel : public QSqlQueryModel
 {
     Q_OBJECT
     QHash<int,QByteArray> hash;
+    QString m_current_user_login;
 public:
     SqlContactModel(QObject *parent = 0);
+    Q_INVOKABLE void setCurrentUserLogin(QString login);
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override
     {
         if(role < Qt::UserRole)
@@ -20,6 +22,7 @@ public:
         return r.value(QString(hash.value(role))).toString();
     }
     QHash<int,QByteArray> roleNames() const override { return hash; }
+    Q_INVOKABLE void updateContacts();
 
     Q_INVOKABLE void addContact(const QString& name);
 

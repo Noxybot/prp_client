@@ -86,12 +86,13 @@ QHash<int, QByteArray> SqlConversationModel::roleNames() const
     return names;
 }
 
-void SqlConversationModel::sendMessage(const QString &recipient, const QString &message)
+void SqlConversationModel::sendMessage(const QString &author, const QString &recipient, const QString &message)
 {
+    qDebug() << "Sending message from: " << author << " to: " << recipient;
     const QString timestamp = QDateTime::currentDateTime().toString(Qt::ISODate);
 
     QSqlRecord newRecord = record();
-    newRecord.setValue("author", "Me");
+    newRecord.setValue("author", author);
     newRecord.setValue("recipient", recipient);
     newRecord.setValue("timestamp", timestamp);
     newRecord.setValue("message", message);

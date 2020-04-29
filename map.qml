@@ -6,7 +6,6 @@ import QtLocation 5.14
 import QtQuick.Layouts 1.12
 
 Page {
-    Component.onCompleted: contactModel.addContact("TEST")
     id: mapPage
     visible: true
     title: qsTr("Come together")

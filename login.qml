@@ -82,6 +82,7 @@ Page {
                     console.log("Login complete")
 
                     currentUserLogin = login_.text
+                    contactModel.setCurrentUserLogin(currentUserLogin)
 
                     mainWebsocket.active = true
                     loadVisible = false
@@ -90,8 +91,8 @@ Page {
 
                 }
                 else {
-                    loadVisible =  false
-                    console.log("Wrong credentials")
+                  loadVisible =  false
+                  console.log("Wrong credentials")
                 }
             }
             background: Rectangle {
