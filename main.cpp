@@ -12,6 +12,7 @@
 #include "markermodel.h"
 #include "sqlconversationmodel.h"
 #include "sqlcontactmodel.h"
+#include "qimageconverter.h"
 
 static void connectToDatabase()
 {
@@ -58,6 +59,9 @@ int main(int argc, char *argv[])
 
     SqlConversationModel conversation_model;
     engine.rootContext()->setContextProperty("conversationModel", &conversation_model);
+
+    QImageConverter imageConverter;
+    engine.rootContext()->setContextProperty("imageConverter", &imageConverter);
 
 
     qmlRegisterType<QDownloader>("Cometogether.downloader", 1, 0, "BackendFileDonwloader");

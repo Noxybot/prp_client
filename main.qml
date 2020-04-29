@@ -14,6 +14,7 @@ ApplicationWindow {
     property var db
     property string currentUserLogin: ""
     property string serverIP: "178.150.141.36:1337"
+    property string profileImageBase64: ""
 
     WebSocket {
         id: mainWebsocket
@@ -24,6 +25,9 @@ ApplicationWindow {
                 login_user_msg["method"] = "login_user"
                 login_user_msg["login"] = currentUserLogin
                 mainWebsocket.sendTextMessage(JSON.stringify(login_user_msg))
+                conversationModel.setCurrentUserLogin(currentUserLogin)
+                contactModel.setCurrentUserLogin(currentUserLogin)
+                profileImageBase64 = fetchImageByLogin(currentUserLogin)
             }
         }
 
@@ -87,18 +91,38 @@ ApplicationWindow {
                     })
     }
 
-    function addUser(name, surname, login, password, path_to_image, isFB) {
-        db.transaction(function(tx) {
-            let results = tx.executeSql('SELECT password FROM user WHERE name=?;', name);
-            if(results.rows.length !== 0)
-            {
-                console.log("User already exist!")
-                //return //no need to to return - just do not try to INSERT a user
+    function fetchImageByLogin(login) {
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "http://" + serverIP, false)
+        xhr.setRequestHeader("Content-type", "application/json")
+
+        let json_request = {"method": "get_user_image", "login": login}
+
+        try {
+            xhr.send(JSON.stringify(json_request));
+            if (xhr.status === 200){
+                let respone = JSON.parse(xhr.response)
+                return respone["result"]
             }
-            else
-                tx.executeSql('INSERT INTO user VALUES(?, ?, ?, ?, ?)', [name, surname, login, password, path_to_image]);
-            console.log("Done")
-        })
+
+
+        } catch(err) {
+            console.log("Registration request failed: " + err.prototype.message)
+        }
+    }
+
+    function addUser(name, surname, login, password, image_base64, isFB) {
+//        db.transaction(function(tx) {
+//            let results = tx.executeSql('SELECT password FROM user WHERE name=?;', name);
+//            if(results.rows.length !== 0)
+//            {
+//                console.log("User already exist!")
+//                //return //no need to to return - just do not try to INSERT a user
+//            }
+//            else
+//                tx.executeSql('INSERT INTO user VALUES(?, ?, ?, ?, ?)', [name, surname, login, password, path_to_image]);
+//            console.log("Done")
+//        })
 
         let ret = false
         if (isFB === undefined)
@@ -115,19 +139,25 @@ ApplicationWindow {
         xhr.open("POST", "http://" + serverIP, false)
         xhr.setRequestHeader("Content-type", "application/json")
 
-        let json_request = {"method": "register_user", "login": login, "password": password, "display_name": name + ' ' + surname}
+        let json_request = {"method": "register_user", "login": login,
+            "password": password, "display_name": name + ' ' + surname, "image": image_base64}
         if (isFB)
             json_request["method"] = "login_fb_user" //todo: write it better
 
         try {
             xhr.send(JSON.stringify(json_request));
             if (xhr.status !== 201 && xhr.status !== 200) //HTTP Created or 200 OK for case FB user login
-                console.log("Registration error ${xhr.status}: ${xhr.statusText}")
+                console.log("Registration error " + xhr.status + " " +  xhr.statusText)
+            else if (xhr.status === 409)
+                console.log("conflict")
             else
             {
+                console.log("Registration success " + xhr.status + " " +  xhr.statusText)
                 ret = true
                 mainWindow.currentUserLogin = login
+                mainWebsocket.active = true
             }
+
         } catch(err) {
             console.log("Registration request failed: " + err.prototype.message)
         }
@@ -160,10 +190,23 @@ ApplicationWindow {
         let json_request = {"method": "login_user", "login": login, "password": password}
         try {
             xhr.send(JSON.stringify(json_request));
-            if (xhr.status !== 200) //HTTP OK
-                console.log("Login error ${xhr.status}: ${xhr.statusText}")
-            else
-                ret = true;
+            if (xhr.status === 200) {//HTTP OK
+
+                let response = JSON.parse(xhr.response)
+                let result = response["result"]
+                if (result === "logged in")
+                    ret = true;
+                else if (result === "not found") {
+                    console.log("user not found")
+                }
+                else {
+                    console.log("login error " + xhr.status + ": " +  xhr.statusText)
+                }
+            }
+            else {
+                console.log("login error " + xhr.status + ": " +  xhr.statusText)
+            }
+
         } catch(err) {
             console.log("Login request failed: " + err.prototype.message)
         }

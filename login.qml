@@ -76,14 +76,11 @@ Page {
             Layout.preferredHeight: loginPage.height / 10
             Layout.preferredWidth: loginPage.width / 2
             onClicked: {
-                console.log("Login")
                 loadVisible =  true
                 if (confirmLogin(login_.text, password.text) === true) {
-                    console.log("Login complete")
+                    console.log("login complete")
 
                     currentUserLogin = login_.text
-                    contactModel.setCurrentUserLogin(currentUserLogin)
-
                     mainWebsocket.active = true
                     loadVisible = false
                     if (stack.depth === 1 )//|| stack.top() !== "map.qml") //ALISA PLEASE MAKE OTHER CHECK AND USE IT IN ALL PLACES
@@ -91,8 +88,8 @@ Page {
 
                 }
                 else {
-                  loadVisible =  false
-                  console.log("Wrong credentials")
+                  loadVisible = false
+                   console.log("wrong credentials")
                 }
             }
             background: Rectangle {

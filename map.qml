@@ -266,8 +266,11 @@ Page {
                             }
                         }
                         else {
-                        if (stack.top !== "chat.qml")
-                            stack.push("chat.qml", {"inConversationWith" : bottomProfile.receipient})
+                        if (stack.top !== "chat.qml") {
+                            let receipent = bottomProfile.receipient
+                            conversationModel.setRecipient(receipent)
+                            stack.push("chat.qml", {"inConversationWith" : bottomProfile.receipient, "imageBase64": fetchImageByLogin(receipent)})
+                            }
                         }
                     }
                 }

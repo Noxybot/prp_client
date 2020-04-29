@@ -6,13 +6,12 @@
 class SqlConversationModel : public QSqlTableModel
 {
     Q_OBJECT
-    Q_PROPERTY(QString recipient READ recipient WRITE setRecipient NOTIFY recipientChanged)
 
 public:
     SqlConversationModel(QObject *parent = 0);
 
-    QString recipient() const;
     Q_INVOKABLE void setRecipient(const QString &recipient);
+    Q_INVOKABLE void setCurrentUserLogin(const QString &login);
 
     QVariant data(const QModelIndex &index, int role) const override;
     QHash<int, QByteArray> roleNames() const override;
@@ -20,10 +19,10 @@ public:
     Q_INVOKABLE void sendMessage(const QString &author, const QString &recipient, const QString &message);
 
 signals:
-    void recipientChanged();
 
 private:
     QString m_recipient;
+    QString m_current_user_login;
 };
 
 #endif // SQLCONVERSATIONMODEL_H

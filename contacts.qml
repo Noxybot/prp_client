@@ -38,19 +38,17 @@ ListView {
             model: contactModel
             delegate: ItemDelegate {
                 text: name
+                property string imageBase64: fetchImageByLogin(name)
                 width: listView.width - listView.leftMargin - listView.rightMargin
                 height: avatar.implicitHeight
                 leftPadding: avatar.implicitWidth + 32
-                onClicked: {conversationModel.setRecipient(name); stack.push("chat.qml", {"inConversationWith" : name}) }
-                Rectangle {
-                    color: "red"
+                onClicked: {conversationModel.setRecipient(name); stack.push("chat.qml", {"inConversationWith" : name, "imageBase64": imageBase64}) }
+                Image {
                     visible: true
                     width: 40
                     height: 40
-                    implicitHeight: 40
-                    implicitWidth: 40
                     id: avatar
-                   // source: "qrc:/shared/" + name.replace(" ", "_") + ".png"
+                    source: "data:image/png;base64," + imageBase64
                 }
             }
         }

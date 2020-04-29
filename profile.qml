@@ -86,7 +86,7 @@ Page {
             Image {
                 id: img
                 anchors.centerIn: parent
-                source: userInfo["pathToImage"].substring(0, 8) === "file:///" ? userInfo["pathToImage"]  : "file:///" + userInfo["pathToImage"]
+                source: "data:image/png;base64," + profileImageBase64 //userInfo["pathToImage"].substring(0, 8) === "file:///" ? userInfo["pathToImage"]  : "file:///" + userInfo["pathToImage"]
                 Layout.preferredWidth: profilePage.width*0.3
                 Layout.preferredHeight: profilePage.width*0.3
                 //fillMode: Image.PreserveAspectCrop

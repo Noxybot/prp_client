@@ -6,7 +6,7 @@ import QtQuick.Layouts 1.12
 
 Page {
     id: signinPage
-    property string pathToFile
+    property string pathToImage
 
     property var loadVisible: false
     StackView.onDeactivated: {
@@ -96,7 +96,7 @@ Page {
             Layout.preferredWidth: signinPage.width / 2
             onClicked: {
                 loadVisible = true
-                if (addUser(name.text, surname.text, login_.text, password.text, "", false) && stack.top !== "map.qml")
+                if (addUser(name.text, surname.text, login_.text, password.text, imageConverter.toBase64(pathToImage), false) && stack.top !== "map.qml")
                 {
                     console.log("adduser returned true")
                     stack.push("map.qml")
@@ -133,12 +133,8 @@ Page {
         folder: shortcuts.pictures
         nameFilters: [ "Image files (*.png *.jpeg *.jpg)" ]
         onAccepted: {
-            pathToFile = fileOpenDialog.fileUrl
-                console.log("Path to file: "+pathToFile)
-                addUser(name.text, surname.text, login_.text, password.text, pathToFile, false)
-            mainWindow.currentUserLogin = login_.text
-            if(stack.top !== "map.qml")
-                stack.push("map.qml")
+            pathToImage = fileOpenDialog.fileUrl.toString().substring(8)
+            console.log("Path to file: " + pathToImage)
         }
     }
 }

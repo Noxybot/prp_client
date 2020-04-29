@@ -5,7 +5,7 @@ import QtQuick.Controls 2.12
 Page {
     visible: true
     property string inConversationWith
-    property alias listView_: listView
+    property string imageBase64
     header: ToolBar {
         ToolButton {
             id: menuButton
@@ -73,12 +73,11 @@ Page {
                     spacing: 6
                     anchors.right: sentByMe ? parent.right : undefined
 
-                    Rectangle {
-                        color: "red"
+                    Image {
                         width: 40
                         height: 40
                         id: avatar
-                       // source: !sentByMe ? "qrc:/" + model.author.replace(" ", "_") + ".png" : ""
+                        source: "data:image/png;base64," +  (!sentByMe ? imageBase64 : profileImageBase64)
                     }
 
                     Rectangle {
