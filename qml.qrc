@@ -12,5 +12,6 @@
         <file>markerDescription.qml</file>
         <file>camera.qml</file>
         <file>contacts.qml</file>
+        <file>imageFetcher.js</file>
     </qresource>
 </RCC>

@@ -2,6 +2,25 @@ import QtQuick 2.0
 import QtQuick.Controls 2.12
 
 Page {
+    WorkerScript {
+            id: fetcher
+            source: "imageFetcher.js"
+            onMessage: {
+                let login = messageObject.login
+                console.log("imageFetcher succeed, login: " + login);
+                contactModel.addUserImage(login, messageObject.image)
+            }
+    }
+
+
+    StackView.onActivated: {
+        let contacts_without_img = contactModel.getContactsWithoutAvatar()
+        console.log("size is: " + contacts_without_img.length)
+        for (let i = 0; i < contacts_without_img.length; ++i){
+            fetcher.sendMessage({"login": contacts_without_img[i], "serverIP": serverIP})
+        }
+    }
+
     visible: true
     header: ToolBar {
         ToolButton {
@@ -37,19 +56,20 @@ ListView {
             spacing: 20
             model: contactModel
             delegate: ItemDelegate {
-                text: name
-                property string imageBase64: fetchImageByLogin(name)
+                text: display_name
                 width: listView.width - listView.leftMargin - listView.rightMargin
-                height: avatar.implicitHeight
+                height: 40 //avatar.implicitHeight
                 leftPadding: avatar.implicitWidth + 32
-                onClicked: {conversationModel.setRecipient(name); stack.push("chat.qml", {"inConversationWith" : name, "imageBase64": imageBase64}) }
+                onClicked: {conversationModel.setRecipient(login); stack.push("chat.qml",
+                             {"inConversationWith" : login, "imageBase64": image, "inConversationWithDN": display_name}) }
                 Image {
                     visible: true
                     width: 40
                     height: 40
                     id: avatar
-                    source: "data:image/png;base64," + imageBase64
+                    source: "data:image/png;base64," + image
                 }
             }
         }
 }
+

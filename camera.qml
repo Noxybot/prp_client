@@ -48,7 +48,7 @@ Page {
           id: pos
           anchors.top: back.bottom
           text: qsTr("Поменять камеру")
-          onClicked: camera.position == Camera.BackFace ? camera.position = Camera.FrontFace : camera.position = Camera.BackFace
+          onClicked: camera.position === Camera.BackFace ? camera.position = Camera.FrontFace : camera.position = Camera.BackFace
       }
       Button {
           anchors.top: pos.bottom

@@ -29,14 +29,6 @@ static void createTable()
         ")")) {
         qFatal("Failed to query database: %s", qPrintable(query.lastError().text()));
     }
-
-//    query.exec("INSERT INTO Conversations VALUES('Me', 'Ernest Hemingway', '2016-01-07T14:36:06', 'Hello!')");
-//    query.exec("INSERT INTO Conversations VALUES('Ernest Hemingway', 'Me', '2016-01-07T14:36:16', 'Good afternoon.')");
-//    query.exec("INSERT INTO Conversations VALUES('Me', 'Albert Einstein', '2016-01-01T11:24:53', 'Hi!')");
-//    query.exec("INSERT INTO Conversations VALUES('Albert Einstein', 'Me', '2016-01-07T14:36:16', 'Good morning.')");
-//    query.exec("INSERT INTO Conversations VALUES('Hans Gude', 'Me', '2015-11-20T06:30:02', 'God morgen. Har du fått mitt maleri?')");
-//    query.exec("INSERT INTO Conversations VALUES('Me', 'Hans Gude', '2015-11-20T08:21:03', 'God morgen, Hans. Ja, det er veldig fint. Tusen takk! "
-//               "Hvor mange timer har du brukt på den?')");
 }
 
 SqlConversationModel::SqlConversationModel(QObject *parent) :
@@ -60,12 +52,12 @@ void SqlConversationModel::setRecipient(const QString &recipient)
         "((recipient = '%1' AND author = 'Me') OR (recipient = 'Me' AND author='%1')) AND owner = '%2'").arg(m_recipient, m_current_user_login);
     setFilter(filterString);
     select();
-
 }
 
 void SqlConversationModel::setCurrentUserLogin(const QString &login)
 {
     m_current_user_login = login;
+    select();
 }
 
 QVariant SqlConversationModel::data(const QModelIndex &index, int role) const

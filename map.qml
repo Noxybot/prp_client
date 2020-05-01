@@ -4,8 +4,25 @@ import QtQuick.Controls 2.12
 import QtPositioning 5.14
 import QtLocation 5.14
 import QtQuick.Layouts 1.12
+import QtQml 2.14
+
 
 Page {
+    WorkerScript {
+            id: fetcher
+            source: "imageFetcher.js"
+
+            onMessage:{console.log("imageFetcher succeed"); profileImageBase64 = messageObject.image; }
+        }
+
+
+    StackView.onActivated: {
+        if (profileImageBase64.length === 0)
+            fetcher.sendMessage({"login": currentUserLogin, "serverIP": serverIP})
+        mainWebsocket.active = true
+    }
+
+
     id: mapPage
     visible: true
     title: qsTr("Come together")
@@ -269,7 +286,8 @@ Page {
                         if (stack.top !== "chat.qml") {
                             let receipent = bottomProfile.receipient
                             conversationModel.setRecipient(receipent)
-                            stack.push("chat.qml", {"inConversationWith" : bottomProfile.receipient, "imageBase64": fetchImageByLogin(receipent)})
+                            stack.push("chat.qml", {"inConversationWith" : bottomProfile.receipient,
+                                       "imageBase64": contactModel.getUserImageByLogin(receipent)})
                             }
                         }
                     }

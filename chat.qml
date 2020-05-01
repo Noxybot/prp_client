@@ -5,6 +5,7 @@ import QtQuick.Controls 2.12
 Page {
     visible: true
     property string inConversationWith
+    property string inConversationWithDN
     property string imageBase64
     header: ToolBar {
         ToolButton {
@@ -26,7 +27,7 @@ Page {
         }
 
         Label {
-            text: inConversationWith
+            text: inConversationWithDN
             anchors.centerIn: parent
         }
 

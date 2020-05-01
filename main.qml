@@ -13,7 +13,7 @@ ApplicationWindow {
     minimumWidth: Screen.width/1.5; minimumHeight: Screen.height/1.5
     property var db
     property string currentUserLogin: ""
-    property string serverIP: "178.150.141.36:1337"
+    property string serverIP: "localhost:1337"//"178.150.141.36:1337"
     property string profileImageBase64: ""
 
     WebSocket {
@@ -27,7 +27,6 @@ ApplicationWindow {
                 mainWebsocket.sendTextMessage(JSON.stringify(login_user_msg))
                 conversationModel.setCurrentUserLogin(currentUserLogin)
                 contactModel.setCurrentUserLogin(currentUserLogin)
-                profileImageBase64 = fetchImageByLogin(currentUserLogin)
             }
         }
 
@@ -62,11 +61,13 @@ ApplicationWindow {
                 let msg_text = json_msg["text"]
                 if (from_login === currentUserLogin){
                     conversationModel.sendMessage("Me", to_login, msg_text)
-                    contactModel.addContact(to_login)
+                    if (!contactModel.userPresent(to_login))
+                        contactModel.addContact(to_login, getDisplayNameByLogin(to_login))
                 }
                 else {
                     conversationModel.sendMessage(from_login, "Me", msg_text)
-                    contactModel.addContact(from_login)
+                    if (!contactModel.userPresent(from_login))
+                        contactModel.addContact(from_login, getDisplayNameByLogin(from_login))
                 }
                 contactModel.updateContacts()
             }
@@ -90,40 +91,22 @@ ApplicationWindow {
                         tx.executeSql('CREATE TABLE IF NOT EXISTS user(name TEXT, surname TEXT, login TEXT, password TEXT, path_to_image TEXT)');
                     })
     }
-
-    function fetchImageByLogin(login) {
+    function uploadImage(login, image_base64) {
         var xhr = new XMLHttpRequest();
-        xhr.open("POST", "http://" + serverIP, false)
+        xhr.responseType = "json"
+        xhr.open("POST", "http://" + serverIP)
         xhr.setRequestHeader("Content-type", "application/json")
+        let json_request = {"method": "upload_user_image", "login": login, "image": image_base64}
+        xhr.onready = function(){
+            console.log("image sent")
 
-        let json_request = {"method": "get_user_image", "login": login}
-
-        try {
-            xhr.send(JSON.stringify(json_request));
-            if (xhr.status === 200){
-                let respone = JSON.parse(xhr.response)
-                return respone["result"]
-            }
-
-
-        } catch(err) {
-            console.log("Registration request failed: " + err.prototype.message)
         }
+
+        xhr.send(JSON.stringify(json_request));
     }
 
-    function addUser(name, surname, login, password, image_base64, isFB) {
-//        db.transaction(function(tx) {
-//            let results = tx.executeSql('SELECT password FROM user WHERE name=?;', name);
-//            if(results.rows.length !== 0)
-//            {
-//                console.log("User already exist!")
-//                //return //no need to to return - just do not try to INSERT a user
-//            }
-//            else
-//                tx.executeSql('INSERT INTO user VALUES(?, ?, ?, ?, ?)', [name, surname, login, password, path_to_image]);
-//            console.log("Done")
-//        })
 
+    function addUser(name, surname, login, password, image_base64, isFB) {
         let ret = false
         if (isFB === undefined)
         {
@@ -155,11 +138,10 @@ ApplicationWindow {
                 console.log("Registration success " + xhr.status + " " +  xhr.statusText)
                 ret = true
                 mainWindow.currentUserLogin = login
-                mainWebsocket.active = true
             }
 
         } catch(err) {
-            console.log("Registration request failed: " + err.prototype.message)
+            console.log("Registration request failed: " + err.message)
         }
         return ret
     }
@@ -172,15 +154,6 @@ ApplicationWindow {
     }
 
     function confirmLogin(login, password, isFB, display_name) {
-        //        db.transaction(function(tx) {
-        //                    var results = tx.executeSql('SELECT password FROM user WHERE login=?;', login);
-        //                    if(results.rows.length === 1 && results.rows.item(0).password === password)
-        //                    {
-        //                        console.log("Correct!")
-        //                        ret = true
-        //                    }
-        //                })
-
         let ret = false
         if (login.length < 4 || password.length < 6)
             return ret
@@ -208,22 +181,23 @@ ApplicationWindow {
             }
 
         } catch(err) {
-            console.log("Login request failed: " + err.prototype.message)
+            console.log("confirmLogin request failed: " + err.message)
         }
         return ret
     }
 
-    function getUserInfoByLogin(login) {
-        let userInfo = { }
-        db.transaction(function(tx) {
-            var results = tx.executeSql('SELECT * FROM user WHERE login=?;', login);
-            if(results.rows.length === 1)
-            {
-                console.log("getUserInfoByLogin: Correct!")
-                userInfo["displayName"] = results.rows.item(0).name + " " + results.rows.item(0).surname
-                userInfo["pathToImage"] = results.rows.item(0).path_to_image
-            }
-        })
-        return userInfo
+    function getDisplayNameByLogin(login) {
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "http://" + serverIP, false)
+        xhr.setRequestHeader("Content-type", "application/json")
+        xhr.responseType = "json"
+        let json_request = {"method": "get_display_name", "login": login}
+        try {
+           xhr.send(JSON.stringify(json_request))
+           return xhr.response["result"]
+        }
+        catch(err) {
+            console.log("getUserInfoByLogin request failed: " + err.message)
+        }
     }
 }

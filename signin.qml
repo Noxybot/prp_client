@@ -3,6 +3,7 @@ import QtQuick.Window 2.14
 import QtQuick.Controls 2.12
 import QtQuick.Dialogs 1.3
 import QtQuick.Layouts 1.12
+import Cometogether.converter 1.0
 
 Page {
     id: signinPage
@@ -89,6 +90,13 @@ Page {
             Layout.preferredWidth: signinPage.width / 1.5
         }
         Button {
+            BackendImageConverter {
+                id: imageConverter
+                onImageConveted: {
+                    console.log("converted image, sending to server...")
+                    uploadImage(currentUserLogin, imageBase64)
+                }
+            }
             Layout.alignment: Qt.AlignHCenter
             text: qsTr("Зарегистрироваться")
             Layout.maximumWidth: 200
@@ -96,8 +104,9 @@ Page {
             Layout.preferredWidth: signinPage.width / 2
             onClicked: {
                 loadVisible = true
-                if (addUser(name.text, surname.text, login_.text, password.text, imageConverter.toBase64(pathToImage), false) && stack.top !== "map.qml")
+                if (addUser(name.text, surname.text, login_.text, password.text, "", false) && stack.top !== "map.qml") //pass empty img
                 {
+                    imageConverter.scheduleToBase64("", pathToImage);
                     console.log("adduser returned true")
                     stack.push("map.qml")
                 }
@@ -133,8 +142,8 @@ Page {
         folder: shortcuts.pictures
         nameFilters: [ "Image files (*.png *.jpeg *.jpg)" ]
         onAccepted: {
-            pathToImage = fileOpenDialog.fileUrl.toString().substring(8)
-            console.log("Path to file: " + pathToImage)
+            pathToImage = fileOpenDialog.fileUrl
+            console.log("Path to file: " + fileOpenDialog.fileUrl + "TEST")
         }
     }
 }

@@ -2,13 +2,17 @@
 #define QIMAGECONVERTER_H
 #include <QObject>
 #include <QString>
+#include <QUrl>
 
 class QImageConverter : public QObject
 {
     Q_OBJECT
 public:
     QImageConverter();
-    Q_INVOKABLE QString toBase64(const QString& file_path);
+    void toBase64Impl(QString id, QString file_path);
+    Q_INVOKABLE void scheduleToBase64(QString id, QString file_path);
+signals:
+    void imageConveted(QString id, QString imageBase64);
 };
 
 #endif // QIMAGECONVERTER_H

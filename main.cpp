@@ -29,6 +29,7 @@ static void connectToDatabase()
 
     // Ensure that we have a writable location on all devices.
     const QString fileName = writeDir.absolutePath() + "/chat-database.sqlite3";
+    qDebug() << "DB FILENAME: " << fileName;
     // When using the SQLite driver, open() will create the SQLite database if it doesn't exist.
     database.setDatabaseName(fileName);
     if (!database.open()) {
@@ -60,9 +61,8 @@ int main(int argc, char *argv[])
     SqlConversationModel conversation_model;
     engine.rootContext()->setContextProperty("conversationModel", &conversation_model);
 
-    QImageConverter imageConverter;
-    engine.rootContext()->setContextProperty("imageConverter", &imageConverter);
 
+    qmlRegisterType<QImageConverter>("Cometogether.converter", 1, 0, "BackendImageConverter");
 
     qmlRegisterType<QDownloader>("Cometogether.downloader", 1, 0, "BackendFileDonwloader");
 

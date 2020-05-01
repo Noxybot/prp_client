@@ -8,10 +8,6 @@ Page {
     id: profilePage
     visible: true
     title: qsTr("Come together")
-    property var userInfo
-    Component.onCompleted: {
-        userInfo = getUserInfoByLogin(mainWindow.currentUserLogin)
-    }
     header: ToolBar {
         ToolButton {
             id: menuButton
@@ -62,7 +58,7 @@ Page {
     }
         RowLayout {
             id: row_
-            anchors.top: top_.bottom
+          //  anchors.top: top_.bottom
             Layout.alignment: Qt.AlignHCenter
             Layout.preferredWidth: profilePage.width*0.6
             Layout.preferredHeight: profilePage.width*0.3
@@ -72,8 +68,8 @@ Page {
                 Layout.alignment: Qt.AlignHCenter
                 Layout.preferredWidth: parent.width*0.2
                 Layout.preferredHeight: parent.width*0.2
-                anchors.left: parent.left
-                anchors.verticalCenter: parent.verticalCenter
+              //  anchors.left: parent.left
+              //  anchors.verticalCenter: parent.verticalCenter
 
                 Text{
                     text: qsTr("\u2706")
@@ -85,8 +81,8 @@ Page {
             }
             Image {
                 id: img
-                anchors.centerIn: parent
-                source: "data:image/png;base64," + profileImageBase64 //userInfo["pathToImage"].substring(0, 8) === "file:///" ? userInfo["pathToImage"]  : "file:///" + userInfo["pathToImage"]
+               // anchors.centerIn: parent
+                source: "data:image/png;base64," + profileImageBase64
                 Layout.preferredWidth: profilePage.width*0.3
                 Layout.preferredHeight: profilePage.width*0.3
                 //fillMode: Image.PreserveAspectCrop
@@ -108,20 +104,20 @@ Page {
                 id: call
                 Layout.preferredWidth: parent.width*0.2
                 Layout.preferredHeight: parent.width*0.2
-                anchors.right: parent.right
-                anchors.verticalCenter: parent.verticalCenter
+              //  anchors.right: parent.right
+              //  anchors.verticalCenter: parent.verticalCenter
                 Text{
                     text: qsTr("\u270E")
-                    anchors.horizontalCenter: parent.horizontalCenter
+                //    anchors.horizontalCenter: parent.horizontalCenter
                     font.pointSize: 100
                     minimumPointSize: 10
                     fontSizeMode: Text.Fit
-                    anchors.fill: call
+                   // anchors.fill: call
                 }
             }
         }
         ColumnLayout {
-            anchors.top: row_.bottom
+          //  anchors.top: row_.bottom
             width: parent.width
             spacing: profilePage.height / 100
         Rectangle {
@@ -132,7 +128,7 @@ Page {
         }
         Text {
             Layout.alignment: Qt.AlignHCenter
-            text: userInfo["displayName"]
+            text: getDisplayNameByLogin(currentUserLogin) //blocking function
         }
 
         Rectangle {
