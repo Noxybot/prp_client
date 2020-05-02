@@ -13,7 +13,7 @@ ApplicationWindow {
     minimumWidth: Screen.width/1.5; minimumHeight: Screen.height/1.5
     property var db
     property string currentUserLogin: ""
-    property string serverIP: "localhost:1337"//"178.150.141.36:1337"
+    property string serverIP: "178.150.141.36:1337"//"178.150.141.36:1337"
     property string profileImageBase64: ""
 
     WebSocket {

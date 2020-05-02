@@ -71,6 +71,8 @@ void SqlContactModel::addContact(const QString &login, const QString& display_na
         query.bindValue(":dn", display_name);
         if (!query.exec())
             qFatal("Contacts addContact query failed: %s", qPrintable(query.lastError().text()));
+        else
+            present_contacts.insert(login);
         updateContacts();
 }
 

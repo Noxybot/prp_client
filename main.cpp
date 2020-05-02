@@ -29,6 +29,7 @@ static void connectToDatabase()
 
     // Ensure that we have a writable location on all devices.
     const QString fileName = writeDir.absolutePath() + "/chat-database.sqlite3";
+    //QFile::remove(fileName);
     qDebug() << "DB FILENAME: " << fileName;
     // When using the SQLite driver, open() will create the SQLite database if it doesn't exist.
     database.setDatabaseName(fileName);
