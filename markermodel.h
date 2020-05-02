@@ -75,8 +75,8 @@ public:
             if (m_coordinates[i].id == id)
             {
                 beginRemoveRows(QModelIndex(), i, i);
-                m_coordinates.remove(i);
                 m_current_markers.erase(m_coordinates[i].id);
+                m_coordinates.remove(i);
                 endRemoveRows();
                 return;
             }

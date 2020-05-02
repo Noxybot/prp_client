@@ -13,7 +13,8 @@ ApplicationWindow {
     minimumWidth: Screen.width/1.5; minimumHeight: Screen.height/1.5
     property var db
     property string currentUserLogin: ""
-    property string serverIP: "178.150.141.36:1337"//"178.150.141.36:1337"
+    property string currentUserDN: ""
+    property string serverIP: "178.150.141.36:1337"
     property string profileImageBase64: ""
 
     WebSocket {
@@ -27,6 +28,7 @@ ApplicationWindow {
                 mainWebsocket.sendTextMessage(JSON.stringify(login_user_msg))
                 conversationModel.setCurrentUserLogin(currentUserLogin)
                 contactModel.setCurrentUserLogin(currentUserLogin)
+                currentUserDN = getDisplayNameByLogin(currentUserLogin) //blocking function
             }
         }
 
@@ -101,7 +103,6 @@ ApplicationWindow {
             console.log("image sent")
 
         }
-
         xhr.send(JSON.stringify(json_request));
     }
 

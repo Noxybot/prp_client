@@ -263,7 +263,6 @@ Page {
                 Button {
                     text: bottomProfile.receipient === currentUserLogin ? "Удалить" : "Ответить"
                     onClicked: {
-                        console.log("onClicked: receip: " + bottomProfile.receipient)
                         if (text == "Удалить")
                         {
                             var xhr = new XMLHttpRequest();

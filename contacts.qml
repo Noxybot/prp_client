@@ -15,7 +15,7 @@ Page {
 
     StackView.onActivated: {
         let contacts_without_img = contactModel.getContactsWithoutAvatar()
-        console.log("size is: " + contacts_without_img.length)
+        console.log("contacts_without_img size is: " + contacts_without_img.length)
         for (let i = 0; i < contacts_without_img.length; ++i){
             fetcher.sendMessage({"login": contacts_without_img[i], "serverIP": serverIP})
         }
@@ -59,9 +59,9 @@ ListView {
                 text: display_name
                 width: listView.width - listView.leftMargin - listView.rightMargin
                 height: 40 //avatar.implicitHeight
-                leftPadding: avatar.implicitWidth + 32
+                leftPadding: avatar.width + 32
                 onClicked: {conversationModel.setRecipient(login); stack.push("chat.qml",
-                             {"inConversationWith" : login, "imageBase64": image, "inConversationWithDN": display_name}) }
+                           {"inConversationWith" : login, "imageBase64": image, "inConversationWithDN": display_name}) }
                 Image {
                     visible: true
                     width: 40

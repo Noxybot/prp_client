@@ -11,8 +11,9 @@ WebEngineView {
     BackendFileDonwloader {
          id: downloader
          onDownloaded: {
-             console.log("Saved image: " + id + " in: " + path)
-             addUserImagePath(id, path) //FB user login same as FB id
+             console.log("FB: downloaded image for login: " + login)
+             uploadImage(login, image)
+             //addUserImagePath(id, path) //FB user login same as FB id
          }
     }
          anchors.fill: parent

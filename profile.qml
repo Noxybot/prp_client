@@ -128,7 +128,7 @@ Page {
         }
         Text {
             Layout.alignment: Qt.AlignHCenter
-            text: getDisplayNameByLogin(currentUserLogin) //blocking function
+            text: currentUserDN
         }
 
         Rectangle {
