@@ -78,6 +78,8 @@ Page {
                         width: 40
                         height: 40
                         id: avatar
+                        sourceSize.width: 40
+                        sourceSize.height: 40
                         source: "data:image/png;base64," +  (!sentByMe ? imageBase64 : profileImageBase64)
                     }
 

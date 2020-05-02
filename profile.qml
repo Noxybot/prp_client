@@ -85,6 +85,8 @@ Page {
                 source: "data:image/png;base64," + profileImageBase64
                 Layout.preferredWidth: profilePage.width*0.3
                 Layout.preferredHeight: profilePage.width*0.3
+                sourceSize.width: profilePage.width*0.3
+                sourceSize.height: profilePage.width*0.3
                 //fillMode: Image.PreserveAspectCrop
 //                layer.enabled: true
 //                layer.effect: OpacityMask {

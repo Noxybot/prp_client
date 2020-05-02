@@ -32,6 +32,7 @@ Page {
             source: camera
             anchors.fill: parent
             focus : visible // to receive focus and capture key events when visible
+            autoOrientation: true
         }
 
         Image {

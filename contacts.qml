@@ -66,6 +66,8 @@ ListView {
                     visible: true
                     width: 40
                     height: 40
+                    sourceSize.width: 40
+                    sourceSize.height: 40
                     id: avatar
                     source: "data:image/png;base64," + image
                 }
