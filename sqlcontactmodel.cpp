@@ -37,7 +37,6 @@ SqlContactModel::SqlContactModel(QObject *parent) :
 void SqlContactModel::setCurrentUserLogin(QString login)
 {
     m_current_user_login = std::move(login);
-    updateContacts();
     QSqlQuery query;
     query.prepare("SELECT login FROM Contacts WHERE contact_owner=:owner");
     query.bindValue(":owner", m_current_user_login);

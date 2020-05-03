@@ -26,8 +26,6 @@ ApplicationWindow {
                 login_user_msg["method"] = "login_user"
                 login_user_msg["login"] = currentUserLogin
                 mainWebsocket.sendTextMessage(JSON.stringify(login_user_msg))
-                conversationModel.setCurrentUserLogin(currentUserLogin)
-                contactModel.setCurrentUserLogin(currentUserLogin)
                 currentUserDN = getDisplayNameByLogin(currentUserLogin) //blocking function
             }
         }
@@ -80,17 +78,17 @@ ApplicationWindow {
                 let to_login = json_msg["to"] //todo: fix it
                 let from_login = json_msg["from"]
                 let msg_text = json_msg["text"]
+                let unix_time = parseInt(json_msg["timestamp"])
                 if (from_login === currentUserLogin){
-                    conversationModel.sendMessage("Me", to_login, msg_text)
+                    conversationModel.sendMessage("Me", to_login, msg_text, unix_time)
                     if (!contactModel.userPresent(to_login))
                         contactModel.addContact(to_login, getDisplayNameByLogin(to_login))
                 }
                 else {
-                    conversationModel.sendMessage(from_login, "Me", msg_text)
+                    conversationModel.sendMessage(from_login, "Me", msg_text, unix_time)
                     if (!contactModel.userPresent(from_login))
                         contactModel.addContact(from_login, getDisplayNameByLogin(from_login))
                 }
-                contactModel.updateContacts()
             }
             else if (method === "delete_marker"){
                 let marker_id = parseInt(json_msg["id"])
@@ -187,8 +185,9 @@ ApplicationWindow {
 
                 let response = JSON.parse(xhr.response)
                 let result = response["result"]
-                if (result === "logged in")
+                if (result === "logged in"){
                     ret = true;
+                }
                 else if (result === "not found") {
                     console.log("user not found")
                 }

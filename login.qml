@@ -81,6 +81,8 @@ Page {
                     console.log("login complete")
 
                     currentUserLogin = login_.text
+                    conversationModel.setCurrentUserLogin(currentUserLogin)
+                    contactModel.setCurrentUserLogin(currentUserLogin)
                     mainWebsocket.active = true
                     loadVisible = false
                     if (stack.depth === 1 )//|| stack.top() !== "map.qml") //ALISA PLEASE MAKE OTHER CHECK AND USE IT IN ALL PLACES
