@@ -1,6 +1,6 @@
 
 
-function fetchImageByLogin(login, callback, serverIP) {
+function fetchImageByLogin(login, callback, serverIP, count) {
     var xhr = new XMLHttpRequest();
     xhr.responseType = "json"
     xhr.open("POST", "http://" + serverIP)
@@ -12,7 +12,7 @@ function fetchImageByLogin(login, callback, serverIP) {
         if (xhr.status === 200) {
             if (xhr.response["result"] !== "no image")
                 console.log("fetchImageByLogin success")
-            callback(login, xhr.response["result"], serverIP)
+            callback(login, xhr.response["result"], serverIP, count)
         }
     }
     xhr.onerror = function(){
@@ -23,15 +23,20 @@ function fetchImageByLogin(login, callback, serverIP) {
 }
 
 
-function callback(login, image, serverIP) {
-    console.log("callback called")
+function callback(login, image, serverIP, count) {
+    console.log("imagefetcher: callback called")
+
+    if (count > 6){
+        console.log("imagefetcher: 6 attempts made, stopping")
+        return;
+    }
     if (image === "no image") {
         let timeStart = new Date().getTime();
         while (new Date().getTime() - timeStart < 5000) {
             // Do nothing
         }
         console.log("trying fetch image again")
-        fetchImageByLogin(login, callback, serverIP)
+        fetchImageByLogin(login, callback, serverIP, ++count)
     }
     else {
         console.log("image fetched")
@@ -39,5 +44,5 @@ function callback(login, image, serverIP) {
     }
 }
 WorkerScript.onMessage = function(msg) {
-    fetchImageByLogin(msg.login, callback, msg.serverIP)
+    fetchImageByLogin(msg.login, callback, msg.serverIP, 0)
 }

@@ -5,7 +5,7 @@
 #include <QGeoCoordinate>
 #include <QTime>
 #include <QDebug>
-#include <unordered_set>
+#include <unordered_map>
 
 struct PlaceInfo
 {
@@ -21,6 +21,7 @@ struct PlaceInfo
     QString expected_expenses;
     QString description;
     QTime creation_time;
+    QString image_base64;
 };
 
 class MarkerModel : public QAbstractListModel
@@ -42,6 +43,7 @@ public:
         expectedPeopleNumber = Qt::UserRole + 10,
         expectedExpenses = Qt::UserRole + 11,
         descriptionRole = Qt::UserRole + 12,
+        imageRole = Qt::UserRole + 13,
     };
 
     Q_INVOKABLE void addMarker(const QGeoCoordinate &coordinate, QString creator_login, QString name,
@@ -65,8 +67,20 @@ public:
         info.expected_expenses = std::move(expected_expenses);
         info.description = std::move(description);
         m_coordinates.push_back(std::move(info));
-        m_current_markers.insert(id);
+        m_current_markers[id] = false;
         endInsertRows();
+    }
+    Q_INVOKABLE void addImage(int id, QString image)
+    {
+        for (int i = 0; i < m_coordinates.size(); ++i)
+        {
+            if (m_coordinates[i].id == id)
+            {
+              m_coordinates[i].image_base64 = std::move(image);
+              m_current_markers[id] = true;
+              return;
+            }
+        }
     }
     Q_INVOKABLE void removeMarker(int id)
     {
@@ -115,6 +129,7 @@ public:
             case MarkerRoles::expectedPeopleNumber: return QVariant::fromValue(element.expected_people_number);
             case MarkerRoles::expectedExpenses: return QVariant::fromValue(element.expected_expenses);
             case MarkerRoles::descriptionRole: return QVariant::fromValue(element.description);
+            case MarkerRoles::imageRole: return QVariant::fromValue(element.image_base64);
         }
         return QVariant();
     }
@@ -134,6 +149,7 @@ public:
         roles[static_cast<int>(MarkerRoles::expectedExpenses)] = "expected_expenses";
         roles[static_cast<int>(MarkerRoles::expectedPeopleNumber)] = "expected_people_number";
         roles[static_cast<int>(MarkerRoles::descriptionRole)] = "description";
+        roles[static_cast<int>(MarkerRoles::imageRole)] = "image";
         return roles;
     }
 
@@ -141,9 +157,16 @@ public:
     {
         return m_current_markers.find(id) != std::end(m_current_markers);
     }
+    Q_INVOKABLE bool markerHasImage(int id)
+    {
+        auto marker = m_current_markers.find(id);
+        if (marker != std::end(m_current_markers))
+            return marker->second;
+        return false;
+    }
 
 private:
-    std::unordered_set<int> m_current_markers;
+    std::unordered_map<int, bool> m_current_markers; //id -> has_image
     QVector<PlaceInfo> m_coordinates;
 };
 

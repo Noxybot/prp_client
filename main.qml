@@ -37,8 +37,27 @@ ApplicationWindow {
             let method = json_msg["method"]
             if (method === "draw_marker") {
                 let id = parseInt(json_msg["id"])
-                if (markerModel.containtsMarker(id))
-                    return
+                if (markerModel.containtsMarker(id)) {
+                    if (!markerModel.markerHasImage(id)){
+                        console.log("marker: " + id + " has no image, will try to obtain it")
+                        let xhr = new XMLHttpRequest();
+                        xhr.responseType = "json"
+                        xhr.open("POST", "http://" + serverIP)
+                        xhr.setRequestHeader("Content-type", "application/json")
+                        let json_request = {"method": "get_marker_image", "id": id}
+                        xhr.onload = function() {
+                            if (xhr.status === 200) {
+                                let response = xhr.response
+                                if (response["result"] !== "no image"){
+                                    console.log("get_marker_image success")
+                                    markerModel.addImage(id, response["result"])
+                                }
+                            }
+                        }
+                        xhr.send(JSON.stringify(json_request));
+                    }
+                    return;
+                }
                 let latitude = parseFloat(json_msg["latitude"])
                 let longitude = parseFloat(json_msg["longitude"])
                 let creator_login = json_msg["creator_login"]
@@ -94,7 +113,7 @@ ApplicationWindow {
                     })
     }
     function uploadImage(login, image_base64) {
-        var xhr = new XMLHttpRequest();
+        let xhr = new XMLHttpRequest();
         xhr.responseType = "json"
         xhr.open("POST", "http://" + serverIP)
         xhr.setRequestHeader("Content-type", "application/json")

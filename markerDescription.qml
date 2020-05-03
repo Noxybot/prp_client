@@ -7,6 +7,7 @@ import QtQuick.Layouts 1.12
 Page {
     id: loginPage
     property var coordinates;
+    property string imageBase64 : "";
     header: ToolBar {
         ToolButton {
             id: menuButton
@@ -174,6 +175,7 @@ Page {
                 add_place_request["creation_time"] = Date.now()
 
                 var xhr = new XMLHttpRequest();
+                xhr.responseType = 'json'
                 xhr.open("POST", "http://" + serverIP, false)
                 xhr.setRequestHeader("Content-type", "application/json")
 
@@ -182,10 +184,24 @@ Page {
                     xhr.send(JSON.stringify(add_place_request));
                     if (xhr.status !== 200) //HTTP 200 OK means place added
                         console.log("Registration error ${xhr.status}: ${xhr.statusText}")
-                    else
-                       console.log(xhr.statusText)
+                    else {
+                         let response = xhr.response;
+                         let xhr1 = new XMLHttpRequest();
+                         xhr1.responseType = 'json'
+                         xhr1.open("POST", "http://" + serverIP, true)
+                         xhr1.setRequestHeader("Content-type", "application/json")
+                         let upload_place_image_request = {}
+                         upload_place_image_request["method"] = "upload_marker_image"
+                         upload_place_image_request["id"] = response["result"] //result of the response is a marker id
+                         console.log("img size: " + imageBase64.length)
+                         upload_place_image_request["image"] = imageBase64
+                         xhr1.onready = function(){
+                             console.log("image for marker sent")
+                         }
+                         xhr1.send(JSON.stringify(upload_place_image_request))
+                    }
                 } catch(err) {
-                    console.log("add_place request failed: " + err.prototype.message)
+                    console.log("add_place request failed: " + err.message)
                   }
 
 

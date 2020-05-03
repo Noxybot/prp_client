@@ -180,8 +180,8 @@ Page {
             model: markerModel
             delegate: MapQuickItem {
                 id: marker
-                anchorPoint.x: image.width / 4
-                anchorPoint.y: image.height
+                anchorPoint.x: image_.width / 4
+                anchorPoint.y: image_.height
                 coordinate: position
                 enabled: true
                 MouseArea {
@@ -196,11 +196,12 @@ Page {
                         description_.text = description
                         bottomProfile.receipient = creator_login
                         bottomProfile.placeId = marker_id
+                        bottomProfile.img_source = "data:image/png;base64," + image
                     }
                 }
 
                 sourceItem: Image {
-                    id: image
+                    id: image_
                     source: "http://maps.gstatic.com/mapfiles/ridefinder-images/mm_20_red.png"
 
                 }
@@ -228,6 +229,7 @@ Page {
         id: bottomProfile
         property string receipient
         property int placeId
+        property alias img_source: locationImage.source
         visible: false
         width: parent.width
         radius: 10
@@ -241,7 +243,7 @@ Page {
             spacing: 8
             Image {
                 id: locationImage
-                source: "images/worldwide-location.png"
+                source: "data:image/png;base64,";//"images/worldwide-location.png"
                 Layout.preferredWidth:  bottomProfile.height
                 Layout.preferredHeight: bottomProfile.height
             }

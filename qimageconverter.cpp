@@ -27,3 +27,8 @@ void QImageConverter::scheduleToBase64(QString id, QString file_path)
     std::thread t {&QImageConverter::toBase64Impl, this, std::move(id), std::move(file_path) };
     t.detach();
 }
+
+void QImageConverter::removeFile(const QString &file_path)
+{
+    QFile::remove(file_path);
+}
