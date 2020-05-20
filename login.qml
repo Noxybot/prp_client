@@ -7,6 +7,11 @@ import QtWebSockets 1.14
 
 Page {
     id: loginPage
+    background: Rectangle
+    {
+        color: "#394454"
+    }
+
     property var loadVisible: false
     StackView.onDeactivated: {
         loadVisible = false
@@ -28,11 +33,14 @@ Page {
         id: icon
         width: parent.width
         height: parent.height * 0.4
+        color: "#394454"
         Text {
             horizontalAlignment: Text.AlignHCenter
             height: parent.height
-            text: qsTr("\u36BE")
+            color: "#6fda9c"
+            text: qsTr("\uf5a0")
             font.pointSize: 200
+            font.family: "Font Awesome 5 Free Solid"
             fontSizeMode: Text.Fit
             anchors.centerIn: parent
         }
@@ -56,11 +64,10 @@ Page {
             placeholderText: qsTr("Пароль")
             Layout.preferredWidth: loginPage.width / 1.5
         }
-        Rectangle {
+        Item {
             Layout.alignment: Qt.AlignHCenter
             Layout.preferredHeight: loginPage.height / 50
             Layout.preferredWidth: loginPage.width / 4
-            visible:true
         }
         Button {
             Layout.alignment: Qt.AlignHCenter
@@ -71,6 +78,7 @@ Page {
                 font.pointSize: 20
                 minimumPointSize: 10
                 fontSizeMode: Text.Fit
+                color: "#f0f0f0"
             }
             Layout.maximumWidth: 200
             Layout.preferredHeight: loginPage.height / 10
@@ -90,13 +98,13 @@ Page {
 
                 }
                 else {
-                  loadVisible = false
-                   console.log("wrong credentials")
+                    loadVisible = false
+                    console.log("wrong credentials")
                 }
             }
             background: Rectangle {
                 radius: 20
-                color: "light grey"
+                color: "#6fda9c"
             }
         }
         Button {
@@ -112,6 +120,7 @@ Page {
                 height: parent.height * 0.7
                 font.pointSize: 100
                 fontSizeMode: Text.Fit
+                color: "#f0f0f0"
             }
             onClicked: {
                 console.log("Registration")
@@ -120,35 +129,46 @@ Page {
             }
             background: Rectangle {
                 radius: 20
-                color: "light grey"
+                color: "#394454"
+                border.color: "#6fda9c"
             }
         }
-        Rectangle {
+        Item {
             Layout.alignment: Qt.AlignHCenter
             Layout.preferredHeight: loginPage.height / 30
             Layout.preferredWidth: loginPage.width / 4
-            visible:true
         }
 
         Button {
             Layout.alignment: Qt.AlignHCenter
-            text: qsTr("Войти с Facebook")
+            Layout.maximumWidth: 200
+            Layout.preferredHeight: loginPage.height / 10
+            Layout.preferredWidth: loginPage.width / 2
+            contentItem: Text {
+                color: "#6fda9c"
+                text: qsTr("\uf082")
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+                height: parent.height * 0.7
+                font.pointSize: 100
+                fontSizeMode: Text.Fit
+                font.family: "Font Awesome 5 Brands"
+            }
+
             font.underline: true
             onClicked: {
                 console.log("FB")
                 if(stack.depth === 1)// || stack.top() !== "loginFB.qml")
-                stack.push("loginFB.qml")
+                    stack.push("loginFB.qml")
             }
-            Layout.preferredWidth: loginPage.width / 2
             background: Rectangle {
-                color: "white"
+                color: "#394454"
             }
         }
-        Rectangle {
+        Item {
             Layout.alignment: Qt.AlignHCenter
             Layout.preferredHeight: loginPage.height / 100
             Layout.preferredWidth: loginPage.width / 4
-            visible:true
         }
     }
 }

@@ -8,6 +8,7 @@
 #include <QSqlDatabase>
 #include <QSqlError>
 #include <QDir>
+#include <QFontDatabase>
 #include "qdownloader.h"
 #include "markermodel.h"
 #include "sqlconversationmodel.h"
@@ -49,6 +50,9 @@ int main(int argc, char *argv[])
 
     QQmlApplicationEngine engine;
     qDebug() << engine.offlineStoragePath();
+    QFontDatabase fontDB;
+    fontDB.addApplicationFont("qrc:/fontawesome-free-5.13.0-desktop/otfs/Font Awesome 5 Free-Regular-400.otf");
+    fontDB.addApplicationFont("qrc:/fontawesome-free-5.13.0-desktop/otfs/Font Awesome 5 Brands-Regular-400.otf");
     const QUrl url(QStringLiteral("qrc:/main.qml"));
 
     MarkerModel model;
