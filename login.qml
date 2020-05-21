@@ -34,13 +34,16 @@ Page {
         width: parent.width
         height: parent.height * 0.4
         color: "#394454"
-        Text {
+        Label {
             horizontalAlignment: Text.AlignHCenter
             height: parent.height
             color: "#6fda9c"
             text: qsTr("\uf5a0")
-            font.pointSize: 200
-            font.family: "Font Awesome 5 Free Solid"
+            font {
+                pointSize: 200
+                family: "Font Awesome 5 Free Solid"
+                bold: true
+            }
             fontSizeMode: Text.Fit
             anchors.centerIn: parent
         }

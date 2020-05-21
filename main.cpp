@@ -51,8 +51,15 @@ int main(int argc, char *argv[])
     QQmlApplicationEngine engine;
     qDebug() << engine.offlineStoragePath();
     QFontDatabase fontDB;
-    fontDB.addApplicationFont("qrc:/fontawesome-free-5.13.0-desktop/otfs/Font Awesome 5 Free-Regular-400.otf");
-    fontDB.addApplicationFont("qrc:/fontawesome-free-5.13.0-desktop/otfs/Font Awesome 5 Brands-Regular-400.otf");
+    auto ret = fontDB.addApplicationFont(":/fontawesome-free-5.13.0-desktop/otfs/Font Awesome 5 Free-Regular-400.otf");
+    if (ret == -1)
+        qDebug() << "font1 could not be loaded";
+    ret = fontDB.addApplicationFont(":/fontawesome-free-5.13.0-desktop/otfs/Font Awesome 5 Brands-Regular-400.otf");
+    if (ret == -1)
+        qDebug() << "font2 could not be loaded";
+    ret = fontDB.addApplicationFont(":/fontawesome-free-5.13.0-desktop/otfs/Font Awesome 5 Free-Solid-900.otf");
+    if (ret == -1)
+        qDebug() << "font3 could not be loaded";
     const QUrl url(QStringLiteral("qrc:/main.qml"));
 
     MarkerModel model;

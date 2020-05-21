@@ -69,7 +69,10 @@ Page {
             anchors.fill: parent
 
             ItemDelegate {
-                text: qsTr("Профиль")
+                text: "\uf2bd " + qsTr("Профиль")
+                font {
+                    family: "Font Awesome 5 Free Solid"
+                }
                 width: parent.width
                 onClicked: {
                     drawer.close()
@@ -78,7 +81,10 @@ Page {
                 }
             }
             ItemDelegate {
-                text: qsTr("Чаты")
+                text: "\uf086 " + qsTr("Чаты")
+                font {
+                    family: "Font Awesome 5 Free Solid"
+                }
                 width: parent.width
                 onClicked: {
                     drawer.close()
@@ -86,7 +92,10 @@ Page {
                 }
             }
             ItemDelegate {
-                text: qsTr("Выйти")
+                text: "\uf52b " + qsTr("Выйти")
+                font {
+                    family: "Font Awesome 5 Free Solid"
+                }
                 width: parent.width
                 onClicked: {
                     drawer.close()
