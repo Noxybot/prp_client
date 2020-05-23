@@ -24,10 +24,16 @@ struct PlaceInfo
     QString image_base64;
 };
 
+template <typename T>
+uint qHash(const std::shared_ptr<T>& ptr, uint seed = 0)
+{
+    return qHash(ptr.get(), seed);
+}
 class MarkerModel : public QAbstractListModel
 {
     Q_OBJECT
 public:
+    using markerPtr = std::shared_ptr<PlaceInfo>;
     using QAbstractListModel::QAbstractListModel;
     enum class MarkerRoles
     {
@@ -52,7 +58,6 @@ public:
                                QString description, const QTime &creation_time, int id)
     {
         qDebug() << "addMarker id : " << id;
-        beginInsertRows(QModelIndex(), rowCount(), rowCount());
         PlaceInfo info;
         info.id = id;
         info.coordinates = coordinate;
@@ -66,17 +71,27 @@ public:
         info.expected_people_number = std::move(expected_people_number);
         info.expected_expenses = std::move(expected_expenses);
         info.description = std::move(description);
-        m_coordinates.push_back(std::move(info));
+        auto marker = std::make_shared<PlaceInfo>(std::move(info));
+
+        beginInsertRows(QModelIndex(), rowCount(), rowCount());
+
+        if (m_visible_subcategories.find(marker->subcategory) != std::end(m_visible_subcategories))
+        {
+            m_visible_coordinates.push_back(marker);
+            m_all_coordinates.insert(std::move(marker));
+        }
+        else
+            m_all_coordinates.insert(std::move(marker));
         m_current_markers[id] = false;
         endInsertRows();
     }
     Q_INVOKABLE void addImage(int id, QString image)
     {
-        for (int i = 0; i < m_coordinates.size(); ++i)
+        for (int i = 0; i < m_visible_coordinates.size(); ++i)
         {
-            if (m_coordinates[i].id == id)
+            if (m_visible_coordinates[i]->id == id)
             {
-              m_coordinates[i].image_base64 = std::move(image);
+              m_visible_coordinates[i]->image_base64 = std::move(image);
               m_current_markers[id] = true;
               return;
             }
@@ -84,15 +99,23 @@ public:
     }
     Q_INVOKABLE void removeMarker(int id)
     {
-        for (int i = 0; i < m_coordinates.size(); ++i)
+        const auto markerIt = std::find_if(m_all_coordinates.begin(), m_all_coordinates.end(),
+                                     [&](const markerPtr& marker){
+            return marker->id == id;
+        });
+        if (markerIt == std::end(m_all_coordinates))
+            return;
+        m_all_coordinates.erase(markerIt);
+        if (markerIt->use_count() == 0)
+            return;
+        for (int i = 0; i < m_visible_coordinates.size(); ++i)
         {
-            if (m_coordinates[i].id == id)
+            if (m_visible_coordinates[i]->id == id)
             {
                 beginRemoveRows(QModelIndex(), i, i);
-                m_current_markers.erase(m_coordinates[i].id);
-                m_coordinates.remove(i);
+                m_current_markers.erase(m_visible_coordinates[i]->id);
+                m_visible_coordinates.remove(i);
                 endRemoveRows();
-                return;
             }
         }
 
@@ -101,7 +124,7 @@ public:
     int rowCount(const QModelIndex &parent = QModelIndex()) const override
     {
         Q_UNUSED(parent)
-        return m_coordinates.size();
+        return m_visible_coordinates.size();
     }
     int columnCount(const QModelIndex &parent) const override
     {
@@ -111,25 +134,25 @@ public:
 
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override
     {
-        if (index.row() < 0 || index.row() >= m_coordinates.size())
+        if (index.row() < 0 || index.row() >= m_visible_coordinates.size())
             return QVariant();
         const auto role_ = static_cast<MarkerRoles>(role);
-        const auto &element = m_coordinates[index.row()];
+        const auto &element = m_visible_coordinates[index.row()];
         switch (role_)
         {
-            case MarkerRoles::idRole: return QVariant::fromValue(element.id);
-            case MarkerRoles::positionRole: return QVariant::fromValue(element.coordinates);
-            case MarkerRoles::creationTimeRole: return QVariant::fromValue(element.creation_time);
-            case MarkerRoles::creatorLoginRole: return QVariant::fromValue(element.creator_login);
-            case MarkerRoles::nameRole: return QVariant::fromValue(element.name);
-            case MarkerRoles::categoryRole: return QVariant::fromValue(element.category);
-            case MarkerRoles::subcategoryRole: return QVariant::fromValue(element.subcategory);
-            case MarkerRoles::fromTimeRole: return QVariant::fromValue(element.from_time);
-            case MarkerRoles::toTimeRole: return QVariant::fromValue(element.to_time);
-            case MarkerRoles::expectedPeopleNumber: return QVariant::fromValue(element.expected_people_number);
-            case MarkerRoles::expectedExpenses: return QVariant::fromValue(element.expected_expenses);
-            case MarkerRoles::descriptionRole: return QVariant::fromValue(element.description);
-            case MarkerRoles::imageRole: return QVariant::fromValue(element.image_base64);
+            case MarkerRoles::idRole: return QVariant::fromValue(element->id);
+            case MarkerRoles::positionRole: return QVariant::fromValue(element->coordinates);
+            case MarkerRoles::creationTimeRole: return QVariant::fromValue(element->creation_time);
+            case MarkerRoles::creatorLoginRole: return QVariant::fromValue(element->creator_login);
+            case MarkerRoles::nameRole: return QVariant::fromValue(element->name);
+            case MarkerRoles::categoryRole: return QVariant::fromValue(element->category);
+            case MarkerRoles::subcategoryRole: return QVariant::fromValue(element->subcategory);
+            case MarkerRoles::fromTimeRole: return QVariant::fromValue(element->from_time);
+            case MarkerRoles::toTimeRole: return QVariant::fromValue(element->to_time);
+            case MarkerRoles::expectedPeopleNumber: return QVariant::fromValue(element->expected_people_number);
+            case MarkerRoles::expectedExpenses: return QVariant::fromValue(element->expected_expenses);
+            case MarkerRoles::descriptionRole: return QVariant::fromValue(element->description);
+            case MarkerRoles::imageRole: return QVariant::fromValue(element->image_base64);
         }
         return QVariant();
     }
@@ -164,10 +187,53 @@ public:
             return marker->second;
         return false;
     }
+    Q_INVOKABLE void AddVisibleSubcategory(const QString& subcat)
+    {
+        m_visible_subcategories.insert(subcat);
+        beginInsertRows(QModelIndex(), rowCount(), rowCount());
+        ActualizeCoordinates();
+        endInsertRows();
+
+    }
+    Q_INVOKABLE void RemoveVisibleSubcategory(const QString& subcat)
+    {
+        m_visible_subcategories.remove(subcat);
+        beginInsertRows(QModelIndex(), rowCount(), rowCount());
+        ActualizeCoordinates();
+        endInsertRows();
+    }
 
 private:
     std::unordered_map<int, bool> m_current_markers; //id -> has_image
-    QVector<PlaceInfo> m_coordinates;
+    QSet<QString> m_visible_subcategories;
+    QSet<markerPtr> m_all_coordinates;
+    QVector<markerPtr> m_visible_coordinates;
+
+    bool IsMarkerVisible(const markerPtr& marker)
+    {
+        return m_visible_subcategories.find(marker->subcategory) != std::end(m_visible_subcategories);
+    }
+
+    void ActualizeCoordinates()
+    {
+        for (auto& marker : m_all_coordinates)
+        {
+            if (IsMarkerVisible(marker))
+            {
+                if (marker.use_count() == 1) //means that shared_ptr stored only in m_all_coordinates
+                {
+                    m_visible_coordinates.push_back(marker);
+                }
+            }
+            else
+            {
+                if (marker.use_count() == 2)
+                {
+                    m_visible_coordinates.removeOne(marker);
+                }
+            }
+        }
+    }
 
 };
 
