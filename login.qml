@@ -142,9 +142,11 @@ Page {
             Layout.preferredWidth: loginPage.width / 4
         }
 
+        RowLayout {
+            Layout.alignment: Qt.AlignHCenter
         Button {
             Layout.alignment: Qt.AlignHCenter
-            Layout.maximumWidth: 200
+            Layout.maximumWidth: 113
             Layout.preferredHeight: loginPage.height / 10
             Layout.preferredWidth: loginPage.width / 2
             contentItem: Text {
@@ -167,6 +169,7 @@ Page {
             background: Rectangle {
                 color: "#394454"
             }
+        }
         }
         Item {
             Layout.alignment: Qt.AlignHCenter
