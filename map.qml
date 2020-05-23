@@ -9,11 +9,11 @@ import QtQml 2.14
 
 Page {
     WorkerScript {
-            id: fetcher
-            source: "imageFetcher.js"
+        id: fetcher
+        source: "imageFetcher.js"
 
-            onMessage:{console.log("imageFetcher succeed"); profileImageBase64 = messageObject.image; }
-        }
+        onMessage:{console.log("imageFetcher succeed"); profileImageBase64 = messageObject.image; }
+    }
 
 
     StackView.onActivated: {
@@ -293,11 +293,11 @@ Page {
                             }
                         }
                         else {
-                        if (stack.top !== "chat.qml") {
-                            let receipent = bottomProfile.receipient
-                            conversationModel.setRecipient(receipent)
-                            stack.push("chat.qml", {"inConversationWith" : bottomProfile.receipient,
-                                       "imageBase64": contactModel.getUserImageByLogin(receipent)})
+                            if (stack.top !== "chat.qml") {
+                                let receipent = bottomProfile.receipient
+                                conversationModel.setRecipient(receipent)
+                                stack.push("chat.qml", {"inConversationWith" : bottomProfile.receipient,
+                                               "imageBase64": contactModel.getUserImageByLogin(receipent)})
                             }
                         }
                     }
@@ -311,6 +311,79 @@ Page {
             anchors.top: parent.top;
             onClicked: {
                 parent.visible = false;
+            }
+        }
+    }
+    footer: ToolBar {
+        RowLayout{
+            Layout.alignment: Qt.AlignHCenter;
+        ComboBox {
+            id: type
+            model: ["Спорт", "Культурный отдых", "Ночная жизнь", "Развлечения"]
+            onCurrentIndexChanged:
+            {
+                switch(type.currentIndex)
+                {
+                case 0:
+                    button1.text = "Велоспорт";
+                    button2.text = "Футбол";
+                    button3.text = "Бег";
+                    button4.text = "Баскетбол";
+                    button5.text = "Спортзал";
+                    button6.visible = false;
+                    button7.visible = false;
+                    break;
+                case 1:
+                    button1.text = "Музей";
+                    button2.text = "Галерея";
+                    button3.text = "Экскурсия";
+                    button4.text = "Театр";
+                    button5.text = "Кинотеатр";
+                    button6.visible = false;
+                    button7.visible = false;
+                    break;
+                case 2:
+                    button1.text = "Бар";
+                    button2.text = "Ресторан";
+                    button3.text = "Клуб";
+                    button4.text = "Кальян";
+                    button5.visible = false;
+                    button6.visible = false;
+                    button7.visible = false;
+                    break;
+                case 3:
+                    button1.text = "Цирк";
+                    button2.text = "Парк развлечений";
+                    button3.text = "Концерт";
+                    button4.text = "Развлекательный центр";
+                    button5.text = "Квест";
+                    button6.text = "Лазертаг\Пейнтбол";
+                    button7.text = "Зоопарк";
+                    break;
+                }
+            }
+        }
+
+            ToolButton{
+                id: button1
+            }
+            ToolButton{
+                id: button2
+            }
+            ToolButton{
+                id: button3
+            }
+            ToolButton{
+                id: button4
+            }
+            ToolButton{
+                id: button5
+            }
+            ToolButton{
+                id: button6
+            }
+            ToolButton{
+                id: button7
             }
         }
     }

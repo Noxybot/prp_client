@@ -87,6 +87,7 @@ Page {
             Layout.preferredHeight: loginPage.height / 10
             Layout.preferredWidth: loginPage.width / 2
             onClicked: {
+                /*
                 loadVisible =  true
                 if (confirmLogin(login_.text, password.text) === true) {
                     console.log("login complete")
@@ -96,10 +97,11 @@ Page {
                     contactModel.setCurrentUserLogin(currentUserLogin)
                     mainWebsocket.active = true
                     loadVisible = false
+                    */
                     if (stack.depth === 1 )//|| stack.top() !== "map.qml") //ALISA PLEASE MAKE OTHER CHECK AND USE IT IN ALL PLACES
                         stack.push("map.qml")
 
-                }
+                //}
                 else {
                     loadVisible = false
                     console.log("wrong credentials")
@@ -151,13 +153,13 @@ Page {
             Layout.preferredWidth: loginPage.width / 2
             contentItem: Text {
                 color: "#6fda9c"
-                text: qsTr("\uf082")
+                text: "\uf082"
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
                 height: parent.height * 0.7
                 font.pointSize: 100
                 fontSizeMode: Text.Fit
-                font.family: "Font Awesome 5 Brands"
+                font.family: "Font Awesome 5 Brands Regular"
             }
 
             font.underline: true

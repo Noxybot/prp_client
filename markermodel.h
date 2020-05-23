@@ -168,6 +168,7 @@ public:
 private:
     std::unordered_map<int, bool> m_current_markers; //id -> has_image
     QVector<PlaceInfo> m_coordinates;
+
 };
 
 #endif // MARKERMODEL_H

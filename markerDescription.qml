@@ -92,37 +92,7 @@ Page {
             Layout.preferredWidth: loginPage.width / 1.5
             model: ["Велоспорт", "Футбол", "Бег", "Баскетбол", "Спортзал"]
         }
-        RowLayout
-        {
-            Layout.alignment: Qt.AlignHCenter
-            Text {
-                id: time
-                text: qsTr("Время")
-            }
-            TextField {
-                id: from_time
-                placeholderText: "С"
-            }
-            TextField {
-                id: to_time
-                placeholderText: "До"
-            }
-        }
 
-        ComboBox {
-            id: peopleCount
-            Layout.maximumWidth: 300
-            Layout.alignment: Qt.AlignHCenter
-            Layout.preferredWidth: loginPage.width / 1.5
-            model: ["Ожидаемое количество участников", "1 - 3", "4 - 6", "7 - 10", "11 - 20", "21 - 30"]
-        }
-        ComboBox {
-            id: expenses
-            Layout.maximumWidth: 300
-            Layout.alignment: Qt.AlignHCenter
-            Layout.preferredWidth: loginPage.width / 1.5
-            model: ["Ожидаемы траты с человека", "0 - 100", "100 - 200", "200 - 500", "500 - 1000", "1000 - 5000"]
-        }
         TextArea {
             id: description_
             Layout.maximumWidth: 300
@@ -141,9 +111,9 @@ Page {
             Layout.maximumWidth: 200
             Layout.alignment: Qt.AlignHCenter
             Layout.preferredWidth: loginPage.width / 1.5
-            text: qsTr("Фото")
+            text: qsTr("Далее")
             onClicked: {
-                stack.push("camera.qml")
+                stack.push("timePicker.qml")
             }
         }
         Button {
