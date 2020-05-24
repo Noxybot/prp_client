@@ -8,6 +8,10 @@ Page {
     id: loginPage
     property var coordinates;
     property string imageBase64 : "";
+    property string name;
+    property string type;
+    property string subtype;
+    property string description;
     header: ToolBar {
         ToolButton {
             id: menuButton
@@ -62,6 +66,10 @@ Page {
             }
 
             TextField {
+                id: from_time
+                placeholderText: "От"
+            }
+            TextField {
                 id: to_time
                 placeholderText: "До"
             }
@@ -87,7 +95,11 @@ Page {
             Layout.preferredWidth: loginPage.width / 1.5
             text: qsTr("Фото")
             onClicked: {
-                stack.push("camera.qml")
+                stack.push("camera.qml", {"name":name,
+                               "type":type, "subtype":subtype,
+                               "description":description, "from_time" : from_time.text,
+                           "to_time": to_time.text, "peopleCount" : peopleCount.currentText,
+                           "expenses": expenses.currentText, "coordinates" : coordinates})
             }
         }
     }

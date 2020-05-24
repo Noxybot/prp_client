@@ -10,7 +10,17 @@ Page {
     id : cameraUI
     background: Rectangle {color: "black"; anchors.fill: parent }
     state: "PhotoCapture"
+    property var coordinates;
+    property string imageBase64_ : "";
     property string last_image_path: ""
+    property string name;
+    property string type;
+    property string subtype;
+    property string description;
+    property string from_time;
+    property string to_time;
+    property string peopleCount;
+    property string expenses;
     states: [
         State {
             name: "PhotoCapture"
@@ -101,9 +111,24 @@ Page {
         id: imageConverter
         onImageConveted: {
             imageConverter.removeFile(last_image_path)
-            let previousItem = stack.get(cameraUI.StackView.index - 1);
-            previousItem.imageBase64 = imageBase64;
-            stack.pop()
+            imageBase64_ = imageBase64;
+            if (xhr.status !== 200) //HTTP 200 OK means place added
+                console.log("Registration error ${xhr.status}: ${xhr.statusText}")
+            else {
+                 let xhr1 = new XMLHttpRequest();
+                 xhr1.responseType = 'json'
+                 xhr1.open("POST", "http://" + serverIP, true)
+                 xhr1.setRequestHeader("Content-type", "application/json")
+                 let upload_place_image_request = {}
+                 upload_place_image_request["method"] = "upload_marker_image"
+                 upload_place_image_request["id"] = response["result"] //result of the response is a marker id
+                 console.log("img size: " + imageBase64_.length)
+                 upload_place_image_request["image"] = imageBase64_
+                 xhr1.onready = function(){
+                     console.log("image for marker sent")
+                 }
+                 xhr1.send(JSON.stringify(upload_place_image_request))
+            }
         }
     }
     Button {
@@ -113,6 +138,44 @@ Page {
         onClicked:
         {
             imageConverter.scheduleToBase64("", last_image_path)
+                function get_milliseconds_from_hours(time_str) {
+                    let date_obj = new Date()
+                    let time_splited = time_str.split(':')
+                    date_obj.setHours(parseInt(time_splited[0]), parseInt(time_splited[1]))
+                    return date_obj.getTime()
+                }
+
+                let add_place_request = {}
+                add_place_request["method"] = "add_place"
+                add_place_request["latitude"] = coordinates.latitude
+                add_place_request["longitude"] = coordinates.longitude
+                add_place_request["creator_login"] = mainWindow.currentUserLogin
+                add_place_request["name"] = name
+                add_place_request["category"] = type
+                add_place_request["subcategory"] = subtype
+                add_place_request["from_time"] = get_milliseconds_from_hours(from_time)
+                add_place_request["to_time"] = get_milliseconds_from_hours(to_time)
+                add_place_request["expected_people_number"] = peopleCount
+                add_place_request["expected_expenses"] = expenses
+                add_place_request["description"] = description
+                add_place_request["creation_time"] = Date.now()
+
+                var xhr = new XMLHttpRequest();
+                xhr.responseType = 'json'
+                xhr.open("POST", "http://" + serverIP, false)
+                xhr.setRequestHeader("Content-type", "application/json")
+
+
+                try {
+                    xhr.send(JSON.stringify(add_place_request));
+
+                } catch(err) {
+                    console.log("add_place request failed: " + err.message)
+                  }
+
+            stack.pop()
+            stack.pop()
+            stack.pop()
         }
     }
     Button {

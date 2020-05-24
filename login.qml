@@ -129,7 +129,7 @@ Page {
             }
             onClicked: {
                 console.log("Registration")
-                if(stack.depth === 1) //top() !== "signin.qml")
+                if(stack.top !== "signin.qml")
                     stack.push("signin.qml")
             }
             background: Rectangle {
@@ -165,7 +165,7 @@ Page {
                 font.underline: true
                 onClicked: {
                     console.log("FB")
-                    if(stack.depth === 1)// || stack.top() !== "loginFB.qml")
+                    if(stack.top !== "loginFB.qml")
                         stack.push("loginFB.qml")
                 }
                 background: Rectangle {
@@ -180,7 +180,7 @@ Page {
         }
     }
     function login() {
-        /*
+
         loadVisible =  true
         if (confirmLogin(login_.text, password.text) === true) {
             console.log("login complete")
@@ -190,11 +190,11 @@ Page {
             contactModel.setCurrentUserLogin(currentUserLogin)
             mainWebsocket.active = true
             loadVisible = false
-            */
-        if (stack.depth === 1 )//|| stack.top() !== "map.qml") //ALISA PLEASE MAKE OTHER CHECK AND USE IT IN ALL PLACES
+
+        if (stack.top !== "map.qml")
             stack.push("map.qml")
 
-        //}
+        }
         else {
             loadVisible = false
             console.log("wrong credentials")
