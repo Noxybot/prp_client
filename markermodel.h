@@ -204,7 +204,6 @@ public:
         endInsertRows();
         m_areAllMarkesVisible = m_visible_subcategories.empty();
     }
-    }
 
 private:
     std::unordered_map<int, bool> m_current_markers; //id -> has_image

@@ -7,6 +7,7 @@ Page {
     property string inConversationWith
     property string inConversationWithDN
     property string imageBase64
+    StackView.onActivated: {nConversationWithDN = getDisplayNameByLogin(inConversationWith)}
     header: ToolBar {
         ToolButton {
             id: menuButton
