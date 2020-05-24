@@ -49,6 +49,12 @@ ApplicationWindow {
                                 if (response["result"] !== "no image"){
                                     console.log("get_marker_image success")
                                     markerModel.addImage(id, response["result"])
+                                    console.log("stack.currentItem.objectName = " + stack.currentItem.objectName)
+                                    if (stack.currentItem.objectName === "mapPage"){
+                                        console.log("stack.currentItem.bottomProfile.placeId: " + stack.currentItem.bottomProfile.placeId + " id: " + id)
+                                        if (stack.currentItem.bottomProfile.placeId === id)
+                                            stack.currentItem.bottomProfile.img_source  = "data:image/png;base64," + response["result"]
+                                    }
                                 }
                             }
                         }

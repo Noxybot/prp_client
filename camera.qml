@@ -12,6 +12,8 @@ Page {
     state: "PhotoCapture"
     property var coordinates;
     property string imageBase64_ : "";
+    property int create_marker_status: -1
+    property string create_marker_id: ""
     property string last_image_path: ""
     property string name;
     property string type;
@@ -111,23 +113,22 @@ Page {
         id: imageConverter
         onImageConveted: {
             imageConverter.removeFile(last_image_path)
-            imageBase64_ = imageBase64;
-            if (xhr.status !== 200) //HTTP 200 OK means place added
-                console.log("Registration error ${xhr.status}: ${xhr.statusText}")
+            if (create_marker_status !== 200) //HTTP 200 OK means place added
+                console.log("Marker creation error ${xhr.status}: ${xhr.statusText}")
             else {
-                 let xhr1 = new XMLHttpRequest();
-                 xhr1.responseType = 'json'
-                 xhr1.open("POST", "http://" + serverIP, true)
-                 xhr1.setRequestHeader("Content-type", "application/json")
+                 let xhr = new XMLHttpRequest();
+                 xhr.responseType = 'json'
+                 xhr.open("POST", "http://" + serverIP, true)
+                 xhr.setRequestHeader("Content-type", "application/json")
                  let upload_place_image_request = {}
                  upload_place_image_request["method"] = "upload_marker_image"
-                 upload_place_image_request["id"] = response["result"] //result of the response is a marker id
-                 console.log("img size: " + imageBase64_.length)
-                 upload_place_image_request["image"] = imageBase64_
-                 xhr1.onready = function(){
+                 upload_place_image_request["id"] = create_marker_id
+                 console.log("img size: " + imageBase64.length)
+                 upload_place_image_request["image"] = imageBase64
+                 xhr.onready = function(){
                      console.log("image for marker sent")
                  }
-                 xhr1.send(JSON.stringify(upload_place_image_request))
+                 xhr.send(JSON.stringify(upload_place_image_request))
             }
         }
     }
@@ -168,6 +169,8 @@ Page {
 
                 try {
                     xhr.send(JSON.stringify(add_place_request));
+                    create_marker_status = xhr.status;
+                    create_marker_id = xhr.response["result"] //result of the response is a marker id
 
                 } catch(err) {
                     console.log("add_place request failed: " + err.message)

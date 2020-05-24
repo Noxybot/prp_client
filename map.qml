@@ -24,6 +24,8 @@ Page {
 
 
     id: mapPage
+    property string objectName: "mapPage"
+    property alias bottomProfile: bottomProfile
     visible: true
     title: qsTr("Come together")
     header: ToolBar {
@@ -212,13 +214,13 @@ Page {
                     anchors.fill: parent;
                     onClicked:
                     {
-                        bottomProfile.visible = true;
                         name_.text = name;
                         info.text = from_time + " - " + to_time + '\t' + expected_expenses + '\t' + expected_people_number
                         description_.text = description
                         bottomProfile.receipient = creator_login
                         bottomProfile.placeId = marker_id
                         bottomProfile.img_source = "data:image/png;base64," + image
+                        bottomProfile.visible = true
                     }
                 }
 
@@ -250,7 +252,7 @@ Page {
     Rectangle {
         id: bottomProfile
         property string receipient
-        property int placeId
+        property int placeId: -1
         property alias img_source: locationImage.source
         visible: false
         width: parent.width
@@ -324,6 +326,7 @@ Page {
             anchors.top: parent.top;
             onClicked: {
                 parent.visible = false;
+                parent.placeId = -1;
             }
         }
     }

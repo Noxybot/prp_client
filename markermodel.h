@@ -75,7 +75,7 @@ public:
 
         beginInsertRows(QModelIndex(), rowCount(), rowCount());
 
-        if (m_visible_subcategories.find(marker->subcategory) != std::end(m_visible_subcategories))
+        if (m_visible_subcategories.find(marker->subcategory) != std::end(m_visible_subcategories) ||m_areAllMarkesVisible)
         {
             m_visible_coordinates.push_back(marker);
             m_all_coordinates.insert(std::move(marker));
@@ -193,6 +193,7 @@ public:
         beginInsertRows(QModelIndex(), rowCount(), rowCount());
         ActualizeCoordinates();
         endInsertRows();
+        m_areAllMarkesVisible = false;
 
     }
     Q_INVOKABLE void RemoveVisibleSubcategory(const QString& subcat)
@@ -201,6 +202,8 @@ public:
         beginInsertRows(QModelIndex(), rowCount(), rowCount());
         ActualizeCoordinates();
         endInsertRows();
+        m_areAllMarkesVisible = m_visible_subcategories.empty();
+    }
     }
 
 private:
@@ -208,6 +211,7 @@ private:
     QSet<QString> m_visible_subcategories;
     QSet<markerPtr> m_all_coordinates;
     QVector<markerPtr> m_visible_coordinates;
+    bool m_areAllMarkesVisible = true;
 
     bool IsMarkerVisible(const markerPtr& marker)
     {
