@@ -25,5 +25,6 @@
         <file>fontawesome-free-5.13.0-desktop/otfs/README.md</file>
         <file>fontawesome-free-5.13.0-desktop/LICENSE.txt</file>
         <file>timePicker.qml</file>
+        <file>qtquickcontrols2.conf</file>
     </qresource>
 </RCC>

@@ -11,11 +11,15 @@ Page {
     {
         color: "#394454"
     }
-
+    focus: true
     property var loadVisible: false
     StackView.onDeactivated: {
         loadVisible = false
     }
+    StackView.onActivated: {
+        login_.focus = true;
+    }
+
     Rectangle {
         id: load
         anchors.fill: parent
@@ -53,12 +57,20 @@ Page {
         anchors.top: icon.bottom
         width: parent.width
         spacing: parent.height/50
+        focus: true
         TextField {
             id: login_
+            focus: true
             Layout.maximumWidth: 300
             Layout.alignment: Qt.AlignHCenter
             placeholderText: qsTr("Логин")
             Layout.preferredWidth: loginPage.width / 1.5
+            leftPadding: 10
+            onAccepted: {
+                password.focus = true;
+                login_.focus = false;
+                console.log("login enter")
+            }
         }
         TextField {
             id: password
@@ -66,6 +78,12 @@ Page {
             Layout.alignment: Qt.AlignHCenter
             placeholderText: qsTr("Пароль")
             Layout.preferredWidth: loginPage.width / 1.5
+            echoMode: TextInput.Password
+            leftPadding: 10
+            onAccepted: {
+                login();
+                console.log("password enter")
+            }
         }
         Item {
             Layout.alignment: Qt.AlignHCenter
@@ -87,25 +105,7 @@ Page {
             Layout.preferredHeight: loginPage.height / 10
             Layout.preferredWidth: loginPage.width / 2
             onClicked: {
-                /*
-                loadVisible =  true
-                if (confirmLogin(login_.text, password.text) === true) {
-                    console.log("login complete")
-
-                    currentUserLogin = login_.text
-                    conversationModel.setCurrentUserLogin(currentUserLogin)
-                    contactModel.setCurrentUserLogin(currentUserLogin)
-                    mainWebsocket.active = true
-                    loadVisible = false
-                    */
-                    if (stack.depth === 1 )//|| stack.top() !== "map.qml") //ALISA PLEASE MAKE OTHER CHECK AND USE IT IN ALL PLACES
-                        stack.push("map.qml")
-
-                //}
-                else {
-                    loadVisible = false
-                    console.log("wrong credentials")
-                }
+                login();
             }
             background: Rectangle {
                 radius: 20
@@ -146,32 +146,32 @@ Page {
 
         RowLayout {
             Layout.alignment: Qt.AlignHCenter
-        Button {
-            Layout.alignment: Qt.AlignHCenter
-            Layout.maximumWidth: 113
-            Layout.preferredHeight: loginPage.height / 10
-            Layout.preferredWidth: loginPage.width / 2
-            contentItem: Text {
-                color: "#6fda9c"
-                text: "\uf082"
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
-                height: parent.height * 0.7
-                font.pointSize: 100
-                fontSizeMode: Text.Fit
-                font.family: "Font Awesome 5 Brands Regular"
-            }
+            Button {
+                Layout.alignment: Qt.AlignHCenter
+                Layout.maximumWidth: 113
+                Layout.preferredHeight: loginPage.height / 10
+                Layout.preferredWidth: loginPage.width / 2
+                contentItem: Text {
+                    color: "#6fda9c"
+                    text: "\uf082"
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                    height: parent.height * 0.7
+                    font.pointSize: 100
+                    fontSizeMode: Text.Fit
+                    font.family: "Font Awesome 5 Brands Regular"
+                }
 
-            font.underline: true
-            onClicked: {
-                console.log("FB")
-                if(stack.depth === 1)// || stack.top() !== "loginFB.qml")
-                    stack.push("loginFB.qml")
+                font.underline: true
+                onClicked: {
+                    console.log("FB")
+                    if(stack.depth === 1)// || stack.top() !== "loginFB.qml")
+                        stack.push("loginFB.qml")
+                }
+                background: Rectangle {
+                    color: "#394454"
+                }
             }
-            background: Rectangle {
-                color: "#394454"
-            }
-        }
         }
         Item {
             Layout.alignment: Qt.AlignHCenter
@@ -179,4 +179,27 @@ Page {
             Layout.preferredWidth: loginPage.width / 4
         }
     }
+    function login() {
+        /*
+        loadVisible =  true
+        if (confirmLogin(login_.text, password.text) === true) {
+            console.log("login complete")
+
+            currentUserLogin = login_.text
+            conversationModel.setCurrentUserLogin(currentUserLogin)
+            contactModel.setCurrentUserLogin(currentUserLogin)
+            mainWebsocket.active = true
+            loadVisible = false
+            */
+        if (stack.depth === 1 )//|| stack.top() !== "map.qml") //ALISA PLEASE MAKE OTHER CHECK AND USE IT IN ALL PLACES
+            stack.push("map.qml")
+
+        //}
+        else {
+            loadVisible = false
+            console.log("wrong credentials")
+        }
+    }
 }
+
+

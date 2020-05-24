@@ -35,27 +35,40 @@ Page {
 
             Text {
                 id: menuButtonName
-                text: qsTr("\u2630")
+                text: qsTr("\uf0c9")
                 width: parent.width * 0.7
                 height: parent.height * 0.7
                 font.pointSize: 100
                 minimumPointSize: 10
                 fontSizeMode: Text.Fit
                 anchors.centerIn: parent
+                font.family: "Font Awesome 5 Free Solid"
+                color: "#6fda9c"
             }
 
         }
         TextField {
-            anchors.right:  parent.right
+            id: search
+            anchors.right:  delete_.left
             placeholderText: qsTr("Искать место...")
             anchors.rightMargin: parent.width*0.015
             anchors.verticalCenter: parent.verticalCenter
             width: parent.width/2
-            background: Rectangle {
-                radius: 5
+            leftPadding: 10
+            Text {
+                anchors.verticalCenter: parent.verticalCenter
+                color: "black"
             }
         }
-
+        ToolButton {
+            id: delete_
+            anchors.right:  parent.right
+            text: "\uf00d"
+            font.family: "Font Awesome 5 Free Solid"
+            onClicked: {
+                search.clear()
+            }
+        }
     }
 
     Drawer {
@@ -316,74 +329,87 @@ Page {
     }
     footer: ToolBar {
         RowLayout{
-            Layout.alignment: Qt.AlignHCenter;
-        ComboBox {
-            id: type
-            model: ["Спорт", "Культурный отдых", "Ночная жизнь", "Развлечения"]
-            onCurrentIndexChanged:
-            {
-                switch(type.currentIndex)
+            width: parent.width
+            ComboBox {
+                id: type
+                model: ["Спорт", "Культурный отдых", "Ночная жизнь", "Развлечения"]
+                Layout.preferredWidth: parent.width*0.3
+                onCurrentIndexChanged:
                 {
-                case 0:
-                    button1.text = "Велоспорт";
-                    button2.text = "Футбол";
-                    button3.text = "Бег";
-                    button4.text = "Баскетбол";
-                    button5.text = "Спортзал";
-                    button6.visible = false;
-                    button7.visible = false;
-                    break;
-                case 1:
-                    button1.text = "Музей";
-                    button2.text = "Галерея";
-                    button3.text = "Экскурсия";
-                    button4.text = "Театр";
-                    button5.text = "Кинотеатр";
-                    button6.visible = false;
-                    button7.visible = false;
-                    break;
-                case 2:
-                    button1.text = "Бар";
-                    button2.text = "Ресторан";
-                    button3.text = "Клуб";
-                    button4.text = "Кальян";
-                    button5.visible = false;
-                    button6.visible = false;
-                    button7.visible = false;
-                    break;
-                case 3:
-                    button1.text = "Цирк";
-                    button2.text = "Парк развлечений";
-                    button3.text = "Концерт";
-                    button4.text = "Развлекательный центр";
-                    button5.text = "Квест";
-                    button6.text = "Лазертаг\Пейнтбол";
-                    button7.text = "Зоопарк";
-                    break;
+                    switch(type.currentIndex)
+                    {
+                    case 0:
+                        button1.text = "Велоспорт";
+                        button2.text = "Футбол";
+                        button3.text = "Бег";
+                        button4.text = "Баскетбол";
+                        button5.visible = true;
+                        button5.text = "Спортзал";
+                        button6.visible = false;
+                        button7.visible = false;
+                        break;
+                    case 1:
+                        button1.text = "Музей";
+                        button2.text = "Галерея";
+                        button3.text = "Экскурсия";
+                        button4.text = "Театр";
+                        button5.visible = true;
+                        button5.text = "Кинотеатр";
+                        button6.visible = false;
+                        button7.visible = false;
+                        break;
+                    case 2:
+                        button1.text = "Бар";
+                        button2.text = "Ресторан";
+                        button3.text = "Клуб";
+                        button4.text = "Кальян";
+                        button5.visible = false;
+                        button6.visible = false;
+                        button7.visible = false;
+                        break;
+                    case 3:
+                        button1.text = "Цирк";
+                        button2.text = "Парк развлечений";
+                        button3.text = "Концерт";
+                        button4.text = "Развлекательный центр";
+                        button5.visible = true;
+                        button5.text = "Квест";
+                        button6.visible = true;
+                        button6.text = "Лазертаг\\Пейнтбол";
+                        button7.visible = true;
+                        button7.text = "Зоопарк";
+                        break;
+                    }
                 }
             }
-        }
 
             ToolButton{
                 id: button1
+                anchors.left: type.right
             }
             ToolButton{
                 id: button2
+                anchors.left: button1.right
             }
             ToolButton{
                 id: button3
+                anchors.left: button2.right
             }
             ToolButton{
                 id: button4
+                anchors.left: button3.right
             }
             ToolButton{
                 id: button5
+                anchors.left: button4.right
             }
             ToolButton{
                 id: button6
+                anchors.left: button5.right
             }
             ToolButton{
                 id: button7
+                anchors.left: button6.right
             }
         }
     }
