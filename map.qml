@@ -312,7 +312,8 @@ Page {
                                 let receipent = bottomProfile.receipient
                                 conversationModel.setRecipient(receipent)
                                 stack.push("chat.qml", {"inConversationWith" : bottomProfile.receipient,
-                                               "imageBase64": contactModel.getUserImageByLogin(receipent)})
+                                               "imageBase64": contactModel.getUserImageByLogin(receipent),
+                                               "inConversationWithDN": getDisplayNameByLogin(inConversationWith)})
                             }
                         }
                     }
