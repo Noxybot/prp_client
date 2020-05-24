@@ -80,7 +80,7 @@ Page {
                         id: avatar
                         sourceSize.width: 40
                         sourceSize.height: 40
-                        source: "data:image/png;base64," +  (!sentByMe ? imageBase64 : profileImageBase64)
+                        source: "data:image/png;base64," +  (!sentByMe ? contactModel.getUserImageByLogin(inConversationWith) : profileImageBase64)
                     }
 
                     Rectangle {
