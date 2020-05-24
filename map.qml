@@ -311,9 +311,9 @@ Page {
                             if (stack.top !== "chat.qml") {
                                 let receipent = bottomProfile.receipient
                                 conversationModel.setRecipient(receipent)
-                                stack.push("chat.qml", {"inConversationWith" : bottomProfile.receipient,
+                                stack.push("chat.qml", {"inConversationWith" : receipient,
                                                "imageBase64": contactModel.getUserImageByLogin(receipent),
-                                               "inConversationWithDN": getDisplayNameByLogin(inConversationWith)})
+                                               "inConversationWithDN": getDisplayNameByLogin(receipent)})
                             }
                         }
                     }
