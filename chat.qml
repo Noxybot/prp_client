@@ -122,6 +122,12 @@ Page {
                     Layout.fillWidth: true
                     placeholderText: qsTr("Compose message")
                     wrapMode: TextArea.Wrap
+                    Keys.onEnterPressed: {
+                        send()
+                    }
+                    Keys.onReturnPressed: {
+                        send()
+                    }
                 }
 
                 Button {
@@ -129,16 +135,19 @@ Page {
                     text: qsTr("Send")
                     enabled: messageField.length > 0
                     onClicked: {
-                        let send_message_request = {}
-                        send_message_request["method"] = "send_message"
-                        send_message_request["from"] = currentUserLogin
-                        send_message_request["to"] = inConversationWith
-                        send_message_request["text"] = messageField.text
-                        mainWebsocket.sendTextMessage(JSON.stringify(send_message_request))
-                        messageField.text = "";
+                        send()
                     }
                 }
             }
         }
+    }
+    function send() {
+        let send_message_request = {}
+        send_message_request["method"] = "send_message"
+        send_message_request["from"] = currentUserLogin
+        send_message_request["to"] = inConversationWith
+        send_message_request["text"] = messageField.text
+        mainWebsocket.sendTextMessage(JSON.stringify(send_message_request))
+        messageField.text = "";
     }
 }

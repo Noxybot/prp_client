@@ -217,7 +217,7 @@ Page {
                         name_.text = name;
                         info.text = from_time + " - " + to_time + '\t' + expected_expenses + '\t' + expected_people_number
                         description_.text = description
-                        bottomProfile.receipient = creator_login
+                        bottomProfile.recipient = creator_login
                         bottomProfile.placeId = marker_id
                         bottomProfile.img_source = "data:image/png;base64," + image
                         bottomProfile.visible = true
@@ -251,7 +251,7 @@ Page {
 
     Rectangle {
         id: bottomProfile
-        property string receipient
+        property string recipient
         property int placeId: -1
         property alias img_source: locationImage.source
         visible: false
@@ -287,7 +287,7 @@ Page {
                     text: qsTr("Краткое\nописание")
                 }
                 Button {
-                    text: bottomProfile.receipient === currentUserLogin ? "Удалить" : "Ответить"
+                    text: bottomProfile.recipient === currentUserLogin ? "Удалить" : "Ответить"
                     onClicked: {
                         if (text == "Удалить")
                         {
@@ -309,11 +309,11 @@ Page {
                         }
                         else {
                             if (stack.top !== "chat.qml") {
-                                let receipent = bottomProfile.receipient
-                                conversationModel.setRecipient(receipent)
-                                stack.push("chat.qml", {"inConversationWith" : receipient,
-                                               "imageBase64": contactModel.getUserImageByLogin(receipent),
-                                               "inConversationWithDN": getDisplayNameByLogin(receipent)})
+                                let recipient = bottomProfile.recipient
+                                conversationModel.setRecipient(recipient)
+                                stack.push("chat.qml", {"inConversationWith" : recipient,
+                                               "imageBase64": contactModel.getUserImageByLogin(recipient),
+                                               "inConversationWithDN": getDisplayNameByLogin(recipient)})
                             }
                         }
                     }
