@@ -123,10 +123,12 @@ Page {
                     placeholderText: qsTr("Compose message")
                     wrapMode: TextArea.Wrap
                     Keys.onEnterPressed: {
-                        send()
+                        if (messageField.length > 0)
+                            send()
                     }
                     Keys.onReturnPressed: {
-                        send()
+                        if (messageField.length > 0)
+                            send()
                     }
                 }
 
