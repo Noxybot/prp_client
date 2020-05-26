@@ -8,6 +8,10 @@ import QtQml 2.14
 
 
 Page {
+    function remove (arr, elem){
+        let index = arr.indexOf(elem);
+        if (index !== -1) arr.splice(index, 1);
+    }
     WorkerScript {
         id: fetcher
         source: "imageFetcher.js"
@@ -334,39 +338,77 @@ Page {
     footer: ToolBar {
         RowLayout{
             width: parent.width
+            property var visible_subcategories: []
             ComboBox {
                 id: type
                 model: ["Спорт", "Культурный отдых", "Ночная жизнь", "Развлечения"]
                 Layout.preferredWidth: parent.width*0.3
+                Layout.alignment: Qt.AlignLeft
                 onCurrentIndexChanged:
                 {
                     switch(type.currentIndex)
                     {
                     case 0:
-                        button1.text = "Велоспорт";
-                        button2.text = "Футбол";
-                        button3.text = "Бег";
-                        button4.text = "Баскетбол";
+                        button1.text = "\uf206";
+                        button1.font.family = "Font Awesome 5 Free Solid"
+                        button1.current_category = "Велоспорт"
+
+                        button2.text = "\uf1e3";
+                        button2.font.family = "Font Awesome 5 Free Solid"
+                        button2.current_category = "Футбол"
+
+                        button3.text = "\uf70c";
+                        button3.font.family = "Font Awesome 5 Free Solid"
+                        button3.current_category = "Бег"
+
+                        button4.text = "\uf434";
+                        button4.font.family = "Font Awesome 5 Free Solid"
+                        button4.current_category = "Баскетбол"
+
                         button5.visible = true;
-                        button5.text = "Спортзал";
+                        button5.text = "\uf44b";
+                        button5.font.family = "Font Awesome 5 Free Solid"
+                        button5.current_category = "Спортзал"
+
                         button6.visible = false;
                         button7.visible = false;
                         break;
                     case 1:
                         button1.text = "Музей";
+                        button1.current_category = "Клуб";
+
                         button2.text = "Галерея";
+                        button2.current_category = "Галерея";
+
                         button3.text = "Экскурсия";
+                        button3.current_category = "Экскурсия";
+
                         button4.text = "Театр";
+                        button4.current_category = "Театр";
+
                         button5.visible = true;
-                        button5.text = "Кинотеатр";
+                        button5.text = "\uf008";
+                        button5.font.family = "Font Awesome 5 Free Solid"
+                        button5.current_category = "Кинотеатр"
+
                         button6.visible = false;
                         button7.visible = false;
                         break;
                     case 2:
-                        button1.text = "Бар";
-                        button2.text = "Ресторан";
+                        button1.text = "\uf0fc";
+                        button1.font.family = "Font Awesome 5 Free Solid"
+                        button1.current_category = "Бар"
+
+                        button2.text = "\uf2e7";
+                        button2.font.family = "Font Awesome 5 Free Solid"
+                        button2.current_category = "Ресторан"
+
                         button3.text = "Клуб";
+                        button3.current_category = "Клуб";
+
                         button4.text = "Кальян";
+                        button4.current_category = "Кальян";
+
                         button5.visible = false;
                         button6.visible = false;
                         button7.visible = false;
@@ -374,46 +416,160 @@ Page {
                     case 3:
                         button1.text = "Цирк";
                         button2.text = "Парк развлечений";
-                        button3.text = "Концерт";
+
+                        button3.text = "\uf001"//"Концерт";
+                        button3.font.family = "Font Awesome 5 Free Solid"
+
                         button4.text = "Развлекательный центр";
                         button5.visible = true;
-                        button5.text = "Квест";
+                        button5.text = "\uf002";
                         button6.visible = true;
                         button6.text = "Лазертаг\\Пейнтбол";
                         button7.visible = true;
-                        button7.text = "Зоопарк";
+
+                        button7.text = "\uf6ed"//"Зоопарк";
+                        button7.font.family = "Font Awesome 5 Free Solid"
                         break;
                     }
                 }
             }
 
             ToolButton{
+                onClicked: {
+                    if (!checked)
+                        remove(parent.visible_subcategories, current_category)
+                    else
+                        parent.visible_subcategories.push(current_category);
+                    for (let i = 0; i < parent.visible_subcategories.length; ++i)
+                        console.log(parent.visible_subcategories[i])
+                }
+                property string current_category: ""
                 id: button1
-                anchors.left: type.right
+                font.pointSize: 20
+
+                checkable: true
+                background: Rectangle {
+                    radius: 13
+                    anchors.fill: parent
+                    color: parent.checked ? "red" : "transparent"
+                }
+                //anchors.left: type.right
+                anchors.verticalCenter: undefined
+                Layout.alignment: Qt.AlignLeft
             }
             ToolButton{
+                onClicked: {
+                    if (!checked)
+                        remove(parent.visible_subcategories, current_category)
+                    else
+                        parent.visible_subcategories.push(current_category);}
+                property string current_category: ""
                 id: button2
-                anchors.left: button1.right
+                font.pointSize: 20
+                anchors.verticalCenter: undefined
+                Layout.alignment: Qt.AlignLeft
+                checkable: true
+                background: Rectangle {
+                    radius: 13
+                    anchors.fill: parent
+                    color: parent.checked ? "red" : "transparent"
+                }
+               // anchors.left: button1.right
             }
             ToolButton{
+                onClicked: {
+                    if (!checked)
+                        remove(parent.visible_subcategories, current_category)
+                    else
+                        parent.visible_subcategories.push(current_category);}
+                property string current_category: ""
                 id: button3
-                anchors.left: button2.right
+                font.pointSize: 20
+                anchors.verticalCenter: undefined
+                Layout.alignment: Qt.AlignLeft
+                checkable: true
+                background: Rectangle {
+                    radius: 13
+                    anchors.fill: parent
+                    color: parent.checked ? "red" : "transparent"
+                }
+               // anchors.left: button2.right
             }
             ToolButton{
+                onClicked: {
+                    if (!checked)
+                        remove(parent.visible_subcategories, current_category)
+                    else
+                        parent.visible_subcategories.push(current_category);}
+                property string current_category: ""
                 id: button4
-                anchors.left: button3.right
+                font.pointSize: 20
+                anchors.verticalCenter: undefined
+                Layout.alignment: Qt.AlignLeft
+                checkable: true
+                background: Rectangle {
+                    radius: 13
+                    anchors.fill: parent
+                    color: parent.checked ? "red" : "transparent"
+                }
+               // anchors.left: button3.right
             }
             ToolButton{
+                onClicked: {
+                    if (!checked)
+                        remove(parent.visible_subcategories, current_category)
+                    else
+                        parent.visible_subcategories.push(current_category);}
+                property string current_category: ""
                 id: button5
-                anchors.left: button4.right
+                font.pointSize: 20
+                anchors.verticalCenter: undefined
+                Layout.alignment: Qt.AlignLeft
+                checkable: true
+                background: Rectangle {
+                    radius: 13
+                    anchors.fill: parent
+                    color: parent.checked ? "red" : "transparent"
+                }
+                //anchors.left: button4.right
             }
             ToolButton{
+                onClicked: {
+                    if (!checked)
+                        remove(parent.visible_subcategories, current_category)
+                    else
+                        parent.visible_subcategories.push(current_category);}
+                property string current_category: ""
                 id: button6
-                anchors.left: button5.right
+                font.pointSize: 20
+                anchors.verticalCenter: undefined
+                Layout.alignment: Qt.AlignLeft
+                checkable: true
+                background: Rectangle {
+                    radius: 13
+                    anchors.fill: parent
+                    color: parent.checked ? "red" : "transparent"
+                }
+               // anchors.left: button5.right
             }
             ToolButton{
+                onClicked: {
+                    if (!checked)
+                        remove(parent.visible_subcategories, current_category)
+                    else
+                        parent.visible_subcategories.push(current_category);}
+                property string current_category: ""
                 id: button7
-                anchors.left: button6.right
+                font.pointSize: 20
+                anchors.verticalCenter: undefined
+                Layout.alignment: Qt.AlignLeft
+                checkable: true
+                background: Rectangle {
+                    radius: 13
+                    anchors.fill: parent
+                    color: parent.checked ? "red" : "transparent"
+                }
+               // anchors.left: button6.right
             }
         }
     }
