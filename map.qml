@@ -65,6 +65,10 @@ Page {
                 anchors.verticalCenter: parent.verticalCenter
                 color: "black"
             }
+            onTextChanged: {
+                console.log(text)
+                markerModel.applySearchPhrase(text)
+            }
         }
         ToolButton {
             id: delete_
@@ -346,50 +350,70 @@ Page {
                 Layout.alignment: Qt.AlignLeft
                 onCurrentIndexChanged:
                 {
+                    //console.log("onCurrentIndexChanged")
                     switch(type.currentIndex)
                     {
                     case 0:
                         button1.text = "\uf206";
                         button1.font.family = "Font Awesome 5 Free Solid"
                         button1.current_category = "Велоспорт"
+                        button1.checked = parent.visible_subcategories.indexOf(button1.current_category) !== -1
+
 
                         button2.text = "\uf1e3";
                         button2.font.family = "Font Awesome 5 Free Solid"
                         button2.current_category = "Футбол"
+                        button2.checked = parent.visible_subcategories.indexOf(button2.current_category) !== -1
+
 
                         button3.text = "\uf70c";
                         button3.font.family = "Font Awesome 5 Free Solid"
                         button3.current_category = "Бег"
+                        button3.checked = parent.visible_subcategories.indexOf(button3.current_category) !== -1
+
 
                         button4.text = "\uf434";
                         button4.font.family = "Font Awesome 5 Free Solid"
                         button4.current_category = "Баскетбол"
+                        button4.checked = parent.visible_subcategories.indexOf(button4.current_category) !== -1
+
 
                         button5.visible = true;
                         button5.text = "\uf44b";
                         button5.font.family = "Font Awesome 5 Free Solid"
                         button5.current_category = "Спортзал"
+                        button5.checked = parent.visible_subcategories.indexOf(button5.current_category) !== -1
+
 
                         button6.visible = false;
                         button7.visible = false;
                         break;
                     case 1:
                         button1.text = "Музей";
-                        button1.current_category = "Клуб";
+                        button1.current_category = "Музей";
+                        button1.checked = parent.visible_subcategories.indexOf(button1.current_category) !== -1
+
 
                         button2.text = "Галерея";
                         button2.current_category = "Галерея";
+                        button2.checked = parent.visible_subcategories.indexOf(button2.current_category) !== -1
+
 
                         button3.text = "Экскурсия";
                         button3.current_category = "Экскурсия";
+                        button3.checked = parent.visible_subcategories.indexOf(button3.current_category) !== -1
 
                         button4.text = "Театр";
                         button4.current_category = "Театр";
+                        button4.checked = parent.visible_subcategories.indexOf(button4.current_category) !== -1
+
 
                         button5.visible = true;
                         button5.text = "\uf008";
                         button5.font.family = "Font Awesome 5 Free Solid"
                         button5.current_category = "Кинотеатр"
+                        button5.checked = parent.visible_subcategories.indexOf(button5.current_category) !== -1
+
 
                         button6.visible = false;
                         button7.visible = false;
@@ -398,16 +422,21 @@ Page {
                         button1.text = "\uf0fc";
                         button1.font.family = "Font Awesome 5 Free Solid"
                         button1.current_category = "Бар"
+                        button1.checked = parent.visible_subcategories.indexOf(button1.current_category) !== -1
+
 
                         button2.text = "\uf2e7";
                         button2.font.family = "Font Awesome 5 Free Solid"
                         button2.current_category = "Ресторан"
+                        button2.checked = parent.visible_subcategories.indexOf(button2.current_category) !== -1
 
                         button3.text = "Клуб";
                         button3.current_category = "Клуб";
+                        button3.checked = visible_subcategories.indexOf(button3.current_category) !== -1
 
                         button4.text = "Кальян";
                         button4.current_category = "Кальян";
+                        button4.checked = parent.visible_subcategories.indexOf(button4.current_category) !== -1
 
                         button5.visible = false;
                         button6.visible = false;
@@ -415,33 +444,52 @@ Page {
                         break;
                     case 3:
                         button1.text = "Цирк";
-                        button2.text = "Парк развлечений";
+                        button1.current_category = "Цирк"
+                        button1.checked = parent.visible_subcategories.indexOf(button1.current_category) !== -1
 
-                        button3.text = "\uf001"//"Концерт";
+                        button2.text = "Парк развлечений";
+                        button2.current_category = "Парк развлечений"
+                        button2.checked = parent.visible_subcategories.indexOf(button2.current_category) !== -1
+
+                        button3.text = "\uf001";
+                        button3.current_category = "Концерт"
                         button3.font.family = "Font Awesome 5 Free Solid"
+                        button3.checked = parent.visible_subcategories.indexOf(button3.current_category) !== -1
 
                         button4.text = "Развлекательный центр";
+                        button4.current_category = "Развлекательный центр"
+                        button4.checked = parent.visible_subcategories.indexOf(button4.current_category) !== -1
+
                         button5.visible = true;
                         button5.text = "\uf002";
+                        button5.current_category = "Парк развлечений"
+                        button5.checked = parent.visible_subcategories.indexOf(button5.current_category) !== -1
+
                         button6.visible = true;
                         button6.text = "Лазертаг\\Пейнтбол";
-                        button7.visible = true;
+                        button6.current_category = "Лазертаг\\Пейнтбол"
+                        button6.checked = parent.visible_subcategories.indexOf(button6.current_category) !== -1
 
-                        button7.text = "\uf6ed"//"Зоопарк";
+                        button7.visible = true;
+                        button7.text = "\uf6ed";
+                        button7.current_category = "Зоопарк"
                         button7.font.family = "Font Awesome 5 Free Solid"
+                        button7.checked = parent.visible_subcategories.indexOf(button7.current_category) !== -1
                         break;
                     }
                 }
             }
 
             ToolButton{
-                onClicked: {
-                    if (!checked)
+                onCheckedChanged: {
+                    if (!checked){
+                        markerModel.removeVisibleSubcategory(current_category)
                         remove(parent.visible_subcategories, current_category)
-                    else
-                        parent.visible_subcategories.push(current_category);
-                    for (let i = 0; i < parent.visible_subcategories.length; ++i)
-                        console.log(parent.visible_subcategories[i])
+                    }
+                    else{
+                        markerModel.addVisibleSubcategory(current_category)
+                        parent.visible_subcategories.push(current_category)
+                    }
                 }
                 property string current_category: ""
                 id: button1
@@ -458,11 +506,16 @@ Page {
                 Layout.alignment: Qt.AlignLeft
             }
             ToolButton{
-                onClicked: {
-                    if (!checked)
+                onCheckedChanged: {
+                    if (!checked){
+                        markerModel.removeVisibleSubcategory(current_category)
                         remove(parent.visible_subcategories, current_category)
-                    else
-                        parent.visible_subcategories.push(current_category);}
+                    }
+                    else{
+                        markerModel.addVisibleSubcategory(current_category)
+                        parent.visible_subcategories.push(current_category)
+                    }
+                }
                 property string current_category: ""
                 id: button2
                 font.pointSize: 20
@@ -477,11 +530,16 @@ Page {
                // anchors.left: button1.right
             }
             ToolButton{
-                onClicked: {
-                    if (!checked)
+                onCheckedChanged: {
+                    if (!checked){
+                        markerModel.removeVisibleSubcategory(current_category)
                         remove(parent.visible_subcategories, current_category)
-                    else
-                        parent.visible_subcategories.push(current_category);}
+                    }
+                    else{
+                        markerModel.addVisibleSubcategory(current_category)
+                        parent.visible_subcategories.push(current_category)
+                    }
+                }
                 property string current_category: ""
                 id: button3
                 font.pointSize: 20
@@ -496,11 +554,16 @@ Page {
                // anchors.left: button2.right
             }
             ToolButton{
-                onClicked: {
-                    if (!checked)
+                onCheckedChanged: {
+                    if (!checked){
+                        markerModel.removeVisibleSubcategory(current_category)
                         remove(parent.visible_subcategories, current_category)
-                    else
-                        parent.visible_subcategories.push(current_category);}
+                    }
+                    else{
+                        markerModel.addVisibleSubcategory(current_category)
+                        parent.visible_subcategories.push(current_category)
+                    }
+                }
                 property string current_category: ""
                 id: button4
                 font.pointSize: 20
@@ -515,11 +578,16 @@ Page {
                // anchors.left: button3.right
             }
             ToolButton{
-                onClicked: {
-                    if (!checked)
+                onCheckedChanged: {
+                    if (!checked){
+                        markerModel.removeVisibleSubcategory(current_category)
                         remove(parent.visible_subcategories, current_category)
-                    else
-                        parent.visible_subcategories.push(current_category);}
+                    }
+                    else{
+                        markerModel.addVisibleSubcategory(current_category)
+                        parent.visible_subcategories.push(current_category)
+                    }
+                }
                 property string current_category: ""
                 id: button5
                 font.pointSize: 20
@@ -534,11 +602,16 @@ Page {
                 //anchors.left: button4.right
             }
             ToolButton{
-                onClicked: {
-                    if (!checked)
+                onCheckedChanged: {
+                    if (!checked){
+                        markerModel.removeVisibleSubcategory(current_category)
                         remove(parent.visible_subcategories, current_category)
-                    else
-                        parent.visible_subcategories.push(current_category);}
+                    }
+                    else{
+                        markerModel.addVisibleSubcategory(current_category)
+                        parent.visible_subcategories.push(current_category)
+                    }
+                }
                 property string current_category: ""
                 id: button6
                 font.pointSize: 20
@@ -553,11 +626,16 @@ Page {
                // anchors.left: button5.right
             }
             ToolButton{
-                onClicked: {
-                    if (!checked)
+                onCheckedChanged: {
+                    if (!checked){
+                        markerModel.removeVisibleSubcategory(current_category)
                         remove(parent.visible_subcategories, current_category)
-                    else
-                        parent.visible_subcategories.push(current_category);}
+                    }
+                    else{
+                        markerModel.addVisibleSubcategory(current_category)
+                        parent.visible_subcategories.push(current_category)
+                    }
+                }
                 property string current_category: ""
                 id: button7
                 font.pointSize: 20

@@ -182,23 +182,7 @@ Page {
     function login() {
 
         loadVisible =  true
-        if (confirmLogin(login_.text, password.text) === true) {
-            console.log("login complete")
-
-            currentUserLogin = login_.text
-            conversationModel.setCurrentUserLogin(currentUserLogin)
-            contactModel.setCurrentUserLogin(currentUserLogin)
-            mainWebsocket.active = true
-            loadVisible = false
-
-        if (stack.top !== "map.qml")
-            stack.push("map.qml")
-
-        }
-        else {
-            loadVisible = false
-            console.log("wrong credentials")
-        }
+        confirmLogin(login_.text, password.text)
     }
 }
 

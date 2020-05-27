@@ -49,9 +49,9 @@ ApplicationWindow {
                                 if (response["result"] !== "no image"){
                                     console.log("get_marker_image success")
                                     markerModel.addImage(id, response["result"])
-                                    console.log("stack.currentItem.objectName = " + stack.currentItem.objectName)
+                                    //console.log("stack.currentItem.objectName = " + stack.currentItem.objectName)
                                     if (stack.currentItem.objectName === "mapPage"){
-                                        console.log("stack.currentItem.bottomProfile.placeId: " + stack.currentItem.bottomProfile.placeId + " id: " + id)
+                                        //console.log("stack.currentItem.bottomProfile.placeId: " + stack.currentItem.bottomProfile.placeId + " id: " + id)
                                         if (stack.currentItem.bottomProfile.placeId === id)
                                             stack.currentItem.bottomProfile.img_source  = "data:image/png;base64," + response["result"]
                                     }
@@ -103,6 +103,36 @@ ApplicationWindow {
             }
         }
     }
+
+    //Popup to show messages or warnings on the bottom postion of the screen
+        Popup {
+            id: popup
+            property alias popMessage: message.text
+
+            background: Rectangle {
+                implicitWidth: mainWindow.width
+                implicitHeight: 60
+                color: "#b44"
+            }
+            y: (mainWindow.height - 60)
+            modal: true
+            focus: true
+            closePolicy: Popup.CloseOnPressOutside
+            Text {
+                id: message
+                anchors.centerIn: parent
+                font.pointSize: 12
+                color: "white"
+            }
+            onOpened: popupClose.start()
+        }
+
+        // Popup will be closed automatically in 2 seconds after its opened
+        Timer {
+            id: popupClose
+            interval: 2000
+            onTriggered: popup.close()
+        }
 
     StackView {
         anchors.fill: parent
@@ -183,33 +213,53 @@ ApplicationWindow {
         if (login.length < 4 || password.length < 6)
             return ret
         var xhr = new XMLHttpRequest();
-        xhr.open("POST", "http://" + serverIP, false)
+        xhr.open("POST", "http://" + serverIP)
         xhr.setRequestHeader("Content-type", "application/json")
         let json_request = {"method": "login_user", "login": login, "password": password}
-        try {
-            xhr.send(JSON.stringify(json_request));
+        var timer = Qt.createQmlObject("import QtQuick 2.14; Timer {interval: 5000; repeat: false; running: true;}",mainWindow,"MyTimer");
+        console.log("timer " + timer)
+        timer.triggered.connect(function(){
+            stack.currentItem.loadVisible = false
+            console.log("cant connect to server");
+            popup.popMessage = qsTr("Ошибка подключения к серверу")
+            popup.open()
+            xhr.abort();
+        });
+
+        xhr.onreadystatechange  = function(){
+            if (xhr.readyState !== XMLHttpRequest.DONE) //in process
+                return
+            timer.stop()
+            stack.currentItem.loadVisible = false
             if (xhr.status === 200) {//HTTP OK
 
                 let response = JSON.parse(xhr.response)
                 let result = response["result"]
                 if (result === "logged in"){
-                    ret = true;
+                    currentUserLogin = login
+                    conversationModel.setCurrentUserLogin(currentUserLogin)
+                    contactModel.setCurrentUserLogin(currentUserLogin)
+                    mainWebsocket.active = true
+                    if (stack.top !== "map.qml")
+                        stack.push("map.qml")
                 }
                 else if (result === "not found") {
                     console.log("user not found")
+                    popup.popMessage = qsTr("Пользователь не найден")
+                    popup.open()
                 }
-                else {
+                else if (result === "wrong credentials"){
                     console.log("login error " + xhr.status + ": " +  xhr.statusText)
+                    popup.popMessage = qsTr("Неправильный логин или пароль")
+                    popup.open()
                 }
             }
             else {
                 console.log("login error " + xhr.status + ": " +  xhr.statusText)
             }
 
-        } catch(err) {
-            console.log("confirmLogin request failed: " + err.message)
         }
-        return ret
+        xhr.send(JSON.stringify(json_request));
     }
 
     function getDisplayNameByLogin(login) {

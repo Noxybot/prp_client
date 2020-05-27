@@ -6,6 +6,7 @@
 #include <QTime>
 #include <QDebug>
 #include <unordered_map>
+#include <mutex>
 
 struct PlaceInfo
 {
@@ -73,6 +74,8 @@ public:
         info.description = std::move(description);
         auto marker = std::make_shared<PlaceInfo>(std::move(info));
 
+        std::lock_guard<std::mutex> lock {m_mtx};
+        //qDebug() << "addMarker lock";
         beginInsertRows(QModelIndex(), rowCount(), rowCount());
 
         if (m_visible_subcategories.find(marker->subcategory) != std::end(m_visible_subcategories) ||m_areAllMarkesVisible)
@@ -87,6 +90,8 @@ public:
     }
     Q_INVOKABLE void addImage(int id, QString image)
     {
+        //qDebug() << "addImage lock";
+        std::lock_guard<std::mutex> lock {m_mtx};
         for (int i = 0; i < m_visible_coordinates.size(); ++i)
         {
             if (m_visible_coordinates[i]->id == id)
@@ -97,23 +102,31 @@ public:
             }
         }
     }
-    Q_INVOKABLE void removeMarker(int id)
+    Q_INVOKABLE void removeMarker(int id, bool removeOnlyFromVisible = false)
     {
+        std::lock_guard<std::mutex> lock {m_mtx};
+        //qDebug() << "removeMarker lock";
         const auto markerIt = std::find_if(m_all_coordinates.begin(), m_all_coordinates.end(),
                                      [&](const markerPtr& marker){
             return marker->id == id;
         });
         if (markerIt == std::end(m_all_coordinates))
             return;
-        m_all_coordinates.erase(markerIt);
-        if (markerIt->use_count() == 0)
-            return;
         for (int i = 0; i < m_visible_coordinates.size(); ++i)
         {
             if (m_visible_coordinates[i]->id == id)
             {
+                if (!removeOnlyFromVisible)
+                {
+                    m_current_markers.erase(m_visible_coordinates[i]->id);
+                    m_all_coordinates.erase(markerIt);
+                    if (markerIt->use_count() == 0)
+                    {
+                        qDebug() << "marker doesnt present in visible, so just return;";
+                        return;
+                    }
+                }
                 beginRemoveRows(QModelIndex(), i, i);
-                m_current_markers.erase(m_visible_coordinates[i]->id);
                 m_visible_coordinates.remove(i);
                 endRemoveRows();
             }
@@ -123,6 +136,7 @@ public:
 
     int rowCount(const QModelIndex &parent = QModelIndex()) const override
     {
+        //qDebug() << "rowCount lock";
         Q_UNUSED(parent)
         return m_visible_coordinates.size();
     }
@@ -178,38 +192,67 @@ public:
 
     Q_INVOKABLE bool containtsMarker(int id)
     {
+        std::lock_guard<std::mutex> lock {m_mtx};
+        //qDebug() << "containtsMarker lock";
         return m_current_markers.find(id) != std::end(m_current_markers);
     }
     Q_INVOKABLE bool markerHasImage(int id)
     {
+        std::lock_guard<std::mutex> lock {m_mtx};
+        //qDebug() << "markerHasImage lock";
         auto marker = m_current_markers.find(id);
         if (marker != std::end(m_current_markers))
             return marker->second;
         return false;
     }
-    Q_INVOKABLE void AddVisibleSubcategory(const QString& subcat)
+    Q_INVOKABLE void addVisibleSubcategory(const QString& subcat)
     {
+        qDebug() << "Adding visible subcategory: " << subcat << ", total size: " << m_visible_subcategories.size();
+        if (m_areAllMarkesVisible)
+        {
+            m_visible_subcategories.clear();
+            m_areAllMarkesVisible = false;
+        }
         m_visible_subcategories.insert(subcat);
-        beginInsertRows(QModelIndex(), rowCount(), rowCount());
         ActualizeCoordinates();
-        endInsertRows();
-        m_areAllMarkesVisible = false;
 
     }
-    Q_INVOKABLE void RemoveVisibleSubcategory(const QString& subcat)
+    Q_INVOKABLE void removeVisibleSubcategory(const QString& subcat)
     {
+        qDebug() << "Removing visible subcategory: " << subcat << ", total size: " << m_visible_subcategories.size();
         m_visible_subcategories.remove(subcat);
-        beginInsertRows(QModelIndex(), rowCount(), rowCount());
-        ActualizeCoordinates();
-        endInsertRows();
         m_areAllMarkesVisible = m_visible_subcategories.empty();
+        ActualizeCoordinates();
+    }
+    Q_INVOKABLE void applySearchPhrase(const QString& phrase)
+    {
+        ActualizeCoordinates();
+        if (phrase.size() == 0)
+            return;
+        QVector<markerPtr> to_remove;
+        {
+            std::lock_guard<std::mutex> lock {m_mtx};
+            for (auto& marker : m_visible_coordinates)
+            {
+                if (marker->name.contains(phrase, Qt::CaseInsensitive) ||
+                    marker->category.contains(phrase, Qt::CaseInsensitive) ||
+                    marker->subcategory.contains(phrase, Qt::CaseInsensitive) ||
+                    marker->description.contains(phrase, Qt::CaseInsensitive))
+                    continue;
+                to_remove.push_back(marker);
+            }
+        }
+        for (auto& marker: to_remove)
+            removeMarker(marker->id, true);
     }
 
 private:
+    mutable std::mutex m_mtx;
     std::unordered_map<int, bool> m_current_markers; //id -> has_image
     QSet<QString> m_visible_subcategories;
     QSet<markerPtr> m_all_coordinates;
     QVector<markerPtr> m_visible_coordinates;
+    //QString m_search_phrase;
     bool m_areAllMarkesVisible = true;
 
     bool IsMarkerVisible(const markerPtr& marker)
@@ -221,19 +264,21 @@ private:
     {
         for (auto& marker : m_all_coordinates)
         {
-            if (IsMarkerVisible(marker))
+            if (m_areAllMarkesVisible || IsMarkerVisible(marker))
             {
-                if (marker.use_count() == 1) //means that shared_ptr stored only in m_all_coordinates
+                if (!m_visible_coordinates.contains(marker))
                 {
+                    qDebug() << "adding marker, use_count: " << marker.use_count();
+                    std::lock_guard<std::mutex> lock {m_mtx};
+                    beginInsertRows(QModelIndex(), rowCount(), rowCount());
                     m_visible_coordinates.push_back(marker);
+                    endInsertRows();
                 }
             }
             else
             {
-                if (marker.use_count() == 2)
-                {
-                    m_visible_coordinates.removeOne(marker);
-                }
+                qDebug() << "removing marker, use_count: " << marker.use_count();
+                removeMarker(marker->id, true);
             }
         }
     }
