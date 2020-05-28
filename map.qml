@@ -49,6 +49,7 @@ Page {
                 fontSizeMode: Text.Fit
                 anchors.centerIn: parent
                 font.family: "Font Awesome 5 Free Solid"
+                font.bold: true
                 color: "#6fda9c"
             }
 
@@ -75,6 +76,7 @@ Page {
             anchors.right:  parent.right
             text: "\uf00d"
             font.family: "Font Awesome 5 Free Solid"
+            font.bold: true
             onClicked: {
                 search.clear()
             }
@@ -92,9 +94,10 @@ Page {
             anchors.fill: parent
 
             ItemDelegate {
-                text: "\uf2bd " + qsTr("Профиль")
+                text: "\uf2bd"
                 font {
                     family: "Font Awesome 5 Free Solid"
+                    bold: true
                 }
                 width: parent.width
                 onClicked: {
@@ -104,9 +107,10 @@ Page {
                 }
             }
             ItemDelegate {
-                text: "\uf086 " + qsTr("Чаты")
+                text: "\uf086"
                 font {
                     family: "Font Awesome 5 Free Solid"
+                    bold: true
                 }
                 width: parent.width
                 onClicked: {
@@ -115,9 +119,10 @@ Page {
                 }
             }
             ItemDelegate {
-                text: "\uf52b " + qsTr("Выйти")
+                text: "\uf52b"
                 font {
                     family: "Font Awesome 5 Free Solid"
+                    bold: true
                 }
                 width: parent.width
                 onClicked: {
@@ -346,7 +351,7 @@ Page {
             ComboBox {
                 id: type
                 model: ["Спорт", "Культурный отдых", "Ночная жизнь", "Развлечения"]
-                Layout.preferredWidth: parent.width*0.3
+                Layout.preferredWidth: 200
                 Layout.alignment: Qt.AlignLeft
                 onCurrentIndexChanged:
                 {
@@ -496,10 +501,11 @@ Page {
                 font.pointSize: 20
 
                 checkable: true
+                font.bold: true
                 background: Rectangle {
                     radius: 13
                     anchors.fill: parent
-                    color: parent.checked ? "red" : "transparent"
+                    color: parent.checked ? "#c22d23" : "transparent"
                 }
                 //anchors.left: type.right
                 anchors.verticalCenter: undefined
@@ -522,10 +528,11 @@ Page {
                 anchors.verticalCenter: undefined
                 Layout.alignment: Qt.AlignLeft
                 checkable: true
+                font.bold: true
                 background: Rectangle {
                     radius: 13
                     anchors.fill: parent
-                    color: parent.checked ? "red" : "transparent"
+                    color: parent.checked ? "#c22d23" : "transparent"
                 }
                // anchors.left: button1.right
             }
@@ -543,13 +550,14 @@ Page {
                 property string current_category: ""
                 id: button3
                 font.pointSize: 20
+                font.bold: true
                 anchors.verticalCenter: undefined
                 Layout.alignment: Qt.AlignLeft
                 checkable: true
                 background: Rectangle {
                     radius: 13
                     anchors.fill: parent
-                    color: parent.checked ? "red" : "transparent"
+                    color: parent.checked ? "#c22d23" : "transparent"
                 }
                // anchors.left: button2.right
             }
@@ -567,13 +575,14 @@ Page {
                 property string current_category: ""
                 id: button4
                 font.pointSize: 20
+                font.bold: true
                 anchors.verticalCenter: undefined
                 Layout.alignment: Qt.AlignLeft
                 checkable: true
                 background: Rectangle {
                     radius: 13
                     anchors.fill: parent
-                    color: parent.checked ? "red" : "transparent"
+                    color: parent.checked ? "#c22d23" : "transparent"
                 }
                // anchors.left: button3.right
             }
@@ -591,13 +600,14 @@ Page {
                 property string current_category: ""
                 id: button5
                 font.pointSize: 20
+                font.bold: true
                 anchors.verticalCenter: undefined
                 Layout.alignment: Qt.AlignLeft
                 checkable: true
                 background: Rectangle {
                     radius: 13
                     anchors.fill: parent
-                    color: parent.checked ? "red" : "transparent"
+                    color: parent.checked ? "#c22d23" : "transparent"
                 }
                 //anchors.left: button4.right
             }
@@ -615,13 +625,14 @@ Page {
                 property string current_category: ""
                 id: button6
                 font.pointSize: 20
+                font.bold: true
                 anchors.verticalCenter: undefined
                 Layout.alignment: Qt.AlignLeft
                 checkable: true
                 background: Rectangle {
                     radius: 13
                     anchors.fill: parent
-                    color: parent.checked ? "red" : "transparent"
+                    color: parent.checked ? "#c22d23" : "transparent"
                 }
                // anchors.left: button5.right
             }
@@ -639,13 +650,14 @@ Page {
                 property string current_category: ""
                 id: button7
                 font.pointSize: 20
+                font.bold: true
                 anchors.verticalCenter: undefined
                 Layout.alignment: Qt.AlignLeft
                 checkable: true
                 background: Rectangle {
                     radius: 13
                     anchors.fill: parent
-                    color: parent.checked ? "red" : "transparent"
+                    color: parent.checked ? "#c22d23" : "transparent"
                 }
                // anchors.left: button6.right
             }

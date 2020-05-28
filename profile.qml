@@ -50,41 +50,25 @@ Page {
             }
         }
     }
-    Item {
-        id: top_
-        height: parent.height / 50
-        width: parent.width
-    }
 
     ColumnLayout {
-      //  anchors.top: row_.bottom
+        //  anchors.top: row_.bottom
         width: parent.width
         spacing: profilePage.height / 100
-            Image {
-                id: img
-                Layout.alignment: Qt.AlignHCenter
-                source: "data:image/png;base64," + profileImageBase64
-                Layout.preferredWidth: profilePage.width*0.3
-                Layout.preferredHeight: profilePage.width*0.3
-                sourceSize.width: profilePage.width*0.3
-                sourceSize.height: profilePage.width*0.3
-                //fillMode: Image.PreserveAspectCrop
-//                layer.enabled: true
-//                layer.effect: OpacityMask {
-//                    maskSource: mask
-//                }
-            }
+        Item {
+            id: top_
+            height: parent.height / 50
+            width: parent.width
+        }
 
-//            Rectangle {
-//                id: mask
-//                Layout.preferredWidth: profilePage.width*0.3
-//                Layout.preferredHeight: profilePage.width*0.3
-//                radius: width*0.5
-//                visible: false
+        Image {
+            id: img
+            Layout.alignment: Qt.AlignHCenter
+            source: "data:image/png;base64," + profileImageBase64
+            Layout.preferredWidth: profilePage.width*0.3
+            Layout.preferredHeight: profilePage.width*0.3
 
-//            }
-
-
+        }
         Item {
             Layout.alignment: Qt.AlignHCenter
             Layout.preferredHeight: profilePage.height/18
