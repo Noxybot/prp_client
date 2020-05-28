@@ -112,6 +112,7 @@ Page {
     BackendImageConverter {
         id: imageConverter
         onImageConveted: {
+            console.log("image converted")
             imageConverter.removeFile(last_image_path)
             if (create_marker_status !== 200) //HTTP 200 OK means place added
                 console.log("Marker creation error ${xhr.status}: ${xhr.statusText}")
@@ -129,6 +130,7 @@ Page {
                      console.log("image for marker sent")
                  }
                  xhr.send(JSON.stringify(upload_place_image_request))
+                 load.visible = false
             }
         }
     }
@@ -138,7 +140,6 @@ Page {
         text: qsTr("Ок")
         onClicked:
         {
-            imageConverter.scheduleToBase64("", last_image_path)
                 function get_milliseconds_from_hours(time_str) {
                     let date_obj = new Date()
                     let time_splited = time_str.split(':')
@@ -146,6 +147,7 @@ Page {
                     return date_obj.getTime()
                 }
 
+                load.visible = true
                 let add_place_request = {}
                 add_place_request["method"] = "add_place"
                 add_place_request["latitude"] = coordinates.latitude
@@ -171,6 +173,7 @@ Page {
                     xhr.send(JSON.stringify(add_place_request));
                     create_marker_status = xhr.status;
                     create_marker_id = xhr.response["result"] //result of the response is a marker id
+                    imageConverter.scheduleToBase64("", last_image_path)
 
                 } catch(err) {
                     console.log("add_place request failed: " + err.message)

@@ -437,7 +437,7 @@ Page {
 
                         button3.text = "Клуб";
                         button3.current_category = "Клуб";
-                        button3.checked = visible_subcategories.indexOf(button3.current_category) !== -1
+                        button3.checked = parent.visible_subcategories.indexOf(button3.current_category) !== -1
 
                         button4.text = "Кальян";
                         button4.current_category = "Кальян";

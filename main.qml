@@ -104,6 +104,19 @@ ApplicationWindow {
         }
     }
 
+    Rectangle {
+        id: load
+        anchors.fill: parent
+        color: "white"
+        opacity: 0.5
+        visible: false
+        z: 10
+        BusyIndicator {
+            anchors.centerIn: parent
+            running: true
+        }
+    }
+
     //Popup to show messages or warnings on the bottom postion of the screen
         Popup {
             id: popup
@@ -209,9 +222,15 @@ ApplicationWindow {
     }
 
     function confirmLogin(login, password, isFB, display_name) {
+        console.log("confirmLogin")
         let ret = false
         if (login.length < 4 || password.length < 6)
-            return ret
+        {
+            load.visible = false
+            popup.popMessage = qsTr("Слишком короткий логин или пароль")
+            popup.open()
+            return
+        }
         var xhr = new XMLHttpRequest();
         xhr.open("POST", "http://" + serverIP)
         xhr.setRequestHeader("Content-type", "application/json")
@@ -219,7 +238,7 @@ ApplicationWindow {
         var timer = Qt.createQmlObject("import QtQuick 2.14; Timer {interval: 5000; repeat: false; running: true;}",mainWindow,"MyTimer");
         console.log("timer " + timer)
         timer.triggered.connect(function(){
-            stack.currentItem.loadVisible = false
+            load.visible = false
             console.log("cant connect to server");
             popup.popMessage = qsTr("Ошибка подключения к серверу")
             popup.open()
@@ -230,7 +249,7 @@ ApplicationWindow {
             if (xhr.readyState !== XMLHttpRequest.DONE) //in process
                 return
             timer.stop()
-            stack.currentItem.loadVisible = false
+            load.visible = false
             if (xhr.status === 200) {//HTTP OK
 
                 let response = JSON.parse(xhr.response)

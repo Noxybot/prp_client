@@ -12,25 +12,11 @@ Page {
         color: "#394454"
     }
     focus: true
-    property var loadVisible: false
     StackView.onDeactivated: {
-        loadVisible = false
+        load.visible = false
     }
     StackView.onActivated: {
         login_.focus = true;
-    }
-
-    Rectangle {
-        id: load
-        anchors.fill: parent
-        color: "white"
-        opacity: 0.5
-        visible: loadVisible
-        z: 10
-        BusyIndicator {
-            anchors.centerIn: parent
-            running: true
-        }
     }
 
     Rectangle {
@@ -183,7 +169,7 @@ Page {
     }
     function login() {
 
-        loadVisible =  true
+        load.visible = true
         confirmLogin(login_.text, password.text)
     }
 }
