@@ -6,7 +6,12 @@ Page {
     visible: true
     property string inConversationWith
     property string inConversationWithDN
-    property string imageBase64
+    property string imageBase64_receip
+    StackView.onActivated: {
+
+        console.log("NEW CODE")
+        imageBase64_receip = contactModel.getUserImageByLogin(inConversationWith)
+    }
     header: ToolBar {
         ToolButton {
             id: menuButton
@@ -80,7 +85,7 @@ Page {
                         id: avatar
                         sourceSize.width: 40
                         sourceSize.height: 40
-                        source: "data:image/png;base64," +  (!sentByMe ? contactModel.getUserImageByLogin(inConversationWith) : profileImageBase64)
+                        source: "data:image/png;base64," +  (!sentByMe ? imageBase64_receip : profileImageBase64)
                     }
 
                     Rectangle {

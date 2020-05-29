@@ -5,6 +5,7 @@ import QtQuick.LocalStorage 2.0
 
 import QtWebSockets 1.14
 import QtPositioning 5.14
+import Cometogether.converter 1.0
 
 ApplicationWindow {
     id: mainWindow
@@ -16,6 +17,21 @@ ApplicationWindow {
     property string currentUserDN: ""
     property string serverIP: "178.150.141.36:1337"
     property string profileImageBase64: ""
+
+
+    BackendImageConverter {
+        id: imageConverter
+        onImageConveted_marker: {
+
+            console.log("converted image for marker" + id + ", sending to server...")
+            uploadMarkerImage(id, imageBase64)
+        }
+
+        onImageConveted_user: {
+            console.log("converted image for user" + login + ", sending to server...")
+            uploadImage(login, imageBase64)
+        }
+    }
 
     WebSocket {
         id: mainWebsocket
@@ -47,7 +63,7 @@ ApplicationWindow {
                             if (xhr.status === 200) {
                                 let response = xhr.response
                                 if (response["result"] !== "no image"){
-                                    console.log("get_marker_image success")
+                                    console.log("get_marker_image for marker id: " + id +" success")
                                     markerModel.addImage(id, response["result"])
                                     //console.log("stack.currentItem.objectName = " + stack.currentItem.objectName)
                                     if (stack.currentItem.objectName === "mapPage"){
@@ -160,20 +176,6 @@ ApplicationWindow {
                         tx.executeSql('CREATE TABLE IF NOT EXISTS user(name TEXT, surname TEXT, login TEXT, password TEXT, path_to_image TEXT)');
                     })
     }
-    function uploadImage(login, image_base64) {
-        let xhr = new XMLHttpRequest();
-        xhr.responseType = "json"
-        xhr.open("POST", "http://" + serverIP)
-        xhr.setRequestHeader("Content-type", "application/json")
-        let json_request = {"method": "upload_user_image", "login": login, "image": image_base64}
-        xhr.onready = function(){
-            console.log("image sent")
-
-        }
-        xhr.send(JSON.stringify(json_request));
-    }
-
-
     function addUser(name, surname, login, password, image_base64, isFB) {
         let ret = false
         if (isFB === undefined)
@@ -255,6 +257,7 @@ ApplicationWindow {
                 let response = JSON.parse(xhr.response)
                 let result = response["result"]
                 if (result === "logged in"){
+                    console.log("setting cuurentuserlogin to " + login)
                     currentUserLogin = login
                     conversationModel.setCurrentUserLogin(currentUserLogin)
                     contactModel.setCurrentUserLogin(currentUserLogin)
@@ -294,5 +297,34 @@ ApplicationWindow {
         catch(err) {
             console.log("getUserInfoByLogin request failed: " + err.message)
         }
+    }
+
+    function uploadImage(login, image_base64) {
+        let xhr = new XMLHttpRequest();
+        xhr.responseType = "json"
+        xhr.open("POST", "http://" + serverIP)
+        xhr.setRequestHeader("Content-type", "application/json")
+        let json_request = {"method": "upload_user_image", "login": login, "image": image_base64}
+        xhr.onready = function(){
+            console.log("image for user: " + login + " sent")
+
+        }
+        xhr.send(JSON.stringify(json_request));
+    }
+
+    function uploadMarkerImage(id, imageBase64){
+        let xhr = new XMLHttpRequest();
+        xhr.responseType = 'json'
+        xhr.open("POST", "http://" + serverIP, true)
+        xhr.setRequestHeader("Content-type", "application/json")
+        let upload_place_image_request = {}
+        upload_place_image_request["method"] = "upload_marker_image"
+        upload_place_image_request["id"] = id
+        console.log("uploading image for marker: " + id + ", img size: " + imageBase64.length)
+        upload_place_image_request["image"] = imageBase64
+        xhr.onready = function(){
+            console.log("image for marker: " + id + " sent")
+        }
+        xhr.send(JSON.stringify(upload_place_image_request))
     }
 }

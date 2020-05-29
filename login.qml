@@ -67,7 +67,7 @@ Page {
             echoMode: TextInput.Password
             leftPadding: 10
             onAccepted: {
-                //login();
+                login();
                 stack.push("map.qml")
                 console.log("password enter")
             }
@@ -92,8 +92,8 @@ Page {
             Layout.preferredHeight: loginPage.height / 10
             Layout.preferredWidth: loginPage.width / 2
             onClicked: {
-                //login();
-                stack.push("map.qml")
+                login();
+                //stack.push("map.qml")
             }
             background: Rectangle {
                 radius: 20

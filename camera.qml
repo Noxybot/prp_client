@@ -4,7 +4,6 @@ import QtQuick.Window 2.14
 import QtQuick.Controls 2.12
 import QtGraphicalEffects 1.0
 import QtQuick.Layouts 1.12
-import Cometogether.converter 1.0
 
 Page {
     id : cameraUI
@@ -108,32 +107,6 @@ Page {
             camera.imageCapture.capture();
         }
     }
-
-    BackendImageConverter {
-        id: imageConverter
-        onImageConveted: {
-            console.log("image converted")
-            imageConverter.removeFile(last_image_path)
-            if (create_marker_status !== 200) //HTTP 200 OK means place added
-                console.log("Marker creation error ${xhr.status}: ${xhr.statusText}")
-            else {
-                 let xhr = new XMLHttpRequest();
-                 xhr.responseType = 'json'
-                 xhr.open("POST", "http://" + serverIP, true)
-                 xhr.setRequestHeader("Content-type", "application/json")
-                 let upload_place_image_request = {}
-                 upload_place_image_request["method"] = "upload_marker_image"
-                 upload_place_image_request["id"] = create_marker_id
-                 console.log("img size: " + imageBase64.length)
-                 upload_place_image_request["image"] = imageBase64
-                 xhr.onready = function(){
-                     console.log("image for marker sent")
-                 }
-                 xhr.send(JSON.stringify(upload_place_image_request))
-                 load.visible = false
-            }
-        }
-    }
     Button {
         id: ok_button
         visible: false
@@ -173,7 +146,8 @@ Page {
                     xhr.send(JSON.stringify(add_place_request));
                     create_marker_status = xhr.status;
                     create_marker_id = xhr.response["result"] //result of the response is a marker id
-                    imageConverter.scheduleToBase64("", last_image_path)
+                    load.visible = false
+                    imageConverter.scheduleToBase64(create_marker_id, last_image_path, "convert marker image")
 
                 } catch(err) {
                     console.log("add_place request failed: " + err.message)

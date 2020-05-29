@@ -290,13 +290,6 @@ Page {
         Button {
             id: sign
             enabled: control.checked ? true : false
-            BackendImageConverter {
-                id: imageConverter
-                onImageConveted: {
-                    console.log("converted image, sending to server...")
-                    uploadImage(currentUserLogin, imageBase64)
-                }
-            }
             Layout.alignment: Qt.AlignHCenter
             contentItem: Text {
                 text:qsTr("Зарегистрироваться")
@@ -317,8 +310,8 @@ Page {
                         loadVisible = true
                         if (addUser(name.text, surname.text, login_.text, password.text, "", false) && stack.top !== "map.qml") //pass empty img
                         {
-                            imageConverter.scheduleToBase64("", pathToImage);
                             console.log("adduser returned true")
+                            imageConverter.scheduleToBase64(login_.text, pathToImage, "convert user image");
                             stack.push("map.qml")
                         }
 
