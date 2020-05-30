@@ -31,24 +31,6 @@ Page {
             text: qsTr("Профиль")
             anchors.centerIn: parent
         }
-
-        ToolButton {
-            id: likeButton
-            anchors.right:  parent.right
-            onClicked: {
-            }
-
-            Text {
-                id: likeButtonName
-                text: qsTr("\u2661")
-                width: parent.width * 0.7
-                height: parent.height * 0.7
-                font.pointSize: 100
-                minimumPointSize: 10
-                fontSizeMode: Text.Fit
-                anchors.centerIn: parent
-            }
-        }
     }
 
     ColumnLayout {
@@ -77,6 +59,8 @@ Page {
         Text {
             Layout.alignment: Qt.AlignHCenter
             text: currentUserDN
+            color: "#6fda9c"
+            font.pointSize: 14
         }
 
         Item {
@@ -87,17 +71,43 @@ Page {
         }
         Button {
             Layout.alignment: Qt.AlignHCenter
-            text: qsTr("Изменить имя")
             Layout.maximumWidth: 200
             Layout.preferredHeight: profilePage.height/10
             Layout.preferredWidth: profilePage.width/2
+            contentItem: Text {
+                text: qsTr("    Изменить имя      ")
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+                font.pointSize: 20
+                minimumPointSize: 10
+                fontSizeMode: Text.Fit
+                color: "#f0f0f0"
+            }
+
+            background: Rectangle {
+                radius: 20
+                color: "#6fda9c"
+            }
         }
         Button {
             Layout.alignment: Qt.AlignHCenter
-            text: qsTr("Изменить фото")
             Layout.maximumWidth: 200
             Layout.preferredHeight: profilePage.height/10
             Layout.preferredWidth: profilePage.width/2
+            contentItem: Text {
+                text: qsTr("    Изменить фото      ")
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+                font.pointSize: 20
+                minimumPointSize: 10
+                fontSizeMode: Text.Fit
+                color: "#f0f0f0"
+            }
+
+            background: Rectangle {
+                radius: 20
+                color: "#6fda9c"
+            }
         }
         Item {
             Layout.alignment: Qt.AlignHCenter

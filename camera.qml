@@ -83,20 +83,33 @@ Page {
     Button
     {
         id: back_button
+        y: 422
         text: qsTr("Назад")
         onClicked: stack.pop();
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: 10
+        anchors.left: parent.left
+        anchors.leftMargin: 39
     }
 
     Button {
         id: position_button
+        x: 461
+        width: 143
         anchors.top: back_button.bottom
         text: qsTr("Поменять камеру")
+        anchors.topMargin: -48
         onClicked: camera.position === Camera.BackFace ? camera.position = Camera.FrontFace : camera.position = Camera.BackFace
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: 10
+        anchors.right: parent.right
+        anchors.rightMargin: 36
     }
-    Button {
+    RoundButton {
         id: take_photo_button
+        width: 117
         anchors.top: position_button.bottom
-        text: qsTr("Сделать фото")
+        anchors.topMargin: -48
         onClicked:
         {
             back_button.visible = false
@@ -106,6 +119,10 @@ Page {
             new_photo_button.visible = true
             camera.imageCapture.capture();
         }
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: 10
+        anchors.horizontalCenter: parent.horizontalCenter
+
     }
     Button {
         id: ok_button
@@ -113,45 +130,45 @@ Page {
         text: qsTr("Ок")
         onClicked:
         {
-                function get_milliseconds_from_hours(time_str) {
-                    let date_obj = new Date()
-                    let time_splited = time_str.split(':')
-                    date_obj.setHours(parseInt(time_splited[0]), parseInt(time_splited[1]))
-                    return date_obj.getTime()
-                }
+            function get_milliseconds_from_hours(time_str) {
+                let date_obj = new Date()
+                let time_splited = time_str.split(':')
+                date_obj.setHours(parseInt(time_splited[0]), parseInt(time_splited[1]))
+                return date_obj.getTime()
+            }
 
-                load.visible = true
-                let add_place_request = {}
-                add_place_request["method"] = "add_place"
-                add_place_request["latitude"] = coordinates.latitude
-                add_place_request["longitude"] = coordinates.longitude
-                add_place_request["creator_login"] = mainWindow.currentUserLogin
-                add_place_request["name"] = name
-                add_place_request["category"] = type
-                add_place_request["subcategory"] = subtype
-                add_place_request["from_time"] = get_milliseconds_from_hours(from_time)
-                add_place_request["to_time"] = get_milliseconds_from_hours(to_time)
-                add_place_request["expected_people_number"] = peopleCount
-                add_place_request["expected_expenses"] = expenses
-                add_place_request["description"] = description
-                add_place_request["creation_time"] = Date.now()
+            load.visible = true
+            let add_place_request = {}
+            add_place_request["method"] = "add_place"
+            add_place_request["latitude"] = coordinates.latitude
+            add_place_request["longitude"] = coordinates.longitude
+            add_place_request["creator_login"] = mainWindow.currentUserLogin
+            add_place_request["name"] = name
+            add_place_request["category"] = type
+            add_place_request["subcategory"] = subtype
+            add_place_request["from_time"] = get_milliseconds_from_hours(from_time)
+            add_place_request["to_time"] = get_milliseconds_from_hours(to_time)
+            add_place_request["expected_people_number"] = peopleCount
+            add_place_request["expected_expenses"] = expenses
+            add_place_request["description"] = description
+            add_place_request["creation_time"] = Date.now()
 
-                var xhr = new XMLHttpRequest();
-                xhr.responseType = 'json'
-                xhr.open("POST", "http://" + serverIP, false)
-                xhr.setRequestHeader("Content-type", "application/json")
+            var xhr = new XMLHttpRequest();
+            xhr.responseType = 'json'
+            xhr.open("POST", "http://" + serverIP, false)
+            xhr.setRequestHeader("Content-type", "application/json")
 
 
-                try {
-                    xhr.send(JSON.stringify(add_place_request));
-                    create_marker_status = xhr.status;
-                    create_marker_id = xhr.response["result"] //result of the response is a marker id
-                    load.visible = false
-                    imageConverter.scheduleToBase64(create_marker_id, last_image_path, "convert marker image")
+            try {
+                xhr.send(JSON.stringify(add_place_request));
+                create_marker_status = xhr.status;
+                create_marker_id = xhr.response["result"] //result of the response is a marker id
+                load.visible = false
+                imageConverter.scheduleToBase64(create_marker_id, last_image_path, "convert marker image")
 
-                } catch(err) {
-                    console.log("add_place request failed: " + err.message)
-                  }
+            } catch(err) {
+                console.log("add_place request failed: " + err.message)
+            }
 
             stack.pop()
             stack.pop()
@@ -176,3 +193,9 @@ Page {
     }
 }
 
+
+/*##^##
+Designer {
+    D{i:0;autoSize:true;height:480;width:640}
+}
+##^##*/

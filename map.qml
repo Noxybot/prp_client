@@ -8,6 +8,7 @@ import QtQml 2.14
 
 
 Page {
+    property bool enableAddMarker: false
     function remove (arr, elem){
         let index = arr.indexOf(elem);
         if (index !== -1) arr.splice(index, 1);
@@ -94,7 +95,7 @@ Page {
             anchors.fill: parent
 
             ItemDelegate {
-                text: "\uf2bd"
+                text: "Профиль"//"\uf2bd"
                 font {
                     family: "Font Awesome 5 Free Solid"
                     bold: true
@@ -107,7 +108,7 @@ Page {
                 }
             }
             ItemDelegate {
-                text: "\uf086"
+                text: "Чаты"//"\uf086"
                 font {
                     family: "Font Awesome 5 Free Solid"
                     bold: true
@@ -119,7 +120,7 @@ Page {
                 }
             }
             ItemDelegate {
-                text: "\uf52b"
+                text: "Выйти"//"\uf52b"
                 font {
                     family: "Font Awesome 5 Free Solid"
                     bold: true
@@ -344,7 +345,28 @@ Page {
             }
         }
     }
+    RoundButton {
+        contentItem: Text {
+            text: " + "
+            font.bold: true
+            font.pointSize: 24
+            color: "white"
+        }
+
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: 20
+        anchors.right: parent.right
+        background: Rectangle{
+            color: "#6fda9c"
+            radius: parent.width
+        }
+        onClicked: {
+            enableAddMarker = true;
+        }
+    }
+
     footer: ToolBar {
+        id: footer
         RowLayout{
             width: parent.width
             property var visible_subcategories: []
@@ -389,39 +411,32 @@ Page {
                         button5.current_category = "Спортзал"
                         button5.checked = parent.visible_subcategories.indexOf(button5.current_category) !== -1
 
-
-                        button6.visible = false;
-                        button7.visible = false;
                         break;
                     case 1:
-                        button1.text = "Музей";
-                        button1.current_category = "Музей";
+                        button1.text = "\uf53f";
+                        button1.font.family = "Font Awesome 5 Free Solid"
+                        button1.current_category = "Галерея";
                         button1.checked = parent.visible_subcategories.indexOf(button1.current_category) !== -1
 
 
-                        button2.text = "Галерея";
-                        button2.current_category = "Галерея";
+                        button2.text = "\uf3ff";
+                        button2.font.family = "Font Awesome 5 Free Solid"
+                        button2.current_category = "Экскурсия";
                         button2.checked = parent.visible_subcategories.indexOf(button2.current_category) !== -1
 
 
-                        button3.text = "Экскурсия";
-                        button3.current_category = "Экскурсия";
+                        button3.text = "\uf630";
+                        button3.font.family = "Font Awesome 5 Free Solid"
+                        button3.current_category = "Театр";
                         button3.checked = parent.visible_subcategories.indexOf(button3.current_category) !== -1
 
-                        button4.text = "Театр";
-                        button4.current_category = "Театр";
+                        button4.text = "\uf008";
+                        button4.font.family = "Font Awesome 5 Free Solid"
+                        button4.current_category = "Кинотеатр";
                         button4.checked = parent.visible_subcategories.indexOf(button4.current_category) !== -1
 
 
-                        button5.visible = true;
-                        button5.text = "\uf008";
-                        button5.font.family = "Font Awesome 5 Free Solid"
-                        button5.current_category = "Кинотеатр"
-                        button5.checked = parent.visible_subcategories.indexOf(button5.current_category) !== -1
-
-
-                        button6.visible = false;
-                        button7.visible = false;
+                        button5.visible = false;
                         break;
                     case 2:
                         button1.text = "\uf0fc";
@@ -435,25 +450,27 @@ Page {
                         button2.current_category = "Ресторан"
                         button2.checked = parent.visible_subcategories.indexOf(button2.current_category) !== -1
 
-                        button3.text = "Клуб";
+                        button3.text = "\uf57b";
+                        button3.font.family = "Font Awesome 5 Free Solid"
                         button3.current_category = "Клуб";
                         button3.checked = parent.visible_subcategories.indexOf(button3.current_category) !== -1
 
-                        button4.text = "Кальян";
+                        button4.text = "\uf55c";
+                        button4.font.family = "Font Awesome 5 Free Solid"
                         button4.current_category = "Кальян";
                         button4.checked = parent.visible_subcategories.indexOf(button4.current_category) !== -1
 
                         button5.visible = false;
-                        button6.visible = false;
-                        button7.visible = false;
                         break;
                     case 3:
-                        button1.text = "Цирк";
-                        button1.current_category = "Цирк"
+                        button1.text = "\uf0f4";
+                        button1.font.family = "Font Awesome 5 Free Solid"
+                        button1.current_category = " Кофейня"
                         button1.checked = parent.visible_subcategories.indexOf(button1.current_category) !== -1
 
-                        button2.text = "Парк развлечений";
-                        button2.current_category = "Парк развлечений"
+                        button1.text = "\uf554";
+                        button1.font.family = "Font Awesome 5 Free Solid"
+                        button2.current_category = "Прогулка"
                         button2.checked = parent.visible_subcategories.indexOf(button2.current_category) !== -1
 
                         button3.text = "\uf001";
@@ -461,25 +478,16 @@ Page {
                         button3.font.family = "Font Awesome 5 Free Solid"
                         button3.checked = parent.visible_subcategories.indexOf(button3.current_category) !== -1
 
-                        button4.text = "Развлекательный центр";
-                        button4.current_category = "Развлекательный центр"
-                        button4.checked = parent.visible_subcategories.indexOf(button4.current_category) !== -1
+                        button4.visible = true;
+                        button4.text = "\uf002";
+                        button4.current_category = "Квест"
+                        button4.checked = parent.visible_subcategories.indexOf(button5.current_category) !== -1
 
                         button5.visible = true;
-                        button5.text = "\uf002";
-                        button5.current_category = "Парк развлечений"
-                        button5.checked = parent.visible_subcategories.indexOf(button5.current_category) !== -1
-
-                        button6.visible = true;
-                        button6.text = "Лазертаг\\Пейнтбол";
-                        button6.current_category = "Лазертаг\\Пейнтбол"
-                        button6.checked = parent.visible_subcategories.indexOf(button6.current_category) !== -1
-
-                        button7.visible = true;
-                        button7.text = "\uf6ed";
-                        button7.current_category = "Зоопарк"
-                        button7.font.family = "Font Awesome 5 Free Solid"
-                        button7.checked = parent.visible_subcategories.indexOf(button7.current_category) !== -1
+                        button5.text = "\uf6ed";
+                        button5.current_category = "Зоопарк"
+                        button5.font.family = "Font Awesome 5 Free Solid"
+                        button5.checked = parent.visible_subcategories.indexOf(button7.current_category) !== -1
                         break;
                     }
                 }
@@ -611,56 +619,7 @@ Page {
                 }
                 //anchors.left: button4.right
             }
-            ToolButton{
-                onCheckedChanged: {
-                    if (!checked){
-                        markerModel.removeVisibleSubcategory(current_category)
-                        remove(parent.visible_subcategories, current_category)
-                    }
-                    else{
-                        markerModel.addVisibleSubcategory(current_category)
-                        parent.visible_subcategories.push(current_category)
-                    }
-                }
-                property string current_category: ""
-                id: button6
-                font.pointSize: 20
-                font.bold: true
-                anchors.verticalCenter: undefined
-                Layout.alignment: Qt.AlignLeft
-                checkable: true
-                background: Rectangle {
-                    radius: 13
-                    anchors.fill: parent
-                    color: parent.checked ? "#c22d23" : "transparent"
-                }
-               // anchors.left: button5.right
-            }
-            ToolButton{
-                onCheckedChanged: {
-                    if (!checked){
-                        markerModel.removeVisibleSubcategory(current_category)
-                        remove(parent.visible_subcategories, current_category)
-                    }
-                    else{
-                        markerModel.addVisibleSubcategory(current_category)
-                        parent.visible_subcategories.push(current_category)
-                    }
-                }
-                property string current_category: ""
-                id: button7
-                font.pointSize: 20
-                font.bold: true
-                anchors.verticalCenter: undefined
-                Layout.alignment: Qt.AlignLeft
-                checkable: true
-                background: Rectangle {
-                    radius: 13
-                    anchors.fill: parent
-                    color: parent.checked ? "#c22d23" : "transparent"
-                }
-               // anchors.left: button6.right
-            }
+
         }
     }
 }

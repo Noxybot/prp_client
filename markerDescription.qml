@@ -5,7 +5,7 @@ import QtGraphicalEffects 1.0
 import QtQuick.Layouts 1.12
 
 Page {
-    id: loginPage
+    id: markerDescriptionPage
     property var coordinates;
     property string imageBase64 : "";
     header: ToolBar {
@@ -17,13 +17,16 @@ Page {
 
             Text {
                 id: menuButtonName
-                text: qsTr("\u2190")
+                text: qsTr("\uf060")
                 width: parent.width * 0.7
                 height: parent.height * 0.7
                 font.pointSize: 100
                 minimumPointSize: 10
                 fontSizeMode: Text.Fit
                 anchors.centerIn: parent
+                font.family: "Font Awesome 5 Free Solid"
+                font.bold: true
+                color: "#6fda9c"
             }
         }
 
@@ -32,23 +35,7 @@ Page {
             anchors.centerIn: parent
         }
 
-        ToolButton {
-            id: likeButton
-            anchors.right: parent.right
-            onClicked: {
-            }
 
-            Text {
-                id: likeButtonName
-                text: qsTr("\u2661")
-                width: parent.width * 0.7
-                height: parent.height * 0.7
-                font.pointSize: 100
-                minimumPointSize: 10
-                fontSizeMode: Text.Fit
-                anchors.centerIn: parent
-            }
-        }
     }
     ColumnLayout {
         width: parent.width
@@ -58,13 +45,21 @@ Page {
             Layout.maximumWidth: 300
             Layout.alignment: Qt.AlignHCenter
             placeholderText: qsTr("Название")
-            Layout.preferredWidth: loginPage.width / 1.5
+            Layout.preferredWidth: markerDescriptionPage.width / 1.5
+        }
+        Text {
+            id: name_error
+            text: qsTr("Это поле не должно быть пустым")
+            color: "#c22d23"
+            font.pointSize: 10
+            Layout.alignment: Qt.AlignHCenter
+            visible: false
         }
         ComboBox {
             id: type
             Layout.maximumWidth: 300
             Layout.alignment: Qt.AlignHCenter
-            Layout.preferredWidth: loginPage.width / 1.5
+            Layout.preferredWidth: markerDescriptionPage.width / 1.5
             model: ["Спорт", "Культурный отдых", "Ночная жизнь", "Развлечения"]
             onCurrentIndexChanged:
             {
@@ -74,7 +69,7 @@ Page {
                     subtype.model = ["Велоспорт", "Футбол", "Бег", "Баскетбол", "Спортзал"];
                     break;
                 case 1:
-                    subtype.model = ["Музей", "Галерея", "Экскурсия", "Театр", "Кинотеатр"];
+                    subtype.model = ["Галерея", "Экскурсия", "Театр", "Кинотеатр"];
                     break;
                 case 2:
                     subtype.model = ["Бар", "Ресторан", "Клуб", "Кальян"];
@@ -89,20 +84,25 @@ Page {
             id: subtype
             Layout.maximumWidth: 300
             Layout.alignment: Qt.AlignHCenter
-            Layout.preferredWidth: loginPage.width / 1.5
+            Layout.preferredWidth: markerDescriptionPage.width / 1.5
             model: ["Велоспорт", "Футбол", "Бег", "Баскетбол", "Спортзал"]
         }
 
         TextArea {
             id: description_
+            leftPadding: 20
+            rightPadding: 20
             Layout.maximumWidth: 300
             Layout.alignment: Qt.AlignHCenter
-            Layout.preferredWidth: loginPage.width / 1.5
-            Layout.maximumHeight: 50
-            Layout.preferredHeight: loginPage.height / 6
+            Layout.preferredWidth: markerDescriptionPage.width / 1.5
+            wrapMode: TextEdit.Wrap
+            Layout.maximumHeight: 100
+            Layout.preferredHeight: markerDescriptionPage.height / 5
             background: Rectangle
             {
-                border.color: "black"
+                radius: 20
+                border.color: "#6fda9c"
+                color: "#394454"
             }
 
             placeholderText: "Опишите свое мероприятие"
@@ -110,23 +110,64 @@ Page {
         Button {
             Layout.maximumWidth: 200
             Layout.alignment: Qt.AlignHCenter
-            Layout.preferredWidth: loginPage.width / 1.5
-            text: qsTr("Далее")
+            Layout.preferredHeight: markerDescriptionPage.height / 10
+            Layout.preferredWidth: markerDescriptionPage.width / 2
+            contentItem: Text {
+                text: qsTr("          Далее          ")
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+                font.pointSize: 20
+                minimumPointSize: 10
+                fontSizeMode: Text.Fit
+                color: "#f0f0f0"
+            }
+            background: Rectangle {
+                radius: 20
+                color: "#6fda9c"
+            }
             onClicked: {
-                stack.push("timePicker.qml", {"name":name.text,
-                               "type":type.currentText, "subtype":subtype.currentText,
-                               "description":description_.text, "coordinates":coordinates})
+                if(validateName()) {
+                    stack.push("timePicker.qml", {"name":name.text,
+                                   "type":type.currentText, "subtype":subtype.currentText,
+                                   "description":description_.text, "coordinates":coordinates})
+                }
             }
         }
 
         Button {
-            Layout.maximumWidth: 200
-            Layout.alignment: Qt.AlignHCenter
-            Layout.preferredWidth: loginPage.width / 1.5
             text: qsTr("Отмена")
             onClicked: {
                 stack.pop()
             }
+            Layout.alignment: Qt.AlignHCenter
+            contentItem: Text {
+                text: qsTr("          Отмена          ")
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+                font.pointSize: 20
+                minimumPointSize: 10
+                fontSizeMode: Text.Fit
+                color: "#f0f0f0"
+            }
+            Layout.maximumWidth: 200
+            Layout.preferredHeight: markerDescriptionPage.height / 10
+            Layout.preferredWidth: markerDescriptionPage.width / 2
+            background: Rectangle {
+                radius: 20
+                color: "#6fda9c"
+            }
+        }
+    }
+    function validateName() {
+        if(name.text.length == 0)
+        {
+            name_error.visible = true
+            return false;
+        }
+        else
+        {
+            name_error.visible = false
+            return true;
         }
     }
 }
