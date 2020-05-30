@@ -24,6 +24,8 @@ ApplicationWindow {
          id: downloader
          onDownloaded: {
              console.log("FB: downloaded image for login: " + login)
+             if (login === currentUserLogin)
+                 profileImageBase64 = image
              uploadImage(login, image)
              //addUserImagePath(id, path) //FB user login same as FB id
          }
@@ -43,15 +45,34 @@ ApplicationWindow {
     }
 
     WebSocket {
+        property bool show_popup: true
         id: mainWebsocket
         url: "ws://" + serverIP
-        onStatusChanged: {
+        onStatusChanged: { //webscoket is opened when http login confirmation received
             if (status == WebSocket.Open){
+                console.log("WS: connected to server")
                 let login_user_msg = {}
                 login_user_msg["method"] = "login_user"
                 login_user_msg["login"] = currentUserLogin
                 mainWebsocket.sendTextMessage(JSON.stringify(login_user_msg))
+                conversationModel.setCurrentUserLogin(currentUserLogin)
+                contactModel.setCurrentUserLogin(currentUserLogin)
                 currentUserDN = getDisplayNameByLogin(currentUserLogin) //blocking function
+
+            }
+            else if (status == WebSocket.Closing || status == WebSocket.Closed){
+                if (currentUserLogin.length !== 0){
+                    console.log("WS: lost connection to server")
+                    currentUserLogin = ""
+                    currentUserDN = ""
+                    conversationModel.setCurrentUserLogin(currentUserLogin)
+                    contactModel.setCurrentUserLogin(currentUserLogin)
+                    if (show_popup){
+                        popup.popMessage = qsTr("Соединение с сервером потеряно")
+                        popup.open()
+                    }
+                    stack.pop(null)
+                }
             }
         }
 
@@ -185,46 +206,68 @@ ApplicationWindow {
                         tx.executeSql('CREATE TABLE IF NOT EXISTS user(name TEXT, surname TEXT, login TEXT, password TEXT, path_to_image TEXT)');
                     })
     }
-    function addUser(name, surname, login, password, image_base64, isFB) {
-        let ret = false
+    function addUser(name, surname, login, password, isFB, pathToImage) {
+        console.log("addUser(), login: " + login +
+                    ", pass: " + password, ", isFB: " + isFB +
+                    ", DN: " + name + " " + surname + ", path: " + pathToImage)
+        //for FB user pathToImage is URL from where we will download image
         if (isFB === undefined)
         {
             console.log("addUser: IsFB is undefined")
-            return ret;
-        }
-        if (login.length < 4 || password.length < 6 && !isFB)
-        {
-            console.log("addUser: validation failed")
-            return ret
+            return;
         }
         var xhr = new XMLHttpRequest();
-        xhr.open("POST", "http://" + serverIP, false)
+        xhr.open("POST", "http://" + serverIP)
         xhr.setRequestHeader("Content-type", "application/json")
 
         let json_request = {"method": "register_user", "login": login,
-            "password": password, "display_name": name + ' ' + surname, "image": image_base64}
+            "password": password, "display_name": name + ' ' + surname}
         if (isFB)
             json_request["method"] = "login_fb_user" //todo: write it better
 
-        try {
-            xhr.send(JSON.stringify(json_request));
-            if (xhr.status !== 201 && xhr.status !== 200) //HTTP Created or 200 OK for case FB user login
-                console.log("Registration error " + xhr.status + " " +  xhr.statusText)
-            else if (xhr.status === 409)
-                console.log("conflict")
-            else
-            {
-                console.log("Registration success " + xhr.status + " " +  xhr.statusText)
-                ret = true
-                currentUserLogin = login
-                conversationModel.setCurrentUserLogin(currentUserLogin)
-                contactModel.setCurrentUserLogin(currentUserLogin)
+        var timer = Qt.createQmlObject("import QtQuick 2.14; Timer {interval: 5000; repeat: false; running: true;}",mainWindow,"MyTimer");
+        timer.triggered.connect(function(){
+            load.visible = false
+            console.log("addUser: cant connect to server");
+            popup.popMessage = qsTr("Ошибка подключения к серверу")
+            popup.open()
+            xhr.abort();
+        });
+
+        xhr.onreadystatechange  = function(){
+            if (xhr.readyState !== XMLHttpRequest.DONE) //in process
+                return
+            timer.stop()
+            load.visible = false
+            if (xhr.status === 200) {//HTTP OK
+
+                let response = JSON.parse(xhr.response)
+                let result = response["result"]
+                if (result === "registered" || result === "logged in"/*when isFB is true*/){
+                    console.log("addUser: setting curentuserlogin to " + login)
+                    currentUserLogin = login
+                    mainWebsocket.active = true
+                    if (isFB)
+                        downloader.downloadImage(login, pathToImage);
+                    else
+                        imageConverter.scheduleToBase64(login, pathToImage, "convert user image");
+
+                    if (stack.top !== "map.qml")
+                        stack.push("map.qml")
+                }
+                else if (result === "user exists") {
+                    console.log("addUser: " + result)
+                    popup.popMessage = qsTr("Логин") + " " + login + " " + qsTr("занят")
+                    load.visible = false
+                    popup.open()
+                }
+            }
+            else {
+                console.log("addUser error " + xhr.status + ": " +  xhr.statusText)
             }
 
-        } catch(err) {
-            console.log("Registration request failed: " + err.message)
         }
-        return ret
+        xhr.send(JSON.stringify(json_request));
     }
     function addUserImagePath(login, path_to_image) {
         db.transaction(function(tx) {
@@ -234,22 +277,13 @@ ApplicationWindow {
         console.log("addUserImagePath")
     }
 
-    function confirmLogin(login, password, isFB, display_name) {
-        console.log("confirmLogin")
-        let ret = false
-        if (login.length < 4 || password.length < 6)
-        {
-            load.visible = false
-            popup.popMessage = qsTr("Слишком короткий логин или пароль")
-            popup.open()
-            return
-        }
+    function confirmLogin(login, password) {
+        console.log("confirmLogin(), login: " + login + ", pass: " + password)
         var xhr = new XMLHttpRequest();
         xhr.open("POST", "http://" + serverIP)
         xhr.setRequestHeader("Content-type", "application/json")
         let json_request = {"method": "login_user", "login": login, "password": password}
         var timer = Qt.createQmlObject("import QtQuick 2.14; Timer {interval: 5000; repeat: false; running: true;}",mainWindow,"MyTimer");
-        console.log("timer " + timer)
         timer.triggered.connect(function(){
             load.visible = false
             console.log("cant connect to server");
@@ -270,8 +304,6 @@ ApplicationWindow {
                 if (result === "logged in"){
                     console.log("setting cuurentuserlogin to " + login)
                     currentUserLogin = login
-                    conversationModel.setCurrentUserLogin(currentUserLogin)
-                    contactModel.setCurrentUserLogin(currentUserLogin)
                     mainWebsocket.active = true
                     if (stack.top !== "map.qml")
                         stack.push("map.qml")
@@ -283,7 +315,7 @@ ApplicationWindow {
                 }
                 else if (result === "wrong credentials"){
                     console.log("login error " + xhr.status + ": " +  xhr.statusText)
-                    popup.popMessage = qsTr("Неправильный логин или пароль")
+                    popup.popMessage = qsTr("Неверный пароль")
                     popup.open()
                 }
             }

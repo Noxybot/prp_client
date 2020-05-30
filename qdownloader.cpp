@@ -14,7 +14,7 @@ QDownloader::~QDownloader()
     delete webCtrl;
 }
 
-void QDownloader::downloadFile(QUrl url, QString login)
+void QDownloader::downloadImage(QString login, QUrl url)
 {
 //    const auto writable_location = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
 //    if (!QDir().mkpath(writable_location))
@@ -99,13 +99,13 @@ void QDownloader::fileDownloaded()
 //    replytofile.remove(reply);
 //    replytopathid.remove(reply);
 //    delete reply;
-    qDebug() << "efileDownloaded";
+    qDebug() << "fileDownloaded";
 
 }
 
 void QDownloader::onReadyRead()
 {
     QNetworkReply* reply = qobject_cast<QNetworkReply*>(sender());
-    emit downloaded(reply->readAll().toBase64(), replytologin[reply]);
     qDebug() << "emit downloaded";
+    emit downloaded(reply->readAll().toBase64(), replytologin[reply]);
 }

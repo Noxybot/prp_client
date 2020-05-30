@@ -47,6 +47,9 @@ int main(int argc, char *argv[])
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 
     QGuiApplication app(argc, argv);
+    app.setOrganizationName("Come Together");
+    app.setOrganizationDomain("cometogether.com");
+    app.setApplicationName("Come Together");
 
     QQmlApplicationEngine engine;
     qDebug() << engine.offlineStoragePath();

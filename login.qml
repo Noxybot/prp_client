@@ -12,11 +12,19 @@ Page {
         color: "#394454"
     }
     focus: true
-    StackView.onDeactivated: {
-        load.visible = false
-    }
     StackView.onActivated: {
         login_.focus = true;
+    }
+    function do_login(){
+        if (login_.text.length < 4 || password.text.length < 6)
+        {
+            load.visible = false
+            popup.popMessage = qsTr("Слишком короткий логин или пароль")
+            popup.open()
+            return
+        }
+        load.visible = true
+        confirmLogin(login_.text, password.text)
     }
 
     Rectangle {
@@ -67,9 +75,7 @@ Page {
             echoMode: TextInput.Password
             leftPadding: 10
             onAccepted: {
-                login();
-                //stack.push("map.qml")
-                console.log("password enter")
+                do_login()
             }
         }
         Item {
@@ -92,8 +98,7 @@ Page {
             Layout.preferredHeight: loginPage.height / 10
             Layout.preferredWidth: loginPage.width / 2
             onClicked: {
-                login();
-                //stack.push("map.qml")
+                do_login()
             }
             background: Rectangle {
                 radius: 20
@@ -166,11 +171,6 @@ Page {
             Layout.preferredHeight: loginPage.height / 100
             Layout.preferredWidth: loginPage.width / 4
         }
-    }
-    function login() {
-
-        load.visible = true
-        confirmLogin(login_.text, password.text)
     }
 }
 

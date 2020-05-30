@@ -9,23 +9,10 @@ Page {
     id: signinPage
     property string pathToImage
 
-    property var loadVisible: false
     StackView.onDeactivated: {
         loadVisible = false
     }
     focus: true
-    Rectangle {
-        id: load
-        anchors.fill: parent
-        color: "white"
-        opacity: 0.5
-        visible: loadVisible
-        z: 10
-        BusyIndicator {
-            anchors.centerIn: parent
-            running: true
-        }
-    }
     header: ToolBar {
         ToolButton {
             id: backButton
@@ -306,18 +293,9 @@ Page {
             Layout.preferredWidth: signinPage.width / 2
             onClicked: {
                 if (checkAge()) {
-                    if(validateLogin() & validateName() & validatePassword() & passwordsMatch()) {
-                        loadVisible = true
-                        if (addUser(name.text, surname.text, login_.text, password.text, "", false) && stack.top !== "map.qml") //pass empty img
-                        {
-                            console.log("adduser returned true")
-                            imageConverter.scheduleToBase64(login_.text, pathToImage, "convert user image");
-                            stack.pop()
-                            stack.push("map.qml")
-                        }
-
-                        else
-                            console.log ("user was not registered") // todo: popup
+                    if (validateLogin() && validateName() && validatePassword() && passwordsMatch()) {
+                        load.visible = true
+                        addUser(name.text, surname.text, login_.text, password.text, false/*isFb*/, pathToImage)
                     }
                     else {
                         enabled: false

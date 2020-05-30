@@ -8,8 +8,6 @@ Page {
     property string inConversationWithDN
     property string imageBase64_receip
     StackView.onActivated: {
-
-        console.log("NEW CODE")
         imageBase64_receip = contactModel.getUserImageByLogin(inConversationWith)
     }
     header: ToolBar {

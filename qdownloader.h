@@ -15,7 +15,7 @@ class QDownloader : public QObject
 public:
     explicit QDownloader(QObject *parent = nullptr);
     virtual ~QDownloader();
-    Q_INVOKABLE void downloadFile(QUrl url, QString id);
+    Q_INVOKABLE void downloadImage(QString login, QUrl url);
 
 signals:
     // emits error string

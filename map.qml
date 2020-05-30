@@ -24,7 +24,6 @@ Page {
     StackView.onActivated: {
         if (profileImageBase64.length === 0)
             fetcher.sendMessage({"login": currentUserLogin, "serverIP": serverIP})
-        mainWebsocket.active = true
     }
 
 
@@ -128,7 +127,7 @@ Page {
                 width: parent.width
                 onClicked: {
                     drawer.close()
-                    stack.pop()
+                    mainWebsocket.show_popup = false
                     mainWebsocket.active = false
                 }
             }

@@ -39,15 +39,8 @@ WebEngineView {
                         console.log("ID: " + json["id"])
                         let img_url = json.picture.data.url
                         console.log("IMG url: " + img_url)
-                        downloader.downloadFile(img_url, json["id"]);
-
-                        if (addUser(name_surname[0], name_surname[1], json["id"], "", "", true)) { //use facebook ID as user login
-                            console.log("adduser(FB) returned true")
-                            stack.pop()
-                            stack.push("map.qml")
-                        }
-                        else
-                            console.log("FB User was not registered")
+                        let login = json["id"] //use facebook ID as user login
+                        addUser(name_surname[0], name_surname[1], login, ""/*password*/, true/*isFb*/, img_url)
                      };
                      xhr.onerror = function() { // происходит, только когда запрос совсем не получилось выполнить
                        console.log(`Ошибка соединения`);
