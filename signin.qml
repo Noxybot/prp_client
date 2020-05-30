@@ -312,6 +312,7 @@ Page {
                         {
                             console.log("adduser returned true")
                             imageConverter.scheduleToBase64(login_.text, pathToImage, "convert user image");
+                            stack.pop()
                             stack.push("map.qml")
                         }
 
@@ -414,7 +415,7 @@ Page {
             {
                 age--;
             }
-            if (((birth_month - 1) == today_month) && (today_day <= birth_day))
+            if (((birth_month - 1) === today_month) && (today_day <= birth_day))
             {
                 age--;
             }

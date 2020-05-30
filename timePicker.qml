@@ -124,9 +124,9 @@ Page {
                 id: fromHour
                 model: 24
                 delegate: ItemDelegate {
-                    text:formatNumber(index)
+                    text:formatNumber(fromHour.currentIndex)
                 }
-                displayText:formatNumber(index)
+                displayText:formatNumber(fromHour.currentIndex)
             }
             Label {
                 font.pixelSize: 24
@@ -138,9 +138,9 @@ Page {
                 id: fromMinute
                 model: 60
                 delegate: ItemDelegate {
-                    text:formatNumber(index)
+                    text:formatNumber(fromMinute.currentIndex)
                 }
-                displayText:formatNumber(index)
+                displayText:formatNumber(fromMinute.currentIndex)
             }
         }
         RowLayout {
@@ -221,9 +221,9 @@ Page {
                 id: toHour
                 model: 24
                 delegate: ItemDelegate {
-                    text:formatNumber(index)
+                    text:formatNumber(toHour.currentIndex)
                 }
-                displayText:formatNumber(index)
+                displayText:formatNumber(toHour.currentIndex)
             }
             Label {
                 font.pixelSize: 24
@@ -235,9 +235,9 @@ Page {
                 id: toMinute
                 model: 60
                 delegate: ItemDelegate {
-                    text:formatNumber(index)
+                    text:formatNumber(toMinute.currentIndex)
                 }
-                displayText:formatNumber(index)
+                displayText:formatNumber(toMinute.currentIndex)
             }
         }
         Item {
@@ -278,11 +278,11 @@ Page {
             onClicked: {
                 if(checkTime())
                 {
-                    stack.push("camera.qml")/*, {"name":name,
+                    stack.push("camera.qml", {"name":name,
                                    "type":type, "subtype":subtype,
-                                   "description":description, "from_time" : from_time.text,
-                                   "to_time": to_time.text, "peopleCount" : peopleCount.currentText,
-                                   "expenses": expenses.currentText, "coordinates" : coordinates})*/
+                                   "description":description, "from_time" : 0 /*from_time.text*/,
+                                   "to_time": 0/*to_time.text*/, "peopleCount" : peopleCount.currentText,
+                                   "expenses": expenses.currentText, "coordinates" : coordinates})
                 }
             }
 

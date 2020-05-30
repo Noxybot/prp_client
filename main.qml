@@ -6,6 +6,7 @@ import QtQuick.LocalStorage 2.0
 import QtWebSockets 1.14
 import QtPositioning 5.14
 import Cometogether.converter 1.0
+import Cometogether.downloader 1.0
 
 ApplicationWindow {
     id: mainWindow
@@ -19,6 +20,14 @@ ApplicationWindow {
     property string profileImageBase64: ""
 
 
+    BackendFileDonwloader {
+         id: downloader
+         onDownloaded: {
+             console.log("FB: downloaded image for login: " + login)
+             uploadImage(login, image)
+             //addUserImagePath(id, path) //FB user login same as FB id
+         }
+    }
     BackendImageConverter {
         id: imageConverter
         onImageConveted_marker: {
@@ -207,7 +216,9 @@ ApplicationWindow {
             {
                 console.log("Registration success " + xhr.status + " " +  xhr.statusText)
                 ret = true
-                mainWindow.currentUserLogin = login
+                currentUserLogin = login
+                conversationModel.setCurrentUserLogin(currentUserLogin)
+                contactModel.setCurrentUserLogin(currentUserLogin)
             }
 
         } catch(err) {

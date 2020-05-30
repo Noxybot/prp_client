@@ -63,6 +63,7 @@ void SqlContactModel::updateContacts()
 
 void SqlContactModel::addContact(const QString &login, const QString& display_name)
 {
+    qDebug() << "addCon: " << login << " dn " << display_name;
         QSqlQuery query;
         query.prepare("INSERT INTO Contacts(contact_owner, login, display_name) VALUES(:owner, :login, :dn)");
         query.bindValue(":owner", m_current_user_login);

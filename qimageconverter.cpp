@@ -23,10 +23,10 @@ void QImageConverter::toBase64Impl(QString login_or_marker_id, QString file_path
     QString iconBase64 = QString::fromLatin1(byteArray.toBase64().data());
     qDebug() << "size: " << iconBase64.size() << ", localpath: " << file_path << ", operation: " << operation_type;
     if (operation_type == "convert user image"){
-        QFile::remove(file_path);
         emit imageConveted_user(login_or_marker_id, iconBase64);
     }
     else if (operation_type == "convert marker image"){
+        QFile::remove(file_path);
         emit imageConveted_marker(login_or_marker_id, iconBase64);
     }
 }

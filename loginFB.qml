@@ -4,18 +4,9 @@ import QtQuick.Controls 2.12
 import QtGraphicalEffects 1.0
 import QtQuick.Layouts 1.12
 import QtWebEngine 1.10
-import Cometogether.downloader 1.0
 //import QtWebView 1.1
 
 WebEngineView {
-    BackendFileDonwloader {
-         id: downloader
-         onDownloaded: {
-             console.log("FB: downloaded image for login: " + login)
-             uploadImage(login, image)
-             //addUserImagePath(id, path) //FB user login same as FB id
-         }
-    }
          anchors.fill: parent
          id: view
          url: "https://www.facebook.com/dialog/oauth?client_id=261012394932672&redirect_uri=https://www.facebook.com/connect/login_success.html&response_type=token&scope=email"
