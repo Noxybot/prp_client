@@ -2,6 +2,7 @@ import QtQuick 2.14
 import QtQuick.Window 2.14
 import QtQuick.Controls 2.12
 import QtQuick.LocalStorage 2.0
+import QtQuick.Layouts 1.12
 
 import QtWebSockets 1.14
 import QtPositioning 5.14
@@ -57,6 +58,7 @@ ApplicationWindow {
                 mainWebsocket.sendTextMessage(JSON.stringify(login_user_msg))
                 conversationModel.setCurrentUserLogin(currentUserLogin)
                 contactModel.setCurrentUserLogin(currentUserLogin)
+                contact_image_provider.setCurrentUserLogin(currentUserLogin)
                 currentUserDN = getDisplayNameByLogin(currentUserLogin) //blocking function
 
             }
@@ -67,6 +69,7 @@ ApplicationWindow {
                     currentUserDN = ""
                     conversationModel.setCurrentUserLogin(currentUserLogin)
                     contactModel.setCurrentUserLogin(currentUserLogin)
+                    contact_image_provider.setCurrentUserLogin(currentUserLogin)
                     if (show_popup){
                         popup.popMessage = qsTr("Соединение с сервером потеряно")
                         popup.open()
@@ -82,30 +85,30 @@ ApplicationWindow {
             if (method === "draw_marker") {
                 let id = parseInt(json_msg["id"])
                 if (markerModel.containtsMarker(id)) {
-                    if (!markerModel.markerHasImage(id)){
-                        console.log("marker: " + id + " has no image, will try to obtain it")
-                        let xhr = new XMLHttpRequest();
-                        xhr.responseType = "json"
-                        xhr.open("POST", "http://" + serverIP)
-                        xhr.setRequestHeader("Content-type", "application/json")
-                        let json_request = {"method": "get_marker_image", "id": id}
-                        xhr.onload = function() {
-                            if (xhr.status === 200) {
-                                let response = xhr.response
-                                if (response["result"] !== "no image"){
-                                    console.log("get_marker_image for marker id: " + id +" success")
-                                    markerModel.addImage(id, response["result"])
-                                    //console.log("stack.currentItem.objectName = " + stack.currentItem.objectName)
-                                    if (stack.currentItem.objectName === "mapPage"){
-                                        //console.log("stack.currentItem.bottomProfile.placeId: " + stack.currentItem.bottomProfile.placeId + " id: " + id)
-                                        if (stack.currentItem.bottomProfile.placeId === id)
-                                            stack.currentItem.bottomProfile.img_source  = "data:image/png;base64," + response["result"]
-                                    }
-                                }
-                            }
-                        }
-                        xhr.send(JSON.stringify(json_request));
-                    }
+//                    if (!markerModel.markerHasImage(id)){
+//                        console.log("marker: " + id + " has no image, will try to obtain it")
+//                        let xhr = new XMLHttpRequest();
+//                        xhr.responseType = "json"
+//                        xhr.open("POST", "http://" + serverIP)
+//                        xhr.setRequestHeader("Content-type", "application/json")
+//                        let json_request = {"method": "get_marker_image", "id": id}
+//                        xhr.onload = function() {
+//                            if (xhr.status === 200) {
+//                                let response = xhr.response
+//                                if (response["result"] !== "no image"){
+//                                    console.log("get_marker_image for marker id: " + id +" success")
+//                                    markerModel.addImage(id, response["result"])
+//                                    //console.log("stack.currentItem.objectName = " + stack.currentItem.objectName)
+//                                    if (stack.currentItem.objectName === "mapPage"){
+//                                        //console.log("stack.currentItem.bottomProfile.placeId: " + stack.currentItem.bottomProfile.placeId + " id: " + id)
+//                                        if (stack.currentItem.bottomProfile.placeId === id)
+//                                            stack.currentItem.bottomProfile.img_source  = "data:image/png;base64," + response["result"]
+//                                    }
+//                                }
+//                            }
+//                        }
+//                        xhr.send(JSON.stringify(json_request));
+//                    }
                     return;
                 }
                 let latitude = parseFloat(json_msg["latitude"])
@@ -126,7 +129,7 @@ ApplicationWindow {
                                       description, creation_time, id);
             }
             else if (method === "send_message"){
-                console.log("onTextMessageReceived: " + message)
+               // console.log("onTextMessageReceived: " + message)
                 let to_login = json_msg["to"] //todo: fix it
                 let from_login = json_msg["from"]
                 let msg_text = json_msg["text"]
@@ -138,8 +141,15 @@ ApplicationWindow {
                 }
                 else {
                     conversationModel.sendMessage(from_login, "Me", msg_text, unix_time)
+                    let dn = json_msg["from_dn"]
+                    popup_msg.text = msg_text
+                    popup_msg.login = from_login
+                    popup_msg.dn = dn
+                    popup_msg.dn_alias = dn
+                    popup_msg.img = "image://contact_image_provider/" + from_login
+                    popup_msg.open()
                     if (!contactModel.userPresent(from_login))
-                        contactModel.addContact(from_login, getDisplayNameByLogin(from_login))
+                        contactModel.addContact(from_login, dn)
                 }
             }
             else if (method === "delete_marker"){
@@ -185,13 +195,71 @@ ApplicationWindow {
             }
             onOpened: popupClose.start()
         }
-
-        // Popup will be closed automatically in 2 seconds after its opened
         Timer {
             id: popupClose
             interval: 2000
             onTriggered: popup.close()
         }
+        Popup {
+            id: popup_msg
+            property alias text: text_content.text
+            property alias img: img.source
+            property alias dn_alias: text_dn.text
+            property string dn: ""
+            property string login: ""
+
+            background: Rectangle {
+                implicitWidth: mainWindow.width
+                implicitHeight: 60
+                color: "#b44"
+            }
+            MouseArea {
+                anchors.fill: parent
+                onClicked: {
+                    if (stack.top !== "chat.qml") {
+                        conversationModel.setRecipient(popup_msg.login)
+                        stack.push("chat.qml", {"inConversationWith" : popup_msg.login,
+                                       "inConversationWithDN": popup_msg.dn})
+                        popup_msg.close()
+                    }
+                }
+            }
+            y: 30
+            modal: true
+            focus: true
+            closePolicy: Popup.CloseOnPressOutside
+            RowLayout{
+                Image {
+                    id: img
+                    sourceSize.width: 40
+                    sourceSize.height: 40
+                }
+                ColumnLayout {
+                    Text {
+                        id: text_dn
+                        //anchors.centerIn: parent
+                        font.pointSize: 12
+                        color: "white"
+                    }
+                    Text {
+                        id: text_content
+                        //anchors.centerIn: parent
+                        font.pointSize: 12
+                        color: "white"
+                    }
+
+                }
+            }
+            onOpened: popup_mss_close.start()
+        }
+        Timer {
+            id: popup_mss_close
+            interval: 2000
+            onTriggered: popup_msg.close()
+        }
+
+        // Popup will be closed automatically in 2 seconds after its opened
+
 
     StackView {
         anchors.fill: parent
@@ -318,6 +386,11 @@ ApplicationWindow {
                     popup.popMessage = qsTr("Неверный пароль")
                     popup.open()
                 }
+                else if (result === "already logged in"){
+                    console.log("login error " + xhr.status + ": " +  xhr.statusText)
+                    popup.popMessage = qsTr("Этот аккаунт используется на другом устройстве")
+                    popup.open()
+                }
             }
             else {
                 console.log("login error " + xhr.status + ": " +  xhr.statusText)
@@ -369,5 +442,13 @@ ApplicationWindow {
             console.log("image for marker: " + id + " sent")
         }
         xhr.send(JSON.stringify(upload_place_image_request))
+    }
+
+    function delay(delayTime, cb) {
+        let timer = Qt.createQmlObject("import QtQuick 2.0; Timer {}", mainWindow)
+        timer.interval = delayTime;
+        timer.repeat = false;
+        timer.triggered.connect(cb);
+        timer.start();
     }
 }

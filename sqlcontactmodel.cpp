@@ -3,6 +3,32 @@
 #include <QDebug>
 #include <QSqlError>
 #include <QSqlQuery>
+void connectToDatabase()
+{
+    QSqlDatabase database = QSqlDatabase::database();
+    if (!database.isValid()) {
+        qDebug() << "adding new db";
+        database = QSqlDatabase::addDatabase("QSQLITE");
+        if (!database.isValid())
+            qFatal("Cannot add database: %s", qPrintable(database.lastError().text()));
+    }
+    qDebug() << "not adding new db";
+
+    const QDir writeDir = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    if (!writeDir.mkpath("."))
+        qFatal("Failed to create writable directory at %s", qPrintable(writeDir.absolutePath()));
+
+    // Ensure that we have a writable location on all devices.
+    const QString fileName = writeDir.absolutePath() + "/chat-database.sqlite3";
+    //QFile::remove(fileName);
+    qDebug() << "DB FILENAME: " << fileName;
+    // When using the SQLite driver, open() will create the SQLite database if it doesn't exist.
+    database.setDatabaseName(fileName);
+    if (!database.open()) {
+        qFatal("Cannot open database: %s", qPrintable(database.lastError().text()));
+        QFile::remove(fileName);
+    }
+}
 
 static void createTable()
 {
@@ -30,12 +56,17 @@ SqlContactModel::SqlContactModel(QObject *parent) :
     createTable();
     updateContacts();
     hash.insert(Qt::UserRole, "display_name");
-    hash.insert(Qt::UserRole + 1, "image");
-    hash.insert(Qt::UserRole + 2, "login");
+    //hash.insert(Qt::UserRole + 1, "image");
+    hash.insert(Qt::UserRole + 1, "login");
 }
 
 void SqlContactModel::setCurrentUserLogin(QString login)
 {
+    if (login.length() == 0)
+    {
+        present_contacts.clear();
+        return;
+    }
     m_current_user_login = std::move(login);
     QSqlQuery query;
     query.prepare("SELECT login FROM Contacts WHERE contact_owner=:owner");
@@ -51,7 +82,7 @@ void SqlContactModel::setCurrentUserLogin(QString login)
 void SqlContactModel::updateContacts()
 {
     QSqlQuery query;
-    query.prepare("SELECT display_name, image, login FROM Contacts WHERE contact_owner=:owner");
+    query.prepare("SELECT display_name, login FROM Contacts WHERE contact_owner=:owner");
     query.bindValue(":owner", m_current_user_login);
     if (!query.exec())
         qFatal("Contacts updateContacts query failed: %s", qPrintable(query.lastError().text()));
@@ -78,6 +109,8 @@ void SqlContactModel::addContact(const QString &login, const QString& display_na
 
 void SqlContactModel::addUserImage(const QString &login, const QString &image)
 {
+    qDebug() << "addUserImage::getUserImageByLogin()";
+    connectToDatabase(); //mb called from another thread
     QSqlQuery query;
     query.prepare("UPDATE Contacts SET image =:image WHERE login=:login");
     query.bindValue(":login", login);
@@ -99,9 +132,14 @@ void SqlContactModel::addUserImage(const QString &login, const QString &image)
 //    return rec.count() != 0;
 //}
 
-QVariantList SqlContactModel::getContactsWithoutAvatar()
+QVector<QString> SqlContactModel::getContactsWithoutAvatar()
 {
-    QVariantList res;
+    if (m_current_user_login.size() == 0)
+    {
+        qDebug() << "SqlContactModel::getContactsWithoutAvatar: no current user";
+        return {};
+    }
+    QVector<QString> res;
     QSqlQuery query;
     query.prepare("SELECT login FROM Contacts WHERE image IS NULL AND contact_owner=:owner");
     query.bindValue(":owner", m_current_user_login);
@@ -123,6 +161,8 @@ bool SqlContactModel::userPresent(const QString &login)
 
 QString SqlContactModel::getUserImageByLogin(const QString &login)
 {
+    qDebug() << "SqlContactModel::getUserImageByLogin()";
+    connectToDatabase(); //mb called from another thread
     QSqlQuery query;
     query.prepare("SELECT image FROM Contacts WHERE login=:login");
     query.bindValue(":login", login);

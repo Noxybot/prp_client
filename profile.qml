@@ -6,6 +6,8 @@ import QtQuick.Layouts 1.12
 
 Page {
     id: profilePage
+    property string display_name: ""
+    property string login: ""
     visible: true
     title: qsTr("Come together")
     header: ToolBar {
@@ -46,9 +48,11 @@ Page {
         Image {
             id: img
             Layout.alignment: Qt.AlignHCenter
-            source: "data:image/png;base64," + profileImageBase64
+            source: !login.length ? "data:image/png;base64," + profileImageBase64 : "image://contact_image_provider/" + login
             Layout.preferredWidth: profilePage.width*0.3
             Layout.preferredHeight: profilePage.width*0.3
+            sourceSize.width: 400
+            sourceSize.height: 400
 
         }
         Item {
@@ -58,7 +62,7 @@ Page {
         }
         Text {
             Layout.alignment: Qt.AlignHCenter
-            text: currentUserDN
+            text: display_name.length ? display_name : currentUserDN
             color: "#6fda9c"
             font.pointSize: 14
         }

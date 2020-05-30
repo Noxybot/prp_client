@@ -6,6 +6,16 @@
 #include <QVariantList>
 #include <unordered_set>
 
+#include <QSqlDatabase>
+#include <QSqlError>
+#include <QDir>
+#include <QFile>
+#include <QStandardPaths>
+#include <QDebug>
+
+void connectToDatabase();
+
+
 class SqlContactModel : public QSqlQueryModel
 {
     Q_OBJECT
@@ -30,9 +40,9 @@ public:
     Q_INVOKABLE void addContact(const QString &login, const QString& display_name);
     Q_INVOKABLE void addUserImage(const QString &login, const QString& image);
     //Q_INVOKABLE bool userHasImage(const QString& login);
-    Q_INVOKABLE QVariantList getContactsWithoutAvatar();
+    QVector<QString> getContactsWithoutAvatar();
     Q_INVOKABLE bool userPresent(const QString& login);
-    Q_INVOKABLE QString getUserImageByLogin(const QString& login);
+    QString getUserImageByLogin(const QString& login);
 
 };
 

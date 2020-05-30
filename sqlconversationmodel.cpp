@@ -56,6 +56,10 @@ void SqlConversationModel::setRecipient(const QString &recipient)
 
 void SqlConversationModel::setCurrentUserLogin(const QString &login)
 {
+    if (login.length() == 0)
+    {
+        return;
+    }
     m_current_user_login = login;
     select();
 }
@@ -81,7 +85,7 @@ QHash<int, QByteArray> SqlConversationModel::roleNames() const
 
 void SqlConversationModel::sendMessage(const QString &author, const QString &recipient, const QString &message, int unix_time)
 {
-    qDebug() << "Sending message from: " << author << " to: " << recipient;
+    qDebug() << "Sending message from: " << author << " to: " << recipient << " text: " << message;
     QDateTime timestamp;
     timestamp.setTime_t(unix_time);
     const QString timestamp_str = timestamp.toString(Qt::ISODate);

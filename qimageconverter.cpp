@@ -17,7 +17,7 @@ void QImageConverter::toBase64Impl(QString login_or_marker_id, QString file_path
     QByteArray byteArray;
     QBuffer buffer(&byteArray);
     qDebug() << "before scale size: " << image.sizeInBytes();
-    image = image.scaled(100, 100);
+    image = image.scaled(400, 400);
     qDebug() << "after scale size: " << image.sizeInBytes();
     image.save(&buffer, "PNG"); // writes the image in JPEG format inside the buffer
     QString iconBase64 = QString::fromLatin1(byteArray.toBase64().data());

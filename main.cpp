@@ -5,8 +5,6 @@
 #include <QQmlEngine>
 #include <QQmlContext>
 #include <QStandardPaths>
-#include <QSqlDatabase>
-#include <QSqlError>
 #include <QDir>
 #include <QFontDatabase>
 #include "qdownloader.h"
@@ -14,32 +12,11 @@
 #include "sqlconversationmodel.h"
 #include "sqlcontactmodel.h"
 #include "qimageconverter.h"
+#include "markerimageprovider.h"
+#include "contactimageprovider.h"
 
-static void connectToDatabase()
-{
-    QSqlDatabase database = QSqlDatabase::database();
-    if (!database.isValid()) {
-        database = QSqlDatabase::addDatabase("QSQLITE");
-        if (!database.isValid())
-            qFatal("Cannot add database: %s", qPrintable(database.lastError().text()));
-    }
 
-    const QDir writeDir = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
-    if (!writeDir.mkpath("."))
-        qFatal("Failed to create writable directory at %s", qPrintable(writeDir.absolutePath()));
-
-    // Ensure that we have a writable location on all devices.
-    const QString fileName = writeDir.absolutePath() + "/chat-database.sqlite3";
-    //QFile::remove(fileName);
-    qDebug() << "DB FILENAME: " << fileName;
-    // When using the SQLite driver, open() will create the SQLite database if it doesn't exist.
-    database.setDatabaseName(fileName);
-    if (!database.open()) {
-        qFatal("Cannot open database: %s", qPrintable(database.lastError().text()));
-        QFile::remove(fileName);
-    }
-}
-
+static QString g_server_ip {"178.150.141.36:1337"};
 int main(int argc, char *argv[])
 {
 
@@ -65,13 +42,13 @@ int main(int argc, char *argv[])
         qDebug() << "font3 could not be loaded";
     const QUrl url(QStringLiteral("qrc:/main.qml"));
 
-    MarkerModel model;
-    engine.rootContext()->setContextProperty("markerModel", &model);
+    MarkerModel marker_model;
+    engine.rootContext()->setContextProperty("markerModel", &marker_model);
 
     connectToDatabase();
 
-    SqlContactModel contact_model;
-    engine.rootContext()->setContextProperty("contactModel", &contact_model);
+    auto contact_model = std::make_shared<SqlContactModel>();
+    engine.rootContext()->setContextProperty("contactModel", contact_model.get());
 
     SqlConversationModel conversation_model;
     engine.rootContext()->setContextProperty("conversationModel", &conversation_model);
@@ -81,6 +58,15 @@ int main(int argc, char *argv[])
 
     qmlRegisterType<QDownloader>("Cometogether.downloader", 1, 0, "BackendFileDonwloader");
 
+    auto  marker_provider = new MarkerImageProvider{g_server_ip};
+    QObject::connect(&marker_model, &MarkerModel::markerDeleted, marker_provider, &MarkerImageProvider::markerDeleted);
+    engine.addImageProvider(QLatin1String("marker_image_provider"), marker_provider);
+
+
+    auto  contact_provider = new ContactImageProvider {g_server_ip, contact_model };
+    engine.addImageProvider(QLatin1String("contact_image_provider"),
+                            contact_provider);
+    engine.rootContext()->setContextProperty("contact_image_provider", contact_provider);
 
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,
                      &app, [url](QObject *obj, const QUrl &objUrl) {

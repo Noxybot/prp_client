@@ -107,5 +107,7 @@ void QDownloader::onReadyRead()
 {
     QNetworkReply* reply = qobject_cast<QNetworkReply*>(sender());
     qDebug() << "emit downloaded";
-    emit downloaded(reply->readAll().toBase64(), replytologin[reply]);
+    const auto login = replytologin[reply];
+    replytologin.remove(reply);
+    emit downloaded(reply->readAll().toBase64(), login);
 }

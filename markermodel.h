@@ -118,8 +118,10 @@ public:
             {
                 if (!removeOnlyFromVisible)
                 {
-                    m_current_markers.erase(m_visible_coordinates[i]->id);
+                    const int id = m_visible_coordinates[i]->id;
+                    m_current_markers.erase(id);
                     m_all_coordinates.erase(markerIt);
+                    emit markerDeleted(id);
                     if (markerIt->use_count() == 0)
                     {
                         qDebug() << "marker doesnt present in visible, so just return;";
@@ -245,6 +247,8 @@ public:
         for (auto& marker: to_remove)
             removeMarker(marker->id, true);
     }
+signals:
+    void markerDeleted(int id);
 
 private:
     mutable std::mutex m_mtx;

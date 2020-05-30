@@ -232,7 +232,7 @@ Page {
                         description_.text = description
                         bottomProfile.recipient = creator_login
                         bottomProfile.placeId = marker_id
-                        bottomProfile.img_source = "data:image/png;base64," + image
+                        //bottomProfile.img_source = "data:image/png;base64," + image
                         bottomProfile.visible = true
                     }
                 }
@@ -279,10 +279,25 @@ Page {
             anchors.centerIn: parent
             spacing: 8
             Image {
+                BusyIndicator {
+                    anchors.centerIn: parent
+                    running: locationImage.status != Image.Ready
+                }
                 id: locationImage
-                source: "data:image/png;base64,";//"images/worldwide-location.png"
+                source: bottomProfile.placeId === -1 ? "" :  "image://marker_image_provider/" + bottomProfile.placeId
                 Layout.preferredWidth:  bottomProfile.height
                 Layout.preferredHeight: bottomProfile.height
+                sourceSize.width: 300
+                sourceSize.height: 300
+                onStatusChanged: {
+                    if (locationImage.status != Image.Ready){
+                        if (locationImage.source == undefined)
+                            return
+                        delay(500, function(){
+                            let old_src = locationImage.source;
+                            locationImage.source = "";
+                            locationImage.source = old_src})
+                    }}
             }
             ColumnLayout{
                 Layout.preferredWidth: mapPage.width * 0.6
@@ -325,7 +340,6 @@ Page {
                                 let recipient = bottomProfile.recipient
                                 conversationModel.setRecipient(recipient)
                                 stack.push("chat.qml", {"inConversationWith" : recipient,
-                                               "imageBase64": contactModel.getUserImageByLogin(recipient),
                                                "inConversationWithDN": getDisplayNameByLogin(recipient)})
                             }
                         }

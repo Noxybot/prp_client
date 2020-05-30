@@ -6,9 +6,9 @@ Page {
     visible: true
     property string inConversationWith
     property string inConversationWithDN
-    property string imageBase64_receip
+    //property string imageBase64_receip
     StackView.onActivated: {
-        imageBase64_receip = contactModel.getUserImageByLogin(inConversationWith)
+        //imageBase64_receip = contactModel.getUserImageByLogin(inConversationWith)
     }
     header: ToolBar {
         ToolButton {
@@ -67,7 +67,7 @@ Page {
             spacing: 12
             model: conversationModel
             delegate: Column {
-                anchors.right: sentByMe ? parent.right : undefined
+                anchors.right: sentByMe && parent != null ? parent.right : undefined
                 spacing: 6
 
                 readonly property bool sentByMe: model.recipient !== "Me"
@@ -83,7 +83,8 @@ Page {
                         id: avatar
                         sourceSize.width: 40
                         sourceSize.height: 40
-                        source: "data:image/png;base64," +  (!sentByMe ? imageBase64_receip : profileImageBase64)
+                        source:  (!sentByMe ? "image://contact_image_provider/" + inConversationWith
+                                            : "data:image/png;base64," + profileImageBase64)
                     }
 
                     Rectangle {
@@ -150,6 +151,7 @@ Page {
         let send_message_request = {}
         send_message_request["method"] = "send_message"
         send_message_request["from"] = currentUserLogin
+        send_message_request["from_dn"] = currentUserDN
         send_message_request["to"] = inConversationWith
         send_message_request["text"] = messageField.text
         mainWebsocket.sendTextMessage(JSON.stringify(send_message_request))
