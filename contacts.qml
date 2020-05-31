@@ -84,7 +84,7 @@ ListView {
                     source: "image://contact_image_provider/" + login
                     onStatusChanged: {
                         if (contact_img.status !== Image.Ready){
-                            if (contact_img.source == undefined)
+                            if (contact_img !== null && contact_img.source == undefined)
                                 return
                             delay(500, function(){ let old_src = contact_img.source;
                                 contact_img.source = "";

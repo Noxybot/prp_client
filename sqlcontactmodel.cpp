@@ -95,16 +95,17 @@ void SqlContactModel::updateContacts()
 void SqlContactModel::addContact(const QString &login, const QString& display_name)
 {
     qDebug() << "addCon: " << login << " dn " << display_name;
-        QSqlQuery query;
-        query.prepare("INSERT INTO Contacts(contact_owner, login, display_name) VALUES(:owner, :login, :dn)");
-        query.bindValue(":owner", m_current_user_login);
-        query.bindValue(":login", login);
-        query.bindValue(":dn", display_name);
-        if (!query.exec())
-            qFatal("Contacts addContact query failed: %s", qPrintable(query.lastError().text()));
-        else
-            present_contacts.insert(login);
-        updateContacts();
+    connectToDatabase();
+    QSqlQuery query;
+    query.prepare("INSERT INTO Contacts(contact_owner, login, display_name) VALUES(:owner, :login, :dn)");
+    query.bindValue(":owner", m_current_user_login);
+    query.bindValue(":login", login);
+    query.bindValue(":dn", display_name);
+    if (!query.exec())
+        qFatal("Contacts addContact query failed: %s", qPrintable(query.lastError().text()));
+    else
+        present_contacts.insert(login);
+    updateContacts();
 }
 
 void SqlContactModel::addUserImage(const QString &login, const QString &image)

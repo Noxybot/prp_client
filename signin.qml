@@ -293,7 +293,7 @@ Page {
             Layout.preferredWidth: signinPage.width / 2
             onClicked: {
                 if (checkAge()) {
-                    if (validateLogin() && validateName() && validatePassword() && passwordsMatch()) {
+                    if (validateLogin() & validateName() & validatePassword() & passwordsMatch()) {
                         load.visible = true
                         addUser(name.text, surname.text, login_.text, password.text, false/*isFb*/, pathToImage)
                     }

@@ -112,25 +112,24 @@ public:
         });
         if (markerIt == std::end(m_all_coordinates))
             return;
+        if (!removeOnlyFromVisible)
+        {
+            m_current_markers.erase((*markerIt)->id);
+            m_all_coordinates.erase(markerIt);
+            emit markerDeleted(id);
+        }
         for (int i = 0; i < m_visible_coordinates.size(); ++i)
         {
+            qDebug() << "i = " << i << ", size: " << m_visible_coordinates.size() << ", id " << m_visible_coordinates[i]->id;
             if (m_visible_coordinates[i]->id == id)
             {
-                if (!removeOnlyFromVisible)
-                {
-                    const int id = m_visible_coordinates[i]->id;
-                    m_current_markers.erase(id);
-                    m_all_coordinates.erase(markerIt);
-                    emit markerDeleted(id);
-                    if (markerIt->use_count() == 0)
-                    {
-                        qDebug() << "marker doesnt present in visible, so just return;";
-                        return;
-                    }
-                }
+                qDebug() << "size before remove111: " << m_visible_coordinates.size();
                 beginRemoveRows(QModelIndex(), i, i);
+                qDebug() << "size before remove: " << m_visible_coordinates.size();
                 m_visible_coordinates.remove(i);
+                qDebug() << "size after remove: " << m_visible_coordinates.size();
                 endRemoveRows();
+                break;
             }
         }
 
@@ -150,6 +149,7 @@ public:
 
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override
     {
+        std::lock_guard<std::mutex> lock {m_mtx};
         if (index.row() < 0 || index.row() >= m_visible_coordinates.size())
             return QVariant();
         const auto role_ = static_cast<MarkerRoles>(role);

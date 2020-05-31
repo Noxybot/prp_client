@@ -131,12 +131,6 @@ public slots:
             break;
         }
     }
-//    void markerDeleted(int id)
-//    {
-//        qDebug() << "Deleting img for id: " << id;
-//        std::lock_guard<std::mutex> lock{m_img_mtx};
-//        m_marker_images.remove(id);
-//    }
 private:
     std::mutex m_replies_mtx;
     QMap<QNetworkReply*, QString> m_replies; //reply -> login

@@ -93,9 +93,11 @@ public slots:
     }
     void markerDeleted(int id)
     {
-        qDebug() << "Deleting img for id: " << id;
+        qDebug() << "Deleting img for id1: " << id;
         std::lock_guard<std::mutex> lock{m_img_mtx};
+        qDebug() << "Deleting img for id: " << id << " success1";
         m_marker_images.remove(id);
+        qDebug() << "Deleting img for id: " << id << " success";
     }
 private:
     std::mutex m_replies_mtx;

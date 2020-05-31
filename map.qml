@@ -232,7 +232,7 @@ Page {
                         description_.text = description
                         bottomProfile.recipient = creator_login
                         bottomProfile.placeId = marker_id
-                        //bottomProfile.img_source = "data:image/png;base64," + image
+                        bottomProfile.img_source = "image://marker_image_provider/" + marker_id
                         bottomProfile.visible = true
                     }
                 }
@@ -284,14 +284,13 @@ Page {
                     running: locationImage.status != Image.Ready
                 }
                 id: locationImage
-                source: bottomProfile.placeId === -1 ? "" :  "image://marker_image_provider/" + bottomProfile.placeId
                 Layout.preferredWidth:  bottomProfile.height
                 Layout.preferredHeight: bottomProfile.height
                 sourceSize.width: 300
                 sourceSize.height: 300
                 onStatusChanged: {
                     if (locationImage.status != Image.Ready){
-                        if (locationImage.source == undefined)
+                        if (locationImage !== null && locationImage.source == undefined)
                             return
                         delay(500, function(){
                             let old_src = locationImage.source;

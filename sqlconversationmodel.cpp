@@ -5,6 +5,8 @@
 #include <QSqlError>
 #include <QSqlRecord>
 #include <QSqlQuery>
+#include "sqlcontactmodel.h"
+
 
 static const char *conversationsTableName = "Conversations";
 
@@ -46,6 +48,7 @@ void SqlConversationModel::setRecipient(const QString &recipient)
     if (recipient == m_recipient)
         return;
 
+    connectToDatabase();
     m_recipient = recipient;
 
     const QString filterString = QString::fromLatin1(
@@ -86,6 +89,7 @@ QHash<int, QByteArray> SqlConversationModel::roleNames() const
 void SqlConversationModel::sendMessage(const QString &author, const QString &recipient, const QString &message, int unix_time)
 {
     qDebug() << "Sending message from: " << author << " to: " << recipient << " text: " << message;
+    connectToDatabase();
     QDateTime timestamp;
     timestamp.setTime_t(unix_time);
     const QString timestamp_str = timestamp.toString(Qt::ISODate);
