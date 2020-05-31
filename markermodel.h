@@ -243,6 +243,24 @@ public:
         for (auto& marker: to_remove)
             removeMarker(marker->id, true);
     }
+    Q_INVOKABLE void hideALlMarkers()
+    {
+        QVector<markerPtr> to_remove;
+        {
+            std::lock_guard<std::mutex> lock {m_mtx};
+            for (auto& marker : m_visible_coordinates)
+            {
+                to_remove.push_back(marker);
+            }
+        }
+        for (auto& marker: to_remove)
+            removeMarker(marker->id, true);
+    }
+    Q_INVOKABLE void restoreState()
+    {
+        m_areAllMarkesVisible = m_visible_subcategories.empty();
+        ActualizeCoordinates();
+    }
 signals:
     void markerDeleted(int id);
 
