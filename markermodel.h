@@ -120,14 +120,10 @@ public:
         }
         for (int i = 0; i < m_visible_coordinates.size(); ++i)
         {
-            qDebug() << "i = " << i << ", size: " << m_visible_coordinates.size() << ", id " << m_visible_coordinates[i]->id;
             if (m_visible_coordinates[i]->id == id)
             {
-                qDebug() << "size before remove111: " << m_visible_coordinates.size();
                 beginRemoveRows(QModelIndex(), i, i);
-                qDebug() << "size before remove: " << m_visible_coordinates.size();
                 m_visible_coordinates.remove(i);
-                qDebug() << "size after remove: " << m_visible_coordinates.size();
                 endRemoveRows();
                 break;
             }

@@ -261,6 +261,15 @@ Page {
 
     }
 
+    Component.onCompleted: {
+        markerModel.markerDeleted.connect(function(id){
+            console.log("marker deleted id : " + id)
+            if (bottomProfile.placeId === id)
+                bottomProfile.visible = false;
+        })
+
+    }
+
 
     Rectangle {
         id: bottomProfile
