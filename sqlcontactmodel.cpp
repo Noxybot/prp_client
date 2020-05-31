@@ -3,8 +3,19 @@
 #include <QDebug>
 #include <QSqlError>
 #include <QSqlQuery>
+#include <QThread>
+#include <QJsonObject>
+#include <QJsonDocument>
+#include <atomic>
 void connectToDatabase()
 {
+    static std::atomic<void*> last_thread_id;
+    if (last_thread_id == QThread::currentThreadId())
+    {
+        //qDebug() << "connection for this thread already made";
+        return;
+    }
+
     QSqlDatabase database = QSqlDatabase::database();
     if (!database.isValid()) {
         qDebug() << "adding new db";
@@ -28,6 +39,7 @@ void connectToDatabase()
         qFatal("Cannot open database: %s", qPrintable(database.lastError().text()));
         QFile::remove(fileName);
     }
+    last_thread_id = QThread::currentThreadId();
 }
 
 static void createTable()
@@ -50,40 +62,79 @@ static void createTable()
     }
 }
 
-SqlContactModel::SqlContactModel(QObject *parent) :
-    QSqlQueryModel(parent)
+SqlContactModel::SqlContactModel(QString server_ip, QObject *parent)
+    : QSqlQueryModel(parent)
+    , m_web_ctrl(new QNetworkAccessManager(this))
+    , m_server_ip(std::move(server_ip))
 {
     createTable();
     updateContacts();
     hash.insert(Qt::UserRole, "display_name");
-    //hash.insert(Qt::UserRole + 1, "image");
     hash.insert(Qt::UserRole + 1, "login");
+    hash.insert(Qt::UserRole + 2, "last_message");
 }
 
 void SqlContactModel::setCurrentUserLogin(QString login)
 {
     if (login.length() == 0)
     {
-        present_contacts.clear();
+        std::lock_guard<std::mutex> lock{m_mtx};
+        m_present_contacts.clear();
         return;
     }
+
+    auto ask_user_state = [&] (const QString& login)
+    {
+        QUrl server_url = QUrl("http://" + m_server_ip);
+
+        QNetworkRequest request(server_url);
+
+        QJsonObject json;
+        json.insert("method", "get_user_status");
+        json.insert("login", login); //marker id
+        QJsonDocument jsonDoc(json);
+        QByteArray jsonData= jsonDoc.toJson();
+        request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+        QNetworkReply *reply = m_web_ctrl->post(request, jsonData);
+        {
+             std::lock_guard<std::mutex> lock{m_replies_mtx};
+             m_replies.insert(reply, login);
+        }
+        QObject::connect(reply, &QNetworkReply::finished, this, &SqlContactModel::userStatusResponseReceived);
+
+    };
+
+    connectToDatabase();
+
     m_current_user_login = std::move(login);
     QSqlQuery query;
     query.prepare("SELECT login FROM Contacts WHERE contact_owner=:owner");
     query.bindValue(":owner", m_current_user_login);
     if (!query.exec())
         qFatal("Contacts setCurrentUserLogin query failed: %s", qPrintable(query.lastError().text()));
-    while (query.next()){
-        present_contacts.insert(query.value(0).toString());
+    {
+        std::lock_guard<std::mutex> lock{m_mtx};
+        while (query.next())
+        {
+            QString login = query.value(0).toString();
+            m_present_contacts.insert(login, false);
+            ask_user_state(login);
+        }
     }
     updateContacts();
+
+   // QObject::connect(reply, &QNetworkReply::readyRead, this, &MarkerImageProvider::markerImageDownloaded);
+    //QObject::connect(reply, &QNetworkReply::errorOccurred, this, &MarkerImageProvider::error);
 }
 
 void SqlContactModel::updateContacts()
 {
     QSqlQuery query;
-    query.prepare("SELECT display_name, login FROM Contacts WHERE contact_owner=:owner");
-    query.bindValue(":owner", m_current_user_login);
+
+    query.prepare("SELECT DISTINCT display_name, login, message, c1.recipient FROM Contacts, Conversations c1 "
+                  "WHERE login != :c_owner AND contact_owner=owner AND contact_owner=:c_owner AND owner=:c_owner AND login=c1.recipient AND timestamp >="
+                  "(SELECT MAX(timestamp) from Conversations c2 WHERE owner = :c_owner AND c2.recipient=c1.recipient)");
+    query.bindValue(":c_owner", m_current_user_login);
     if (!query.exec())
         qFatal("Contacts updateContacts query failed: %s", qPrintable(query.lastError().text()));
 
@@ -96,6 +147,7 @@ void SqlContactModel::addContact(const QString &login, const QString& display_na
 {
     qDebug() << "addCon: " << login << " dn " << display_name;
     connectToDatabase();
+
     QSqlQuery query;
     query.prepare("INSERT INTO Contacts(contact_owner, login, display_name) VALUES(:owner, :login, :dn)");
     query.bindValue(":owner", m_current_user_login);
@@ -103,15 +155,86 @@ void SqlContactModel::addContact(const QString &login, const QString& display_na
     query.bindValue(":dn", display_name);
     if (!query.exec())
         qFatal("Contacts addContact query failed: %s", qPrintable(query.lastError().text()));
-    else
-        present_contacts.insert(login);
+    else{
+        std::lock_guard<std::mutex> lock{m_mtx};
+        m_present_contacts.insert(login, false);
+    }
     updateContacts();
+}
+
+void SqlContactModel::loginUser(const QString &login)
+{
+     {
+        std::unique_lock<std::mutex>lock {m_mtx};
+        auto user_it = m_present_contacts.find(login);
+        if (user_it != std::end(m_present_contacts))
+        {
+            *user_it = true;
+            lock.unlock();
+            emit userLoggedIn(login);
+        }
+
+     }
+}
+
+void SqlContactModel::logoutUser(const QString &login)
+{
+    {
+        std::unique_lock<std::mutex>lock {m_mtx};
+        auto user_it = m_present_contacts.find(login);
+        if (user_it != std::end(m_present_contacts))
+        {
+            *user_it = false;
+            lock.unlock();
+            emit userLogout(login);
+        }
+    }
+}
+
+bool SqlContactModel::isUserLoggedIn(const QString &login) const
+{
+    std::lock_guard<std::mutex> lock{m_mtx};
+    auto it = m_present_contacts.find(login);
+    if (it == std::end(m_present_contacts))
+    {
+        qDebug() << "SqlContactModel::isUserLoggedIn: no such user: " << login;
+        return false;
+    }
+    return it.value();
+}
+
+void SqlContactModel::userStatusResponseReceived()
+{
+    QNetworkReply* reply = qobject_cast<QNetworkReply*>(sender());
+    switch(reply->error())
+    {
+    case QNetworkReply::NoError:
+    {
+        qDebug() << "userStatusResponseReceived(): NoError";
+        QNetworkReply* reply = qobject_cast<QNetworkReply*>(sender());
+        const QString login = m_replies[reply];
+        QJsonDocument jsonResponse = QJsonDocument::fromJson(reply->readAll());
+        const QString result = jsonResponse["result"].toString();
+        qDebug() << "status response for user: " << login << ", res: " << result;
+        {
+            std::lock_guard<std::mutex> lock{m_replies_mtx};
+            m_replies.remove(reply);
+            std::lock_guard<std::mutex> lock_{m_mtx};
+            m_present_contacts[login] = result == "online" ? true : false;
+        }
+    }
+        break;
+
+    default:
+        qDebug() << "userStatusResponseReceived(): Error " << reply->errorString();
+        break;
+    }
 }
 
 void SqlContactModel::addUserImage(const QString &login, const QString &image)
 {
     qDebug() << "addUserImage::getUserImageByLogin()";
-    connectToDatabase(); //mb called from another thread
+    connectToDatabase();//mb called from another thread
     QSqlQuery query;
     query.prepare("UPDATE Contacts SET image =:image WHERE login=:login");
     query.bindValue(":login", login);
@@ -157,13 +280,14 @@ QVector<QString> SqlContactModel::getContactsWithoutAvatar()
 
 bool SqlContactModel::userPresent(const QString &login)
 {
-    return present_contacts.find(login) != std::end(present_contacts);
+    std::lock_guard<std::mutex> {m_mtx};
+    return m_present_contacts.find(login) != std::end(m_present_contacts);
 }
 
 QString SqlContactModel::getUserImageByLogin(const QString &login)
 {
     qDebug() << "SqlContactModel::getUserImageByLogin()";
-    connectToDatabase(); //mb called from another thread
+    connectToDatabase();//mb called from another thread
     QSqlQuery query;
     query.prepare("SELECT image FROM Contacts WHERE login=:login");
     query.bindValue(":login", login);

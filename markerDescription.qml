@@ -92,6 +92,7 @@ Page {
             id: description_
             leftPadding: 20
             rightPadding: 20
+            clip: true
             Layout.maximumWidth: 300
             Layout.alignment: Qt.AlignHCenter
             Layout.preferredWidth: markerDescriptionPage.width / 1.5

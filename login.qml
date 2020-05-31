@@ -121,6 +121,7 @@ Page {
                 color: "#f0f0f0"
             }
             onClicked: {
+                load.visible = true
                 console.log("Registration")
                 if(stack.top !== "signin.qml")
                     stack.push("signin.qml")

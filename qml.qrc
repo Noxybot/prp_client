@@ -26,6 +26,6 @@
         <file>fontawesome-free-5.13.0-desktop/LICENSE.txt</file>
         <file>timePicker.qml</file>
         <file>qtquickcontrols2.conf</file>
-        <file>images/маркер.png</file>
+        <file>images/marker.png</file>
     </qresource>
 </RCC>

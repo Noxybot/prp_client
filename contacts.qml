@@ -46,6 +46,26 @@ Page {
         }
 
     }
+    Component.onCompleted: {
+        contactModel.userLoggedIn.connect(
+        function (login) {
+            for(var child in listView.contentItem.children) {
+                let item = listView.contentItem.children[child]
+                if (item.delegate_login === login)
+                    item.color = "green"
+            }
+        });
+        contactModel.userLogout.connect(
+        function (login)
+        {
+            for(var child in listView.contentItem.children) {
+                let item = listView.contentItem.children[child]
+                if (item.delegate_login === login)
+                    item.color = "red"
+            }
+
+        });
+    }
 ListView {
             id: listView
             anchors.fill: parent
@@ -56,40 +76,57 @@ ListView {
             spacing: 20
             model: contactModel
             delegate: ItemDelegate {
-                text: display_name
-                width: listView.width - listView.leftMargin - listView.rightMargin
-                height: 40 //avatar.implicitHeight
+                readonly property string delegate_login: login
+                property alias color: cont_img_rect.border.color
+                text: display_name + "\n" + last_message  //
+                width: parent.width//listView.width - listView.leftMargin - listView.rightMargin
+                height: 42 //avatar.implicitHeight
                 leftPadding: contact_img.width + 32
                 onClicked: {conversationModel.setRecipient(login);
                     stack.push("chat.qml",
                            {"inConversationWith" : login, "inConversationWithDN": display_name}) }
-                Image {
-                    asynchronous: true
-                    id: contact_img
-                    MouseArea {
-                        anchors.fill: parent;
-                        onClicked:  {
-                            stack.push("profile.qml", {"login": login, "display_name": display_name})
-                        }
-                    }
-                    BusyIndicator {
-                        anchors.centerIn: parent
-                        running: contact_img.status !== Image.Ready
-                    }
+                Rectangle {
+                    id: cont_img_rect;
+                    width: 42
+                    height: 42
                     visible: true
-                    width: 40
-                    height: 40
-                    sourceSize.width: 40
-                    sourceSize.height: 40
-                    source: "image://contact_image_provider/" + login
-                    onStatusChanged: {
-                        if (contact_img.status !== Image.Ready){
-                            if (contact_img !== null && contact_img.source == undefined)
+                    border.color: contactModel.isUserLoggedIn(login) ?  "green" : "red"
+                    border.width: 10
+                    Image {
+                        //anchors.fill: parent
+                        asynchronous: true
+                        id: contact_img
+                        MouseArea {
+                            anchors.fill: parent;
+                            onClicked:  {
+                                stack.push("profile.qml", {"login": login, "display_name": display_name})
+                            }
+                        }
+                        BusyIndicator {
+                            anchors.centerIn: parent
+                            running: contact_img.status !== Image.Ready
+                        }
+                        visible: true
+                        width: 40
+                        height: 40
+                        sourceSize.width: 40
+                        sourceSize.height: 40
+                       // Component.onCompleted:  {console.log("last msg" + )}
+
+                        source: "image://contact_image_provider/" + login
+                        onStatusChanged: {
+                            if (contact_img === null || contact_img.source === undefined)
                                 return
-                            delay(500, function(){ let old_src = contact_img.source;
-                                contact_img.source = "";
-                                contact_img.source = old_src})
-                        }}
+                            if (contact_img.status !== Image.Ready){
+                                delay(500, function(){ let old_src = contact_img.source;
+                                    contact_img.source = "";
+                                    contact_img.source = old_src})
+                            }}
+                    }
+                }
+                Text {
+                    id: name
+                    text: last_message
                 }
             }
         }

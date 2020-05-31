@@ -53,10 +53,25 @@ Page {
         }
 
     }
+    Component.onCompleted: {
+        contactModel.userLoggedIn.connect(
+        function (login) {
+            if (listView !== null)
+                listView.receip_status_color = "green"
+
+        });
+        contactModel.userLogout.connect(
+        function (login)
+        {
+            if (listView !== null)
+                listView.receip_status_color = "red"
+        });
+    }
     ColumnLayout {
         anchors.fill: parent
 
         ListView {
+            property string receip_status_color: contactModel.isUserLoggedIn(inConversationWith) ? "green" : "red"
             id: listView
             Layout.fillWidth: true
             Layout.fillHeight: true
@@ -76,15 +91,21 @@ Page {
                     id: messageRow
                     spacing: 6
                     anchors.right: sentByMe ? parent.right : undefined
+                    Rectangle {
+                        id: cont_img_rect
+                        width: 42
+                        height: 42
+                        border.width: 2
+                        border.color: sentByMe ? "transparent" : listView.receip_status_color
 
-                    Image {
-                        width: 40
-                        height: 40
-                        id: avatar
-                        sourceSize.width: 40
-                        sourceSize.height: 40
-                        source:  (!sentByMe ? "image://contact_image_provider/" + inConversationWith
-                                            : "data:image/png;base64," + profileImageBase64)
+                        Image {
+                            width: 40
+                            height: 40
+                            id: avatar
+                            sourceSize.width: 40
+                            sourceSize.height: 40
+                            source:  "image://contact_image_provider/" + (!sentByMe ? inConversationWith : currentUserLogin)
+                        }
                     }
 
                     Rectangle {

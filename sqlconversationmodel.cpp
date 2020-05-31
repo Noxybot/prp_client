@@ -5,6 +5,7 @@
 #include <QSqlError>
 #include <QSqlRecord>
 #include <QSqlQuery>
+#include <QThread>
 #include "sqlcontactmodel.h"
 
 
@@ -69,6 +70,7 @@ void SqlConversationModel::setCurrentUserLogin(const QString &login)
 
 QVariant SqlConversationModel::data(const QModelIndex &index, int role) const
 {
+    connectToDatabase();
     if (role < Qt::UserRole)
         return QSqlTableModel::data(index, role);
 

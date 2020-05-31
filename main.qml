@@ -60,6 +60,8 @@ ApplicationWindow {
                 contactModel.setCurrentUserLogin(currentUserLogin)
                 contact_image_provider.setCurrentUserLogin(currentUserLogin)
                 currentUserDN = getDisplayNameByLogin(currentUserLogin) //blocking function
+                if (!contactModel.userPresent(currentUserLogin)) //hack: add myself to contacts
+                    contactModel.addContact(currentUserLogin, currentUserDN)
 
             }
             else if (status == WebSocket.Closing || status == WebSocket.Closed){
@@ -157,6 +159,18 @@ ApplicationWindow {
                 console.log("Deleting marker: " + marker_id)
                 markerModel.removeMarker(marker_id)
             }
+            else if (method === "login_user"){
+                let login = json_msg["login"]
+                console.log("loggin in user: " + login)
+                contactModel.loginUser(login);
+                //contactModel.userLoggedIn(login);
+            }
+            else if (method === "logout_user"){
+                let login = json_msg["login"]
+                console.log("logout user: " + login)
+                contactModel.logoutUser(login);
+                //contactModel.userLogout(login);
+            }
         }
     }
 
@@ -230,9 +244,22 @@ ApplicationWindow {
             closePolicy: Popup.CloseOnPressOutside
             RowLayout{
                 Image {
+                    visible: true
+                    BusyIndicator {
+                        anchors.centerIn: parent
+                        running: img.status !== Image.Ready
+                    }
                     id: img
                     sourceSize.width: 40
                     sourceSize.height: 40
+                    onStatusChanged: {
+                        if (img.status !== Image.Ready){
+                            if (img === null || img.source === undefined)
+                                return
+                            delay(500, function(){ let old_src = img.source;
+                                img.source = "";
+                                img.source = old_src})
+                        }}
                 }
                 ColumnLayout {
                     Text {

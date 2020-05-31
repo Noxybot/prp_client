@@ -12,6 +12,10 @@
 #include <QFile>
 #include <QStandardPaths>
 #include <QDebug>
+#include <QMap>
+#include <mutex>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
 
 void connectToDatabase();
 
@@ -21,9 +25,14 @@ class SqlContactModel : public QSqlQueryModel
     Q_OBJECT
     QHash<int,QByteArray> hash;
     QString m_current_user_login;
-    std::unordered_set<QString> present_contacts;
+    mutable std::mutex m_mtx;
+    std::mutex m_replies_mtx;
+    QMap<QString, bool> m_present_contacts; // login -> is online
+    QNetworkAccessManager* m_web_ctrl;
+    QString m_server_ip;
+    QMap<QNetworkReply*, QString> m_replies; //reply -> login
 public:
-    SqlContactModel(QObject *parent = 0);
+    SqlContactModel(QString server_ip, QObject *parent = 0);
     Q_INVOKABLE void setCurrentUserLogin(QString login);
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override
     {
@@ -35,14 +44,26 @@ public:
         return r.value(QString(hash.value(role))).toString();
     }
     QHash<int,QByteArray> roleNames() const override { return hash; }
-    Q_INVOKABLE void updateContacts();
+    void updateContacts();
 
-    Q_INVOKABLE void addContact(const QString &login, const QString& display_name);
-    Q_INVOKABLE void addUserImage(const QString &login, const QString& image);
+    void addUserImage(const QString &login, const QString& image);
     //Q_INVOKABLE bool userHasImage(const QString& login);
     QVector<QString> getContactsWithoutAvatar();
-    Q_INVOKABLE bool userPresent(const QString& login);
     QString getUserImageByLogin(const QString& login);
+
+    Q_INVOKABLE bool userPresent(const QString& login);
+    Q_INVOKABLE void addContact(const QString &login, const QString& display_name);
+    Q_INVOKABLE void loginUser(const QString& login);
+    Q_INVOKABLE void logoutUser(const QString& login);
+    Q_INVOKABLE bool isUserLoggedIn(const QString& login) const;
+
+signals:
+    void userLoggedIn(const QString& login);
+    void userLogout(const QString& login);
+
+public slots:
+    void userStatusResponseReceived();
+
 
 };
 

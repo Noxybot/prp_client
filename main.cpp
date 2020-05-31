@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
 
     connectToDatabase();
 
-    auto contact_model = std::make_shared<SqlContactModel>();
+    auto contact_model = std::make_shared<SqlContactModel>(g_server_ip);
     engine.rootContext()->setContextProperty("contactModel", contact_model.get());
 
     SqlConversationModel conversation_model;

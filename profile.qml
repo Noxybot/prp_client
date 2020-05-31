@@ -48,11 +48,25 @@ Page {
         Image {
             id: img
             Layout.alignment: Qt.AlignHCenter
-            source: !login.length ? "data:image/png;base64," + profileImageBase64 : "image://contact_image_provider/" + login
+            source: "image://contact_image_provider/" + (!login.length ? currentUserLogin :  login)
             Layout.preferredWidth: profilePage.width*0.3
             Layout.preferredHeight: profilePage.width*0.3
             sourceSize.width: 400
             sourceSize.height: 400
+            BusyIndicator {
+                anchors.centerIn: parent
+                running: img.status !== Image.Ready
+            }
+            onStatusChanged: {
+                if (img === null || img.source === undefined)
+                    return
+                if (img.status !== Image.Ready){
+                    if (img === null || img.source === undefined)
+                        return
+                    delay(500, function(){ let old_src = img.source;
+                        img.source = "";
+                        img.source = old_src})
+                }}
 
         }
         Item {

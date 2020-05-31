@@ -2,15 +2,18 @@ import QtQuick 2.14
 import QtQuick.Window 2.14
 import QtQuick.Controls 2.12
 import QtQuick.Dialogs 1.3
+//import Qt.labs.platform 1.1
 import QtQuick.Layouts 1.12
 import Cometogether.converter 1.0
 
 Page {
     id: signinPage
     property string pathToImage
-
+    StackView.onActivated: {
+        load.visible = false
+    }
     StackView.onDeactivated: {
-        loadVisible = false
+        load.visible = false
     }
     focus: true
     header: ToolBar {
@@ -44,9 +47,14 @@ Page {
         width: parent.width
     }
     ColumnLayout {
-        anchors.top: top_.bottom
+
+       // anchors.top: top_.bottom
+        //Layout.fillWidth: true
+        //Layout.alignment: Qt.AlignAbsolute
+        //Layout.horizontalCenter: parent.horizontalCenter
+       // Layout.preferredWidth: parent.width
+       // focus: true
         width: parent.width
-        focus: true
         TextField {
             id: name
             focus: true
@@ -312,8 +320,8 @@ Page {
 
     FileDialog {
         id: fileOpenDialog
-        title: "Select an image file"
         folder: shortcuts.pictures
+        title: qsTr("Выберите изображение")
         nameFilters: [ "Image files (*.png *.jpeg *.jpg)" ]
         onAccepted: {
             pathToImage = fileOpenDialog.fileUrl

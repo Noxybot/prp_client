@@ -13,18 +13,18 @@ Page {
         let index = arr.indexOf(elem);
         if (index !== -1) arr.splice(index, 1);
     }
-    WorkerScript {
-        id: fetcher
-        source: "imageFetcher.js"
+//    WorkerScript {
+//        id: fetcher
+//        source: "imageFetcher.js"
 
-        onMessage:{console.log("imageFetcher succeed"); profileImageBase64 = messageObject.image; }
-    }
+//        onMessage:{console.log("imageFetcher succeed"); profileImageBase64 = messageObject.image; }
+//    }
 
 
-    StackView.onActivated: {
-        if (profileImageBase64.length === 0)
-            fetcher.sendMessage({"login": currentUserLogin, "serverIP": serverIP})
-    }
+//    StackView.onActivated: {
+//        if (profileImageBase64.length === 0)
+//            fetcher.sendMessage({"login": currentUserLogin, "serverIP": serverIP})
+//    }
 
 
     id: mapPage
@@ -241,7 +241,7 @@ Page {
                     sourceSize.width: 30
                     sourceSize.height: 30
                     id: image_
-                    source: "images/маркер.png"//"http://maps.gstatic.com/mapfiles/ridefinder-images/mm_20_red.png"
+                    source: "images/marker.png"//"http://maps.gstatic.com/mapfiles/ridefinder-images/mm_20_red.png"
 
                 }
 
@@ -300,9 +300,9 @@ Page {
                 sourceSize.width: 300
                 sourceSize.height: 300
                 onStatusChanged: {
+                    if (locationImage === null || locationImage.source === undefined)
+                        return
                     if (locationImage.status != Image.Ready){
-                        if (locationImage !== null && locationImage.source == undefined)
-                            return
                         delay(500, function(){
                             let old_src = locationImage.source;
                             locationImage.source = "";
