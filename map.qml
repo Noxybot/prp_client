@@ -238,8 +238,10 @@ Page {
                 }
 
                 sourceItem: Image {
+                    sourceSize.width: 30
+                    sourceSize.height: 30
                     id: image_
-                    source: "http://maps.gstatic.com/mapfiles/ridefinder-images/mm_20_red.png"
+                    source: "images/маркер.png"//"http://maps.gstatic.com/mapfiles/ridefinder-images/mm_20_red.png"
 
                 }
 
