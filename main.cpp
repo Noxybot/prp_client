@@ -16,7 +16,7 @@
 #include "contactimageprovider.h"
 
 
-static QString g_server_ip {"109.87.116.179:1337"/*"178.150.141.36:1337"*/};
+static QString g_server_ip {"178.150.141.36:1337"/*"178.150.141.36:1337"*/};
 int main(int argc, char *argv[])
 {
 

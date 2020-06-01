@@ -17,7 +17,7 @@ ApplicationWindow {
     property var db
     property string currentUserLogin: ""
     property string currentUserDN: ""
-    property string serverIP: "109.87.116.179:1337"//"178.150.141.36:1337"
+    property string serverIP: "178.150.141.36:1337"//"178.150.141.36:1337"
     property string profileImageBase64: ""
 
 

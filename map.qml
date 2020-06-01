@@ -371,14 +371,14 @@ Page {
                     running: locationImage.status != Image.Ready
                 }
                 id: locationImage
-                Layout.preferredWidth:  bottomProfile.width*0.3//*4/3
+                Layout.preferredWidth:  bottomProfile.width*0.3*4/3
                 Layout.preferredHeight: bottomProfile.width*0.3
                 Layout.alignment: Qt.AlignLeft
                 Layout.topMargin: 10
                 Layout.leftMargin: 10
                 autoTransform: true
-                sourceSize.width: 300//bottomProfile.height*4/3
-                sourceSize.height: 300//bottomProfile.height
+                sourceSize.width: bottomProfile.width*0.3*4/3
+                sourceSize.height: bottomProfile.width*0.3
                 onStatusChanged: {
                     if (locationImage === null || locationImage.source === undefined)
                         return

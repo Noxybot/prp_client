@@ -16,7 +16,9 @@ void QImageConverter::toBase64Impl(QString login_or_marker_id, QString file_path
     file_path.replace("file:///", "");
     QImage image {file_path};
     QImage dstImg = image;
-    /*QFile file(file_path);
+    QFile file(file_path);
+    bool mirror = true;
+
     if (file.open(QIODevice::ReadOnly)){
     QByteArray data = file.readAll();
     easyexif::EXIFInfo info;
@@ -35,13 +37,13 @@ void QImageConverter::toBase64Impl(QString login_or_marker_id, QString file_path
          }
          qDebug()<<"Camera model         : \n"<< info.Model.c_str();
     } else
-         qDebug() << "Can't open file:" << file_path;*/
+         qDebug() << "Can't open file:" << file_path;
     QByteArray byteArray;
     QBuffer buffer(&byteArray);
     qDebug() <<"width "<<dstImg.width()<<"height "<<dstImg.height();
     qDebug() << "before scale size: " << dstImg.sizeInBytes();
-    //double proportion = dstImg.width()/dstImg.height();
-    dstImg = dstImg.scaled(/*int(*/400/**proportion)*/, 400);
+    double proportion = dstImg.width()/dstImg.height();
+    dstImg = dstImg.scaled(int(400*proportion), 400);
     qDebug() << "after scale size: " << dstImg.sizeInBytes();
     dstImg.save(&buffer, "PNG"); // writes the image in JPEG format inside the buffer
     QString iconBase64 = QString::fromLatin1(byteArray.toBase64().data());
@@ -50,7 +52,7 @@ void QImageConverter::toBase64Impl(QString login_or_marker_id, QString file_path
         emit imageConveted_user(login_or_marker_id, iconBase64);
     }
     else if (operation_type == "convert marker image"){
-        //QFile::remove(file_path);
+        QFile::remove(file_path);
         emit imageConveted_marker(login_or_marker_id, iconBase64);
     }
 }

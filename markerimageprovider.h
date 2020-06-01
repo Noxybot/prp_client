@@ -26,6 +26,15 @@ public:
         auto img_it = m_marker_images.find(id.toInt());
         if (img_it != std::end(m_marker_images))
             return img_it.value().scaled(requestedSize, Qt::KeepAspectRatio);
+
+        {
+            std::lock_guard<std::mutex> lock_{m_replies_mtx};
+            for (const auto& elem : m_replies)
+            {
+                if (elem == id) //already in progress
+                    return {};
+            }
+        }
        //int width = 100;
       // int height = 50;
        QUrl server_url = QUrl("http://" + m_server_ip);
