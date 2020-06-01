@@ -72,10 +72,10 @@ Page {
                     subtype.model = ["Галерея", "Экскурсия", "Театр", "Кинотеатр"];
                     break;
                 case 2:
-                    subtype.model = ["Бар", "Ресторан", "Клуб", "Кальян"];
+                    subtype.model = ["Бар", "Ресторан", "Клуб"];
                     break;
                 case 3:
-                    subtype.model = ["Цирк", "Парк развлечений", "Концерт", "Развлекательный центр", "Квест", "Лазертаг\Пейнтбол", "Зоопарк"];
+                    subtype.model = ["Кофейня", "Прогулка", "Концерт", "Квест", "Зоопарк"];
                     break;
                 }
             }
@@ -93,9 +93,9 @@ Page {
             leftPadding: 20
             rightPadding: 20
             clip: true
-            Layout.maximumWidth: 300
+            Layout.maximumWidth: 500
             Layout.alignment: Qt.AlignHCenter
-            Layout.preferredWidth: markerDescriptionPage.width / 1.5
+            Layout.preferredWidth: markerDescriptionPage.width / 1.2
             wrapMode: TextEdit.Wrap
             Layout.maximumHeight: 100
             Layout.preferredHeight: markerDescriptionPage.height / 5

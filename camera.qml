@@ -83,33 +83,65 @@ Page {
     Button
     {
         id: back_button
-        y: 422
-        text: qsTr("Назад")
+        width: parent.width*0.15 >  50 ? 50 : parent.width*0.15
+        height: width
         onClicked: stack.pop();
         anchors.bottom: parent.bottom
-        anchors.bottomMargin: 10
+        anchors.bottomMargin: 15
         anchors.left: parent.left
-        anchors.leftMargin: 39
+        anchors.leftMargin: parent.width*0.12
+        contentItem: Text {
+            text: qsTr("\uf0a8")
+            width: parent.width
+            height: parent.height
+            font.pointSize: 100
+            minimumPointSize: 10
+            fontSizeMode: Text.Fit
+            anchors.centerIn: parent
+            anchors.fill: parent
+            font.family: "Font Awesome 5 Free Solid"
+            font.bold: true
+            color: "#6fda9c"
+        }
+        background: Rectangle{
+            color: "transparent"
+            height: parent.height
+            width: height
+        }
     }
 
     Button {
         id: position_button
-        x: 461
-        width: 143
-        anchors.top: back_button.bottom
-        text: qsTr("Поменять камеру")
-        anchors.topMargin: -48
+        width: parent.width*0.15 >  50 ? 50 : parent.width*0.15
+        height: width
+        contentItem: Text {
+            text: qsTr("\uf021")
+            width: parent.width
+            height: parent.height
+            anchors.centerIn: parent
+            anchors.fill: parent
+            font.pointSize: 100
+            minimumPointSize: 10
+            fontSizeMode: Text.Fit
+            font.family: "Font Awesome 5 Free Solid"
+            font.bold: true
+            color: "#6fda9c"
+        }
         onClicked: camera.position === Camera.BackFace ? camera.position = Camera.FrontFace : camera.position = Camera.BackFace
         anchors.bottom: parent.bottom
-        anchors.bottomMargin: 10
+        anchors.bottomMargin: 15
         anchors.right: parent.right
-        anchors.rightMargin: 36
+        anchors.rightMargin: parent.width*0.1
+        background: Rectangle{
+            color: "transparent"
+            height: parent.height
+            width: height
+        }
     }
     RoundButton {
         id: take_photo_button
-        width: 117
-        anchors.top: position_button.bottom
-        anchors.topMargin: -48
+        width: parent.width*0.3 >  100 ? 100 : parent.width*0.3
+        height: width
         onClicked:
         {
             back_button.visible = false
@@ -122,12 +154,35 @@ Page {
         anchors.bottom: parent.bottom
         anchors.bottomMargin: 10
         anchors.horizontalCenter: parent.horizontalCenter
-
+        background: Rectangle{
+            width: parent.width
+            height: width
+            radius: parent.radius
+            color: "white"
+        }
     }
     Button {
         id: ok_button
         visible: false
-        text: qsTr("Ок")
+        width: parent.width*0.2 >  60 ? 60 : parent.width*0.2
+        height: width
+        contentItem: Text {
+            text: qsTr("\uf058")
+            width: parent.width * 0.7
+            height: parent.height * 0.7
+            anchors.centerIn: parent
+            anchors.fill: parent
+            font.pointSize: 100
+            minimumPointSize: 10
+            fontSizeMode: Text.Fit
+            font.family: "Font Awesome 5 Free Regular"
+            font.bold: true
+            color: "#6fda9c"
+        }
+        anchors.right: parent.right
+        anchors.rightMargin: parent.width*0.1
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: 15
         onClicked:
         {
             function get_milliseconds_from_hours(time_str) {
@@ -146,8 +201,8 @@ Page {
             add_place_request["name"] = name
             add_place_request["category"] = type
             add_place_request["subcategory"] = subtype
-            add_place_request["from_time"] = get_milliseconds_from_hours(from_time)
-            add_place_request["to_time"] = get_milliseconds_from_hours(to_time)
+            add_place_request["from_time"] = from_time//get_milliseconds_from_hours(from_time)
+            add_place_request["to_time"] = to_time//get_milliseconds_from_hours(to_time)
             add_place_request["expected_people_number"] = peopleCount
             add_place_request["expected_expenses"] = expenses
             add_place_request["description"] = description
@@ -164,6 +219,7 @@ Page {
                 create_marker_status = xhr.status;
                 create_marker_id = xhr.response["result"] //result of the response is a marker id
                 load.visible = false
+                console.log("image_path"+last_image_path)
                 imageConverter.scheduleToBase64(create_marker_id, last_image_path, "convert marker image")
 
             } catch(err) {
@@ -174,12 +230,34 @@ Page {
             stack.pop()
             stack.pop()
         }
+        background: Rectangle{
+            color: "transparent"
+            height: parent.height
+            width: height
+        }
     }
     Button {
         id: new_photo_button
         visible: false
-        anchors.top: ok_button.bottom
-        text: qsTr("Новое фото")
+        width: parent.width*0.2 >  60 ? 60 : parent.width*0.2
+        height: width
+        contentItem: Text {
+            text: qsTr("\uf057")
+            width: parent.width * 0.7
+            height: parent.height * 0.7
+            anchors.centerIn: parent
+            anchors.fill: parent
+            font.pointSize: 100
+            minimumPointSize: 10
+            fontSizeMode: Text.Fit
+            font.family: "Font Awesome 5 Free Regular"
+            font.bold: true
+            color: "#6fda9c"
+        }
+        anchors.left: parent.left
+        anchors.leftMargin: parent.width*0.12
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: 15
         onClicked:
         {
             ok_button.visible = false
@@ -190,12 +268,18 @@ Page {
             cameraUI.state = "PhotoCapture"
             imageConverter.removeFile(last_image_path)
         }
+        background: Rectangle{
+            color: "transparent"
+            height: parent.height
+            width: height
+        }
     }
 }
 
 
 /*##^##
 Designer {
-    D{i:0;autoSize:true;height:480;width:640}
+    D{i:0;autoSize:true;height:480;width:640}D{i:12;anchors_height:125;anchors_width:133}
+D{i:11;anchors_height:149}
 }
 ##^##*/

@@ -9,22 +9,27 @@ import QtQml 2.14
 
 Page {
     property bool enableAddMarker: false
+    StackView.onActivated: {
+        markerModel.restoreState();
+        addButton.visible=true
+    }
+
     function remove (arr, elem){
         let index = arr.indexOf(elem);
         if (index !== -1) arr.splice(index, 1);
     }
-//    WorkerScript {
-//        id: fetcher
-//        source: "imageFetcher.js"
+    //    WorkerScript {
+    //        id: fetcher
+    //        source: "imageFetcher.js"
 
-//        onMessage:{console.log("imageFetcher succeed"); profileImageBase64 = messageObject.image; }
-//    }
+    //        onMessage:{console.log("imageFetcher succeed"); profileImageBase64 = messageObject.image; }
+    //    }
 
 
-//    StackView.onActivated: {
-//        if (profileImageBase64.length === 0)
-//            fetcher.sendMessage({"login": currentUserLogin, "serverIP": serverIP})
-//    }
+    //    StackView.onActivated: {
+    //        if (profileImageBase64.length === 0)
+    //            fetcher.sendMessage({"login": currentUserLogin, "serverIP": serverIP})
+    //    }
 
 
     id: mapPage
@@ -133,7 +138,27 @@ Page {
             }
         }
     }
+    Popup {
+        id: popupMarkerGuide
+        property alias popMessage: message.text
 
+        background: Rectangle {
+            implicitWidth: mainWindow.width
+            implicitHeight: 60
+            color: "#b44"
+        }
+        y: 0
+        modal: true
+        focus: true
+        closePolicy: Popup.CloseOnPressOutside
+        Text {
+            id: message
+            text: qsTr("Нажмите и подержите в месте на карте, чтобы поставить маркер")
+            anchors.centerIn: parent
+            font.pointSize: 12
+            color: "white"
+        }
+    }
     Map {
         transformOrigin: Item.Center
         MapParameter {type: "layout";property var layer:"tunnel-oneway-arrows-blue-minor";property var textField: ["get", "name_ru"]}
@@ -216,6 +241,45 @@ Page {
             anchors.fill: parent
             model: markerModel
             delegate: MapQuickItem {
+                Component.onCompleted: {
+                    switch(subcategory){
+                    case "Велоспорт": image_.source = "images/markers/sport/1.1.png";
+                        break;
+                    case "Футбол": image_.source = "images/markers/sport/1.2.png";
+                        break;
+                    case "Бег": image_.source = "images/markers/sport/1.4.png";
+                        break;
+                    case "Баскетбол": image_.source = "images/markers/sport/1.3.png";
+                        break;
+                    case "Спортзал": image_.source = "images/markers/sport/1.5.png";
+                        break;
+                    case "Галерея": image_.source = "images/markers/culture/2.1.png";
+                        break;
+                    case "Экскурсия": image_.source = "images/markers/culture/2.2.png";
+                        break;
+                    case "Театр": image_.source = "images/markers/culture/2.3.png";
+                        break;
+                    case "Кинотеатр": image_.source = "images/markers/culture/2.4.png";
+                        break;
+                    case "Бар": image_.source = "images/markers/night/3.1.png";
+                        break;
+                    case "Ресторан": image_.source = "images/markers/night/3.2.png";
+                        break;
+                    case "Клуб": image_.source = "images/markers/night/3.3.png";
+                        break;
+                    case "Кофейня": image_.source = "images/markers/fun/4.1.png";
+                        break;
+                    case "Прогулка": image_.source = "images/markers/fun/4.2.png";
+                        break;
+                    case "Концерт": image_.source = "images/markers/fun/4.3.png";
+                        break;
+                    case "Квест": image_.source = "images/markers/fun/4.4.png";
+                        break;
+                    case "Зоопарк": image_.source = "images/markers/fun/4.5.png";
+                        break;
+                    }
+                }
+
                 id: marker
                 anchorPoint.x: image_.width / 4
                 anchorPoint.y: image_.height
@@ -228,12 +292,15 @@ Page {
                     onClicked:
                     {
                         name_.text = name;
-                        info.text = from_time + " - " + to_time + '\t' + expected_expenses + '\t' + expected_people_number
+                        time.text = from_time + " - " + to_time
+                        amount.text = expected_expenses + (expected_expenses === "" ? "":' грн.\t')
+                                + expected_people_number + (expected_people_number === "" ?"":" чел.")
                         description_.text = description
                         bottomProfile.recipient = creator_login
                         bottomProfile.placeId = marker_id
                         bottomProfile.img_source = "image://marker_image_provider/" + marker_id
                         bottomProfile.visible = true
+                        addButton.visible = false
                     }
                 }
 
@@ -241,7 +308,7 @@ Page {
                     sourceSize.width: 30
                     sourceSize.height: 30
                     id: image_
-                    source: "images/marker.png"//"http://maps.gstatic.com/mapfiles/ridefinder-images/mm_20_red.png"
+                    source: "images/2.1-1.svg"//"http://maps.gstatic.com/mapfiles/ridefinder-images/mm_20_red.png"
 
                 }
 
@@ -253,8 +320,11 @@ Page {
             propagateComposedEvents: true
 
             onPressAndHold:  {
-                var coordinate = map.toCoordinate(Qt.point(mouse.x,mouse.y))
-                stack.push("markerDescription.qml", { "coordinates" : coordinate})
+                if(enableAddMarker){
+                    popupMarkerGuide.close()
+                    var coordinate = map.toCoordinate(Qt.point(mouse.x,mouse.y))
+                    stack.push("markerDescription.qml", { "coordinates" : coordinate})
+                }
                 //markerModel.addMarker(coordinate, "","")
             }
         }
@@ -281,24 +351,34 @@ Page {
         visible: false
         width: parent.width
         radius: 10
-        property var max: 200
-        height: (parent.width * 0.4 < max) ? parent.width * 0.4 : max
+        property var max: 250
+        height: (parent.height * 0.3 < max) ? parent.height * 0.3 : max
         anchors.bottom: parent.bottom
         border.width: 1
-        border.color: "light gray"
+        border.color: "#6fda9c"
+        color: "#394454"
         RowLayout {
-            anchors.centerIn: parent
+            id:upper
+            Layout.alignment: Qt.AlignTop
+            //Layout.alignment: Qt.AlignHCenter
+            width: parent.width
             spacing: 8
+
             Image {
+
                 BusyIndicator {
                     anchors.centerIn: parent
                     running: locationImage.status != Image.Ready
                 }
                 id: locationImage
-                Layout.preferredWidth:  bottomProfile.height
-                Layout.preferredHeight: bottomProfile.height
-                sourceSize.width: 300
-                sourceSize.height: 300
+                Layout.preferredWidth:  bottomProfile.width*0.3//*4/3
+                Layout.preferredHeight: bottomProfile.width*0.3
+                Layout.alignment: Qt.AlignLeft
+                Layout.topMargin: 10
+                Layout.leftMargin: 10
+                autoTransform: true
+                sourceSize.width: 300//bottomProfile.height*4/3
+                sourceSize.height: 300//bottomProfile.height
                 onStatusChanged: {
                     if (locationImage === null || locationImage.source === undefined)
                         return
@@ -310,23 +390,106 @@ Page {
                     }}
             }
             ColumnLayout{
-                Layout.preferredWidth: mapPage.width * 0.6
-                spacing: 8
+                Layout.preferredWidth: bottomProfile.width*0.65
+                Layout.preferredHeight: bottomProfile.width*0.3
                 Text {
                     id: name_
                     text: qsTr("Название объявления")
+                    color: "#6fda9c"
+                    font.pointSize: 14
                 }
                 Text {
-                    id: info
-                    text: qsTr("Информация")
+                    id: time
+                    text: qsTr("Время")
+                    color: "white"
+                    font.pointSize: 12
                 }
                 Text {
+                    id: amount
+                    text: qsTr("Кол-во участников и расходов")
+                    color: "white"
+                    font.pointSize: 12
+                }
+
+            }
+            Button {
+                transformOrigin: Item.Center
+                Layout.alignment:  Qt.AlignTop
+                contentItem: Text {
+                    text: "\uf00d"
+                    font.family: "Font Awesome 5 Free Solid"
+                    font.bold: true
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                    font.pointSize: 20
+                    minimumPointSize: 10
+                    fontSizeMode: Text.Fit
+                    color: "#f0f0f0"
+                }
+                Layout.preferredHeight: loginPage.height / 10
+                Layout.preferredWidth: loginPage.height / 10
+                background: Rectangle {
+                    height: parent.height
+                    width: height
+                    color: "transparent"
+                }
+                anchors.right: bottomProfile.right;
+                anchors.top: bottomProfile.top;
+                onClicked: {
+                    bottomProfile.placeId = -1;
+                    addButton.visible = true
+                    bottomProfile.visible = false;
+                }
+            }
+        }
+            RowLayout{
+                anchors.top: upper.bottom
+                anchors.topMargin: 10
+                Layout.preferredHeight: bottomProfile.height*0.65
+                width: parent.width
+                TextArea {
                     id: description_
-                    text: qsTr("Краткое\nописание")
+                    leftPadding: 20
+                    rightPadding: 20
+                    color: "white"
+                    enabled: false
+                    clip: true
+                    font.pointSize: 12
+                    //Layout.alignment: Qt.AlignHCenter
+                    Layout.preferredWidth: parent.width*0.6
+                    Layout.alignment: Qt.AlignLeft
+                    Layout.leftMargin: 10
+                    wrapMode: TextEdit.Wrap
+                    Layout.preferredHeight: 65
+                    background: Rectangle
+                    {
+                        radius: 20
+                        border.color: "#6fda9c"
+                        color: "#394454"
+                    }
+
                 }
                 Button {
+                    Layout.alignment: Qt.AlignBottom | Qt.AlignLeft
+                    contentItem: Text {
+                        text: bottomProfile.recipient === currentUserLogin ? qsTr("Удалить") : qsTr("Ответить")
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                        font.pointSize: 20
+                        minimumPointSize: 10
+                        fontSizeMode: Text.Fit
+                        color: "#f0f0f0"
+                    }
+                    Layout.maximumWidth: 200
+                    Layout.preferredHeight: 50
+                    Layout.preferredWidth: parent.width*0.3
+                    background: Rectangle {
+                        radius: 20
+                        color: "#6fda9c"
+                    }
                     text: bottomProfile.recipient === currentUserLogin ? "Удалить" : "Ответить"
                     onClicked: {
+
                         if (text == "Удалить")
                         {
                             var xhr = new XMLHttpRequest();
@@ -339,6 +502,7 @@ Page {
                                     console.log("Delete marker error ${xhr.status}: ${xhr.statusText}")
                                 else {
                                     bottomProfile.visible = false
+                                    addButton.visible = true
                                     console.log("Delete marker success")
                                 }
                             } catch(err) {
@@ -355,27 +519,23 @@ Page {
                         }
                     }
                 }
-            }
+
+
 
         }
-        Button {
-            text: qsTr("X");
-            anchors.right: parent.right;
-            anchors.top: parent.top;
-            onClicked: {
-                parent.visible = false;
-                parent.placeId = -1;
-            }
-        }
+
     }
+
     RoundButton {
+        id: addButton
         contentItem: Text {
             text: " + "
             font.bold: true
             font.pointSize: 24
             color: "white"
-        }
 
+        }
+        radius: 20
         anchors.bottom: parent.bottom
         anchors.bottomMargin: 20
         anchors.right: parent.right
@@ -385,6 +545,9 @@ Page {
         }
         onClicked: {
             enableAddMarker = true;
+            markerModel.hideALlMarkers();
+            popupMarkerGuide.open()
+            addButton.visible=false
         }
     }
 
@@ -478,10 +641,8 @@ Page {
                         button3.current_category = "Клуб";
                         button3.checked = parent.visible_subcategories.indexOf(button3.current_category) !== -1
 
-                        button4.text = "\uf55c";
-                        button4.font.family = "Font Awesome 5 Free Solid"
-                        button4.current_category = "Кальян";
-                        button4.checked = parent.visible_subcategories.indexOf(button4.current_category) !== -1
+                        button4.visible = false;
+
 
                         button5.visible = false;
                         break;
@@ -538,7 +699,7 @@ Page {
                     anchors.fill: parent
                     color: parent.checked ? "#c22d23" : "transparent"
                 }
-                //anchors.left: type.right
+                anchors.left: type.right
                 anchors.verticalCenter: undefined
                 Layout.alignment: Qt.AlignLeft
             }
@@ -565,7 +726,7 @@ Page {
                     anchors.fill: parent
                     color: parent.checked ? "#c22d23" : "transparent"
                 }
-               // anchors.left: button1.right
+                anchors.left: button1.right
             }
             ToolButton{
                 onCheckedChanged: {
@@ -590,7 +751,7 @@ Page {
                     anchors.fill: parent
                     color: parent.checked ? "#c22d23" : "transparent"
                 }
-               // anchors.left: button2.right
+                anchors.left: button2.right
             }
             ToolButton{
                 onCheckedChanged: {
@@ -615,7 +776,7 @@ Page {
                     anchors.fill: parent
                     color: parent.checked ? "#c22d23" : "transparent"
                 }
-               // anchors.left: button3.right
+                anchors.left: button3.right
             }
             ToolButton{
                 onCheckedChanged: {
@@ -640,9 +801,15 @@ Page {
                     anchors.fill: parent
                     color: parent.checked ? "#c22d23" : "transparent"
                 }
-                //anchors.left: button4.right
+                anchors.left: button4.right
             }
 
         }
     }
 }
+
+/*##^##
+Designer {
+    D{i:0;autoSize:true;height:480;width:640}
+}
+##^##*/

@@ -17,7 +17,7 @@ ApplicationWindow {
     property var db
     property string currentUserLogin: ""
     property string currentUserDN: ""
-    property string serverIP: "178.150.141.36:1337"
+    property string serverIP: "109.87.116.179:1337"//"178.150.141.36:1337"
     property string profileImageBase64: ""
 
 
@@ -119,8 +119,8 @@ ApplicationWindow {
                 let name = json_msg["name"]
                 let category = json_msg["category"]
                 let subcategory = json_msg["subcategory"]
-                let from_time = new Date(parseInt(json_msg["from_time"]))
-                let to_time = new Date(parseInt(json_msg["to_time"]))
+                let from_time = json_msg["from_time"]
+                let to_time = json_msg["to_time"]
                 let creation_time = new Date(parseInt(json_msg["creation_time"]))
                 let expected_people_number = json_msg["expected_people_number"]
                 let expected_expenses = json_msg["expected_expenses"]
@@ -144,6 +144,7 @@ ApplicationWindow {
                 else {
                     conversationModel.sendMessage(from_login, "Me", msg_text, unix_time)
                     let dn = json_msg["from_dn"]
+
                     popup_msg.text = msg_text
                     popup_msg.login = from_login
                     popup_msg.dn = dn

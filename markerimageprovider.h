@@ -25,7 +25,7 @@ public:
         qDebug() << "requestPixmap for marker id: " << id << " size: " << requestedSize;
         auto img_it = m_marker_images.find(id.toInt());
         if (img_it != std::end(m_marker_images))
-            return img_it.value().scaled(requestedSize);
+            return img_it.value().scaled(requestedSize, Qt::KeepAspectRatio);
        //int width = 100;
       // int height = 50;
        QUrl server_url = QUrl("http://" + m_server_ip);

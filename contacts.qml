@@ -30,13 +30,17 @@ Page {
             }
 
             Text {
-                text: qsTr("\u2190")
+                id: menuButtonName
+                text: qsTr("\uf060")
                 width: parent.width * 0.7
                 height: parent.height * 0.7
                 font.pointSize: 100
                 minimumPointSize: 10
                 fontSizeMode: Text.Fit
                 anchors.centerIn: parent
+                font.family: "Font Awesome 5 Free Solid"
+                font.bold: true
+                color: "#6fda9c"
             }
         }
 
@@ -78,8 +82,8 @@ ListView {
             delegate: ItemDelegate {
                 readonly property string delegate_login: login
                 property alias color: cont_img_rect.border.color
-                text: display_name + "\n" + last_message  //
-                width: parent.width//listView.width - listView.leftMargin - listView.rightMargin
+                text: display_name
+                width: listView.width - listView.leftMargin - listView.rightMargin
                 height: 42 //avatar.implicitHeight
                 leftPadding: contact_img.width + 32
                 onClicked: {conversationModel.setRecipient(login);

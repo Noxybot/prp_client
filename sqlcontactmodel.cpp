@@ -130,17 +130,20 @@ void SqlContactModel::setCurrentUserLogin(QString login)
 void SqlContactModel::updateContacts()
 {
     QSqlQuery query;
-
-    query.prepare("SELECT DISTINCT display_name, login, message, c1.recipient FROM Contacts, Conversations c1 "
-                  "WHERE login != :c_owner AND contact_owner=owner AND contact_owner=:c_owner AND owner=:c_owner AND login=c1.recipient AND timestamp >="
-                  "(SELECT MAX(timestamp) from Conversations c2 WHERE owner = :c_owner AND c2.recipient=c1.recipient)");
+   /* query.prepare("SELECT DISTINCT display_name, login, message as last_message, c1.recipient FROM Contacts, Conversations c1 "
+                  "WHERE author!=c1.recipient AND contact_owner=owner AND contact_owner=:c_owner AND owner=:c_owner AND login=c1.recipient AND timestamp >= "
+                  "(SELECT MAX(timestamp) from Conversations c2 WHERE owner = :c_owner AND c2.recipient=c1.recipient)");*/
+    query.prepare("SELECT display_name, login FROM Contacts WHERE contact_owner=:c_owner AND login!=:c_owner");
     query.bindValue(":c_owner", m_current_user_login);
+    //qDebug() <<
+    qDebug() <<":c_owner"<< m_current_user_login;
     if (!query.exec())
         qFatal("Contacts updateContacts query failed: %s", qPrintable(query.lastError().text()));
 
     setQuery(query);
     if (lastError().isValid())
         qFatal("Cannot set query on SqlContactModel: %s", qPrintable(lastError().text()));
+
 }
 
 void SqlContactModel::addContact(const QString &login, const QString& display_name)

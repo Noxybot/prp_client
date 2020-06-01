@@ -16,8 +16,8 @@ struct PlaceInfo
     QString name;
     QString category;
     QString subcategory;
-    QTime from_time;
-    QTime to_time;
+    QString from_time;
+    QString to_time;
     QString expected_people_number;
     QString expected_expenses;
     QString description;
@@ -54,7 +54,7 @@ public:
     };
 
     Q_INVOKABLE void addMarker(const QGeoCoordinate &coordinate, QString creator_login, QString name,
-                               QString category, QString subcategory, const QTime &from_time, const QTime &to_time,
+                               QString category, QString subcategory,  QString from_time,  QString to_time,
                                QString expected_people_number, QString expected_expenses,
                                QString description, const QTime &creation_time, int id)
     {

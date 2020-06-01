@@ -102,7 +102,11 @@ Page {
                     if(!tomorrow1.chosen) {
                         today1.chosen = false
                         tomorrow1.chosen = true
+                        today2.chosen = false
                         today2.enabled = false
+                        tomorrow2.chosen = true
+                        tomorrow2.enabled = true
+
                     }
                 }
                 background: Rectangle {
@@ -124,9 +128,9 @@ Page {
                 id: fromHour
                 model: 24
                 delegate: ItemDelegate {
-                    text:formatNumber(fromHour.currentIndex)
+                    text:formatNumber(index)
                 }
-                displayText:formatNumber(fromHour.currentIndex)
+                displayText:formatNumber(currentIndex)
             }
             Label {
                 font.pixelSize: 24
@@ -138,9 +142,9 @@ Page {
                 id: fromMinute
                 model: 60
                 delegate: ItemDelegate {
-                    text:formatNumber(fromMinute.currentIndex)
+                    text:formatNumber(index)
                 }
-                displayText:formatNumber(fromMinute.currentIndex)
+                displayText:formatNumber(currentIndex)
             }
         }
         RowLayout {
@@ -221,9 +225,9 @@ Page {
                 id: toHour
                 model: 24
                 delegate: ItemDelegate {
-                    text:formatNumber(toHour.currentIndex)
+                    text:formatNumber(index)
                 }
-                displayText:formatNumber(toHour.currentIndex)
+                displayText:formatNumber(currentIndex)
             }
             Label {
                 font.pixelSize: 24
@@ -235,9 +239,9 @@ Page {
                 id: toMinute
                 model: 60
                 delegate: ItemDelegate {
-                    text:formatNumber(toMinute.currentIndex)
+                    text:formatNumber(index)
                 }
-                displayText:formatNumber(toMinute.currentIndex)
+                displayText:formatNumber(currentIndex)
             }
         }
         Item {
@@ -257,7 +261,7 @@ Page {
             Layout.maximumWidth: 300
             Layout.alignment: Qt.AlignHCenter
             Layout.preferredWidth: timePickerPage.width / 1.5
-            model: ["Ожидаемы траты с человека", "0 - 100", "100 - 200", "200 - 500", "500 - 1000", "1000 - 5000"]
+            model: ["Ожидаемые траты с человека", "0 - 100", "100 - 200", "200 - 500", "500 - 1000", "1000 - 5000"]
         }
         Button {
             Layout.alignment: Qt.AlignHCenter
@@ -280,9 +284,14 @@ Page {
                 {
                     stack.push("camera.qml", {"name":name,
                                    "type":type, "subtype":subtype,
-                                   "description":description, "from_time" : 0 /*from_time.text*/,
-                                   "to_time": 0/*to_time.text*/, "peopleCount" : peopleCount.currentText,
-                                   "expenses": expenses.currentText, "coordinates" : coordinates})
+                                   "description":description, "from_time" : (today1.chosen ? "Сегодня " : "Завтра ") +
+                                    (fromHour.displayText.length === 1 ? "0"+fromHour.displayText : fromHour.displayText)+
+                                    ":"+(fromMinute.displayText.length === 1 ? "0"+fromMinute.displayText : fromMinute.displayText),
+                                   "to_time": (today2.chosen ? " Сегодня " : " Завтра ") +
+                                   (toHour.displayText.length === 1 ? "0"+toHour.displayText : toHour.displayText)+":"+
+                                   (toMinute.displayText.length === 1 ? "0"+toMinute.displayText : toMinute.displayText),
+                                   "peopleCount" : (peopleCount.currentText === "Ожидаемое кол-во участников" ? "" : peopleCount.currentText),
+                                   "expenses": (expenses.currentText === "Ожидаемые траты с человека" ? "" : expenses.currentText), "coordinates" : coordinates})
                 }
             }
 

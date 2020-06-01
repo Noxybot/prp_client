@@ -19,37 +19,22 @@ Page {
 
             Text {
                 id: menuButtonName
-                text: qsTr("\u2190")
+                text: qsTr("\uf060")
                 width: parent.width * 0.7
                 height: parent.height * 0.7
                 font.pointSize: 100
                 minimumPointSize: 10
                 fontSizeMode: Text.Fit
                 anchors.centerIn: parent
+                font.family: "Font Awesome 5 Free Solid"
+                font.bold: true
+                color: "#6fda9c"
             }
         }
 
         Label {
             text: inConversationWithDN
             anchors.centerIn: parent
-        }
-
-        ToolButton {
-            id: editButton
-            anchors.right:  parent.right
-            onClicked: {
-            }
-
-            Text {
-                id: editButtonName
-                text: qsTr("\u2630")
-                width: parent.width * 0.7
-                height: parent.height * 0.7
-                font.pointSize: 100
-                minimumPointSize: 10
-                fontSizeMode: Text.Fit
-                anchors.centerIn: parent
-            }
         }
 
     }

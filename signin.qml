@@ -216,20 +216,17 @@ Page {
                 color: "transparent"
                 border.color: "#6fda9c"
 
-                Label {
-                    x: 4
-                    y: 5
-                    text: "\uf00c"
-                    color: "#6fda9c"
-                    font: {
-                        pointSize: 24
-                        bold: true
-                        weight: Font.Black
-                        family: "Font Awesome 5 Free Solid"
-                    }
+                Rectangle {
+                            width: 14
+                            height: 14
+                            x: 6
+                            y: 6
+                            radius: 2
+                            color: "#6fda9c"
+                            visible: control.checked
+                        }
 
-                    visible: control.checked
-                }
+
             }
             contentItem: Text {
                 text: control.text

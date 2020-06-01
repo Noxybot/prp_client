@@ -13,6 +13,7 @@
 #include <thread>
 #include "sqlcontactmodel.h"
 #include <QQuickImageResponse>
+#include <QBuffer>
 
 
 class ContactImageProvider : public QObject, public QQuickImageProvider
@@ -114,7 +115,20 @@ public slots:
             qDebug() << "receive image for user: " << login ;//<< //", img: " << jsonResponse["result"].toString().toUtf8();
             QPixmap image;
             QString image_str = jsonResponse["result"].toString();
-            image.loadFromData(QByteArray::fromBase64(image_str.toUtf8()));
+            qDebug()<<"image_str: "<<image_str;
+            if(image_str == "no image")
+            {
+                image.load(":/images/profile.png");
+                qDebug()<<"image is null: "<<image.isNull();
+                QByteArray byteArray;
+                QBuffer buffer(&byteArray);
+                image.save(&buffer, "PNG"); // writes the image in JPEG format inside the buffer
+                image_str = QString::fromLatin1(byteArray.toBase64().data());
+            }
+            else{
+                image.loadFromData(QByteArray::fromBase64(image_str.toUtf8()));
+            }
+
             {
                 std::lock_guard<std::mutex> lock{m_replies_mtx};
                 m_replies.remove(reply);
