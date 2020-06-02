@@ -18,20 +18,23 @@ Page {
     focus: true
     header: ToolBar {
         ToolButton {
-            id: backButton
+            id: menuButton
             onClicked: {
                 stack.pop()
             }
 
             Text {
                 id: menuButtonName
-                text: qsTr("\u2190")
+                text: qsTr("\uf060")
                 width: parent.width * 0.7
                 height: parent.height * 0.7
                 font.pointSize: 100
                 minimumPointSize: 10
                 fontSizeMode: Text.Fit
                 anchors.centerIn: parent
+                font.family: "Font Awesome 5 Free Solid"
+                font.bold: true
+                color: "#6fda9c"
             }
         }
 

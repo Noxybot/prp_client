@@ -3,10 +3,10 @@ import QtQuick.Window 2.14
 import QtQuick.Controls 2.12
 import QtGraphicalEffects 1.0
 import QtQuick.Layouts 1.12
-import QtWebEngine 1.10
+import QtWebView 1.1
 //import QtWebView 1.1
 
-WebEngineView {
+WebView {
          anchors.fill: parent
          id: view
          url: "https://www.facebook.com/dialog/oauth?client_id=261012394932672&redirect_uri=https://www.facebook.com/connect/login_success.html&response_type=token&scope=email"

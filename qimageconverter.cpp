@@ -32,8 +32,9 @@ void QImageConverter::toBase64Impl(QString login_or_marker_id, QString file_path
              QPoint center = image.rect().center();
              matrix.translate(center.x(), center.y());
              matrix.rotate(270);
-
+             qDebug()<<"before transformation "<<login_or_marker_id << " width "<<dstImg.width()<<" height "<<dstImg.height();
              dstImg = image.transformed(matrix);
+             qDebug()<<"after transformation "<<login_or_marker_id << " width "<<dstImg.width()<<" height "<<dstImg.height();
          }
          qDebug()<<"Camera model         : \n"<< info.Model.c_str();
     } else
@@ -41,9 +42,10 @@ void QImageConverter::toBase64Impl(QString login_or_marker_id, QString file_path
     QByteArray byteArray;
     QBuffer buffer(&byteArray);
     qDebug() <<"width "<<dstImg.width()<<"height "<<dstImg.height();
-    qDebug() << "before scale size: " << dstImg.sizeInBytes();
-    double proportion = dstImg.width()/dstImg.height();
-    dstImg = dstImg.scaled(int(400*proportion), 400);
+    qDebug()<<"id "<<login_or_marker_id << " before scale size: " << dstImg.sizeInBytes();
+    //double proportion = dstImg.width()/dstImg.height();
+    //dstImg = dstImg.scaled(int(400*proportion), 400);
+    dstImg = dstImg.scaled(400, 400);
     qDebug() << "after scale size: " << dstImg.sizeInBytes();
     dstImg.save(&buffer, "PNG"); // writes the image in JPEG format inside the buffer
     QString iconBase64 = QString::fromLatin1(byteArray.toBase64().data());

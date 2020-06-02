@@ -244,11 +244,6 @@ Page {
                 displayText:formatNumber(currentIndex)
             }
         }
-        Item {
-            Layout.alignment: Qt.AlignHCenter
-            Layout.preferredHeight: timePickerPage.height / 10
-            Layout.preferredWidth: timePickerPage.width / 4
-        }
         ComboBox {
             id: peopleCount
             Layout.maximumWidth: 300

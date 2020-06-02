@@ -206,7 +206,29 @@ Page {
             add_place_request["expected_people_number"] = peopleCount
             add_place_request["expected_expenses"] = expenses
             add_place_request["description"] = description
-            add_place_request["creation_time"] = Date.now()
+            to_time = to_time.substring(1)
+            console.log(to_time)
+            let time = new Date().getHours() + 1;
+            let minute = new Date().getMinutes();
+console.log("time " + time)
+            let first = to_time.split(" ");
+            console.log("minute " + minute)
+            let day2 = first[0];
+            console.log("day " + day2)
+            let hour2 = first[1].split(":")[0];
+            console.log("hour " + hour2)
+            let minute2 = first[1].split(":")[1];
+            console.log("minute " + minute2)
+            let difference=0;
+            if(day2 === "Сегодня"){
+                difference += (hour2 - time)*3600+(minute2-minute)*60;
+            }
+            else{
+                difference += hour2*3600+minute2*60;
+                difference += (24 - time-1)*3600+(60-minute)*60;
+            }
+            console.log("difference " + difference)
+            add_place_request["expire_time"] =  difference;
 
             var xhr = new XMLHttpRequest();
             xhr.responseType = 'json'

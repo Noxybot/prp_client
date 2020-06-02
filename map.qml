@@ -351,8 +351,8 @@ Page {
         visible: false
         width: parent.width
         radius: 10
-        property var max: 250
-        height: (parent.height * 0.3 < max) ? parent.height * 0.3 : max
+        property var max: 300
+        height: (parent.height * 0.4 > max) ? parent.height * 0.3 : max
         anchors.bottom: parent.bottom
         border.width: 1
         border.color: "#6fda9c"
@@ -371,13 +371,13 @@ Page {
                     running: locationImage.status != Image.Ready
                 }
                 id: locationImage
-                Layout.preferredWidth:  bottomProfile.width*0.3*4/3
+                Layout.preferredWidth:  bottomProfile.width*0.3//*4/3
                 Layout.preferredHeight: bottomProfile.width*0.3
                 Layout.alignment: Qt.AlignLeft
                 Layout.topMargin: 10
                 Layout.leftMargin: 10
                 autoTransform: true
-                sourceSize.width: bottomProfile.width*0.3*4/3
+                sourceSize.width: bottomProfile.width*0.3//*4/3
                 sourceSize.height: bottomProfile.width*0.3
                 onStatusChanged: {
                     if (locationImage === null || locationImage.source === undefined)

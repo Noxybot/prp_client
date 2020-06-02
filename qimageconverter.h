@@ -3,12 +3,16 @@
 #include <QObject>
 #include <QString>
 #include <QUrl>
+#include <QFile>
 
 class QImageConverter : public QObject
 {
     Q_OBJECT
 public:
     QImageConverter();
+    Q_INVOKABLE void removeFile(QString filepath) {
+        QFile::remove(filepath);
+    }
     Q_INVOKABLE void scheduleToBase64(QString login_or_marker_id, QString file_path, QString operation_type);
 signals:
     void imageConveted_user(QString login, QString imageBase64);

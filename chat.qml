@@ -4,6 +4,7 @@ import QtQuick.Controls 2.12
 
 Page {
     visible: true
+    id:chatPage
     property string inConversationWith
     property string inConversationWithDN
     //property string imageBase64_receip
@@ -94,6 +95,7 @@ Page {
                     }
 
                     Rectangle {
+                        radius: 20
                         width: Math.min(messageText.implicitWidth + 24, listView.width - avatar.width - messageRow.spacing)
                         height: messageText.implicitHeight + 24
                         color: sentByMe ? "lightgrey" : "steelblue"

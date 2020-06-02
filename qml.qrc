@@ -49,5 +49,6 @@
         <file>images/markers/sport/1.4.png</file>
         <file>images/markers/sport/1.5.png</file>
         <file>images/profile.png</file>
+        <file>images/empty.jpg</file>
     </qresource>
 </RCC>

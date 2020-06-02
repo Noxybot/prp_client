@@ -9,6 +9,7 @@
 #include <QNetworkAccessManager>
 #include <QByteArray>
 #include <mutex>
+#include <QBuffer>
 class MarkerImageProvider : public QObject, public QQuickImageProvider
 {
     Q_OBJECT
@@ -25,13 +26,13 @@ public:
         qDebug() << "requestPixmap for marker id: " << id << " size: " << requestedSize;
         auto img_it = m_marker_images.find(id.toInt());
         if (img_it != std::end(m_marker_images))
-            return img_it.value().scaled(requestedSize, Qt::KeepAspectRatio);
+            return img_it.value().scaled(requestedSize);//, Qt::KeepAspectRatio);
 
         {
             std::lock_guard<std::mutex> lock_{m_replies_mtx};
             for (const auto& elem : m_replies)
             {
-                if (elem == id) //already in progress
+                if (elem == id.toInt()) //already in progress
                     return {};
             }
         }
@@ -84,11 +85,27 @@ public slots:
             QJsonDocument jsonResponse = QJsonDocument::fromJson(reply->readAll());
             qDebug() << "receive image for marker: " << id ;//<< //", img: " << jsonResponse["result"].toString().toUtf8();
             QPixmap image;
-            image.loadFromData(QByteArray::fromBase64(jsonResponse["result"].toString().toUtf8()));
+
+            QString image_str = jsonResponse["result"].toString();
+            if(image_str == "no image")
+            {
+                image.load(":/images/empty.jpg");
+                qDebug()<<"image is null: "<<image.isNull();
+                QByteArray byteArray;
+                QBuffer buffer(&byteArray);
+                image.save(&buffer, "PNG"); // writes the image in JPEG format inside the buffer
+                image_str = QString::fromLatin1(byteArray.toBase64().data());
+            }
+            else{
+                image.loadFromData(QByteArray::fromBase64(image_str.toUtf8()));
+            }
+
             {
                 std::lock_guard<std::mutex> lock{m_replies_mtx};
                 m_replies.remove(reply);
             }
+
+
 
             std::lock_guard<std::mutex> lock{m_img_mtx};
             m_marker_images.insert(id, std::move(image));
