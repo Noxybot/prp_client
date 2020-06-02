@@ -162,6 +162,26 @@ void SqlContactModel::addContact(const QString &login, const QString& display_na
         std::lock_guard<std::mutex> lock{m_mtx};
         m_present_contacts.insert(login, false);
     }
+    /*auto ask_user_state = */[&] (const QString& login)
+    {
+        QUrl server_url = QUrl("http://" + m_server_ip);
+
+        QNetworkRequest request(server_url);
+
+        QJsonObject json;
+        json.insert("method", "get_user_status");
+        json.insert("login", login); //marker id
+        QJsonDocument jsonDoc(json);
+        QByteArray jsonData= jsonDoc.toJson();
+        request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+        QNetworkReply *reply = m_web_ctrl->post(request, jsonData);
+        {
+             std::lock_guard<std::mutex> lock{m_replies_mtx};
+             m_replies.insert(reply, login);
+        }
+        QObject::connect(reply, &QNetworkReply::finished, this, &SqlContactModel::userStatusResponseReceived);
+
+    }(login);
     updateContacts();
 }
 
