@@ -228,7 +228,7 @@ console.log("time " + time)
                 difference += (24 - time-1)*3600+(60-minute)*60;
             }
             console.log("difference " + difference)
-            diffrence = (difference < 0 ? difference*(-1):difference)
+            difference = (difference < 0 ? difference*(-1):difference)
             add_place_request["expire_time"] =  difference;
 
             var xhr = new XMLHttpRequest();
