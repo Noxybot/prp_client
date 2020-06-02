@@ -559,7 +559,7 @@ Page {
             ComboBox {
                 id: type
                 model: ["Спорт", "Культурный отдых", "Ночная жизнь", "Развлечения"]
-                Layout.preferredWidth: 200
+                Layout.preferredWidth: 180
                 Layout.alignment: Qt.AlignLeft
                 onCurrentIndexChanged:
                 {
