@@ -17,7 +17,7 @@ ApplicationWindow {
     property var db
     property string currentUserLogin: ""
     property string currentUserDN: ""
-    property string serverIP: "178.150.141.36:1337"//"178.150.141.36:1337"
+    property string serverIP: "109.87.116.179:1337"//"178.150.141.36:1337"
     property string profileImageBase64: ""
 
 
@@ -144,8 +144,10 @@ ApplicationWindow {
                 else {
                     conversationModel.sendMessage(from_login, "Me", msg_text, unix_time)
                     let dn = json_msg["from_dn"]
-                    if(stack.currentItem.objectName !== "chatPage" || stack.currentItem.inConversationWithDN !== dn)
+                    if(stack.currentItem.objectName !== "chatPage" && stack.currentItem.inConversationWithDN !== dn)
                     {
+                        console.log("page " + stack.currentItem.objectName)
+                        console.log("name "+stack.currentItem.inConversationWithDN + " "+dn)
                         popup_msg.text = msg_text
                         popup_msg.login = from_login
                         popup_msg.dn = dn

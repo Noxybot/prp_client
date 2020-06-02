@@ -351,8 +351,8 @@ Page {
         visible: false
         width: parent.width
         radius: 10
-        property var max: 300
-        height: (parent.height * 0.4 > max) ? parent.height * 0.3 : max
+        property var max: 250
+        height: (mapPage.height * 0.25 > max) ? mapPage.height * 0.25 : max
         anchors.bottom: parent.bottom
         border.width: 1
         border.color: "#6fda9c"

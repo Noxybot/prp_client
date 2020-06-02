@@ -26,12 +26,22 @@ void QImageConverter::toBase64Impl(QString login_or_marker_id, QString file_path
          qDebug() << "Error parsing EXIF: code " << code;
     }
          qDebug() << "Orientation         : " << info.Orientation;
-         if(info.Orientation == 8) {
+         if(info.Orientation == 8 || info.Orientation == 7) {
              qDebug()<<"Roating";
              QMatrix matrix;
              QPoint center = image.rect().center();
              matrix.translate(center.x(), center.y());
              matrix.rotate(270);
+             qDebug()<<"before transformation "<<login_or_marker_id << " width "<<dstImg.width()<<" height "<<dstImg.height();
+             dstImg = image.transformed(matrix);
+             qDebug()<<"after transformation "<<login_or_marker_id << " width "<<dstImg.width()<<" height "<<dstImg.height();
+         }
+         if(info.Orientation == 5 || info.Orientation == 6) {
+             qDebug()<<"Roating";
+             QMatrix matrix;
+             QPoint center = image.rect().center();
+             matrix.translate(center.x(), center.y());
+             matrix.rotate(90);
              qDebug()<<"before transformation "<<login_or_marker_id << " width "<<dstImg.width()<<" height "<<dstImg.height();
              dstImg = image.transformed(matrix);
              qDebug()<<"after transformation "<<login_or_marker_id << " width "<<dstImg.width()<<" height "<<dstImg.height();

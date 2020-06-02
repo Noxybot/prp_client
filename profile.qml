@@ -52,8 +52,8 @@ Page {
             id: img
             Layout.alignment: Qt.AlignHCenter
             source: "image://contact_image_provider/" + (!login.length ? currentUserLogin :  login)
-            Layout.preferredWidth: profilePage.width*0.3
-            Layout.preferredHeight: profilePage.width*0.3
+            Layout.preferredWidth: profilePage.width*0.6
+            Layout.preferredHeight: profilePage.width*0.6
             sourceSize.width: 400
             sourceSize.height: 400
             BusyIndicator {
