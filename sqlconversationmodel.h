@@ -16,7 +16,7 @@ public:
     QVariant data(const QModelIndex &index, int role) const override;
     QHash<int, QByteArray> roleNames() const override;
 
-    Q_INVOKABLE void sendMessage(const QString &author, const QString &recipient, const QString &message, int unix_time);
+    void sendMessage(const QString &author, const QString &recipient, const QString &message, int unix_time);
 
 signals:
 

@@ -50,6 +50,7 @@ public:
     //Q_INVOKABLE bool userHasImage(const QString& login);
     QVector<QString> getContactsWithoutAvatar();
     QString getUserImageByLogin(const QString& login);
+    const QString& getCurrentUserLogin() const;
 
     Q_INVOKABLE bool userPresent(const QString& login);
     Q_INVOKABLE void addContact(const QString &login, const QString& display_name);

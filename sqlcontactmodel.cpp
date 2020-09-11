@@ -321,4 +321,9 @@ QString SqlContactModel::getUserImageByLogin(const QString &login)
     return "";
 }
 
+const QString &SqlContactModel::getCurrentUserLogin() const
+{
+    return m_current_user_login;
+}
+
 
