@@ -1,14 +1,23 @@
 #ifndef REQUESTMANAGER_H
 #define REQUESTMANAGER_H
 
-#include <QVariant>
+#include <QString>
+#include <QByteArray>
+
 #include <future>
+#include <cstdint>
 
 class RequestManager
 {
 public:
     virtual ~RequestManager() = default;
-    virtual std::future<QVariant> GetDisplayNameByLogin(const QString& login) const = 0;
+    virtual std::future<QString> GetDisplayNameByLogin(const QString& login) const = 0;
+    virtual std::future<bool> ConfirmLogin(const QString& login, const QString& password) const = 0;
+    virtual std::future<bool> UploadUserImage(const QString& login, const QByteArray& image) const = 0;
+    virtual std::future<bool> UploadMarkerImage(std::uint64_t id, const QByteArray& image) const = 0;
+    virtual std::future<bool> RegisterUser(const QString& name, const QString& surname, const QString& login,
+                                           const QString& password, const QByteArray& image = {}) const = 0;
+
 };
 
 #endif // REQUESTMANAGER_H
