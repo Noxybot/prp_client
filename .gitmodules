@@ -1,0 +1,3 @@
+[submodule "prp_common"]
+	path = prp_common
+	url = https://github.com/Noxybot/prp_common.git
