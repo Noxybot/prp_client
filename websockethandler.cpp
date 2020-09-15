@@ -1,6 +1,9 @@
-#include "websockethandler.h"
-#include <QJsonDocument>
 #include "markermodel.h"
+#include "websockethandler.h"
+
+#include <QJsonDocument>
+
+
 
 WebsocketHandler::WebsocketHandler(const QUrl& server_url, std::shared_ptr<MarkerModel> marker_model,
                                    std::shared_ptr<SqlContactModel> sql_contact_model,
@@ -15,7 +18,7 @@ WebsocketHandler::WebsocketHandler(const QUrl& server_url, std::shared_ptr<Marke
 
 void WebsocketHandler::onAboutToClose()
 {
-    qDebug()<<"aboutToClose\n";
+    qDebug()<< "aboutToClose\n";
 }
 
 void WebsocketHandler::onTextMessageReceived(const QString &message)
