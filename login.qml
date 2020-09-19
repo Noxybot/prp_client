@@ -24,7 +24,17 @@ Page {
             return
         }
         load.visible = true
-        confirmLogin(login_.text, password.text)
+        let res = GUIConnector.confirmLogin(login_.text, password.text)
+        load.visible = false
+        if (res) {
+            currentUserLogin = login_.text
+            if (stack.top !== "map.qml")
+                stack.push("map.qml")
+        }
+        else {
+            popup.popMessage = qsTr("Какая-то ошибка")
+            popup.open()
+        }
     }
 
     Rectangle {

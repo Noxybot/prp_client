@@ -5,6 +5,7 @@ import QtQuick.Dialogs 1.3
 //import Qt.labs.platform 1.1
 import QtQuick.Layouts 1.12
 import Cometogether.converter 1.0
+import GuiConnector 1.0
 
 Page {
     id: signinPage
@@ -300,10 +301,28 @@ Page {
             Layout.preferredHeight: signinPage.height / 10
             Layout.preferredWidth: signinPage.width / 2
             onClicked: {
+
                 if (checkAge()) {
                     if (validateLogin() & validateName() & validatePassword() & passwordsMatch()) {
                         load.visible = true
-                        addUser(name.text, surname.text, login_.text, password.text, false/*isFb*/, pathToImage)
+                        let result = GUIConnector.registerUser(name.text + surname.text, login_.text, password.text, false/*isFb*/, pathToImage)
+                        console.log("result=" + result)
+                        if (result == 0)
+                        {
+                            load.visible = false
+                            console.log("addUser: setting curentuserlogin to " + login_.text)
+                            currentUserLogin = name.text
+                            //mainWebsocket.active = true
+                          //  if (isFB)
+                                //downloader.downloadImage(login, pathToImage);
+                          //  else
+                                //imageConverter.scheduleToBase64(login, pathToImage, "convert user image");
+
+                            if (stack.top !== "map.qml")
+                                stack.push("map.qml")
+                        }
+                        else if (result === GuiConnector.NO_RESPONSE_FROM_SERVER)
+                            load.visible = false
                     }
                     else {
                         enabled: false

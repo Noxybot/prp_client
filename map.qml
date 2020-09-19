@@ -426,8 +426,8 @@ Page {
                     fontSizeMode: Text.Fit
                     color: "#f0f0f0"
                 }
-                Layout.preferredHeight: loginPage.height / 10
-                Layout.preferredWidth: loginPage.height / 10
+                Layout.preferredHeight: mapPage.height / 10
+                Layout.preferredWidth: mapPage.height / 10
                 background: Rectangle {
                     height: parent.height
                     width: height
@@ -514,7 +514,7 @@ Page {
                                 let recipient = bottomProfile.recipient
                                 conversationModel.setRecipient(recipient)
                                 stack.push("chat.qml", {"inConversationWith" : recipient,
-                                               "inConversationWithDN": getDisplayNameByLogin(recipient)})
+                                               "inConversationWithDN": GUIConnector.getDisplayNameByLogin(recipient)})
                             }
                         }
                     }

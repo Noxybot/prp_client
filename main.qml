@@ -6,7 +6,6 @@ import QtQuick.Layouts 1.12
 
 import QtWebSockets 1.14
 import QtPositioning 5.14
-import Cometogether.converter 1.0
 import Cometogether.downloader 1.0
 
 ApplicationWindow {
@@ -31,19 +30,6 @@ ApplicationWindow {
              //addUserImagePath(id, path) //FB user login same as FB id
          }
     }
-    BackendImageConverter {
-        id: imageConverter
-        onImageConveted_marker: {
-
-            console.log("converted image for marker" + id + ", sending to server...")
-            uploadMarkerImage(id, imageBase64)
-        }
-
-        onImageConveted_user: {
-            console.log("converted image for user" + login + ", sending to server...")
-            uploadImage(login, imageBase64)
-        }
-    }
 
     WebSocket {
         property bool show_popup: true
@@ -59,7 +45,7 @@ ApplicationWindow {
                 conversationModel.setCurrentUserLogin(currentUserLogin)
                 contactModel.setCurrentUserLogin(currentUserLogin)
                 contact_image_provider.setCurrentUserLogin(currentUserLogin)
-                currentUserDN = getDisplayNameByLogin(currentUserLogin) //blocking function
+                currentUserDN = GUIConnector.getDisplayNameByLogin(currentUserLogin) //blocking function
                 if (!contactModel.userPresent(currentUserLogin)) //hack: add myself to contacts
                     contactModel.addContact(currentUserLogin, currentUserDN)
 
@@ -211,175 +197,6 @@ ApplicationWindow {
                     function(tx) {
                         tx.executeSql('CREATE TABLE IF NOT EXISTS user(name TEXT, surname TEXT, login TEXT, password TEXT, path_to_image TEXT)');
                     })
-    }
-    function addUser(name, surname, login, password, isFB, pathToImage) {
-        console.log("addUser(), login: " + login +
-                    ", pass: " + password, ", isFB: " + isFB +
-                    ", DN: " + name + " " + surname + ", path: " + pathToImage)
-        //for FB user pathToImage is URL from where we will download image
-        if (isFB === undefined)
-        {
-            console.log("addUser: IsFB is undefined")
-            return;
-        }
-        var xhr = new XMLHttpRequest();
-        xhr.open("POST", "http://" + serverIP)
-        xhr.setRequestHeader("Content-type", "application/json")
-
-        let json_request = {"method": "register_user", "login": login,
-            "password": password, "display_name": name + ' ' + surname}
-        if (isFB)
-            json_request["method"] = "login_fb_user" //todo: write it better
-
-        var timer = Qt.createQmlObject("import QtQuick 2.14; Timer {interval: 5000; repeat: false; running: true;}",mainWindow,"MyTimer");
-        timer.triggered.connect(function(){
-            load.visible = false
-            console.log("addUser: cant connect to server");
-            popup.popMessage = qsTr("Ошибка подключения к серверу")
-            popup.open()
-            xhr.abort();
-        });
-
-        xhr.onreadystatechange  = function(){
-            if (xhr.readyState !== XMLHttpRequest.DONE) //in process
-                return
-            timer.stop()
-            load.visible = false
-            if (xhr.status === 200) {//HTTP OK
-
-                let response = JSON.parse(xhr.response)
-                let result = response["result"]
-                if (result === "registered" || result === "logged in"/*when isFB is true*/){
-                    console.log("addUser: setting curentuserlogin to " + login)
-                    currentUserLogin = login
-                    mainWebsocket.active = true
-                    if (isFB)
-                        downloader.downloadImage(login, pathToImage);
-                    else
-                        imageConverter.scheduleToBase64(login, pathToImage, "convert user image");
-
-                    if (stack.top !== "map.qml")
-                        stack.push("map.qml")
-                }
-                else if (result === "user exists") {
-                    console.log("addUser: " + result)
-                    popup.popMessage = qsTr("Логин") + " " + login + " " + qsTr("занят")
-                    load.visible = false
-                    popup.open()
-                }
-            }
-            else {
-                console.log("addUser error " + xhr.status + ": " +  xhr.statusText)
-            }
-
-        }
-        xhr.send(JSON.stringify(json_request));
-    }
-    function addUserImagePath(login, path_to_image) {
-        db.transaction(function(tx) {
-            tx.executeSql('UPDATE user SET path_to_image=? WHERE login=?', [path_to_image, login])
-
-        })
-        console.log("addUserImagePath")
-    }
-
-    function confirmLogin(login, password) {
-        console.log("confirmLogin(), login: " + login + ", pass: " + password)
-        var xhr = new XMLHttpRequest();
-        xhr.open("POST", "http://" + serverIP)
-        xhr.setRequestHeader("Content-type", "application/json")
-        let json_request = {"method": "login_user", "login": login, "password": password}
-        var timer = Qt.createQmlObject("import QtQuick 2.14; Timer {interval: 5000; repeat: false; running: true;}",mainWindow,"MyTimer");
-        timer.triggered.connect(function(){
-            load.visible = false
-            console.log("cant connect to server");
-            popup.popMessage = qsTr("Ошибка подключения к серверу")
-            popup.open()
-            xhr.abort();
-        });
-
-        xhr.onreadystatechange  = function(){
-            if (xhr.readyState !== XMLHttpRequest.DONE) //in process
-                return
-            timer.stop()
-            load.visible = false
-            if (xhr.status === 200) {//HTTP OK
-
-                let response = JSON.parse(xhr.response)
-                let result = response["result"]
-                if (result === "logged in"){
-                    console.log("setting cuurentuserlogin to " + login)
-                    currentUserLogin = login
-                    mainWebsocket.active = true
-                    if (stack.top !== "map.qml")
-                        stack.push("map.qml")
-                }
-                else if (result === "not found") {
-                    console.log("user not found")
-                    popup.popMessage = qsTr("Пользователь не найден")
-                    popup.open()
-                }
-                else if (result === "wrong credentials"){
-                    console.log("login error " + xhr.status + ": " +  xhr.statusText)
-                    popup.popMessage = qsTr("Неверный пароль")
-                    popup.open()
-                }
-                else if (result === "already logged in"){
-                    console.log("login error " + xhr.status + ": " +  xhr.statusText)
-                    popup.popMessage = qsTr("Этот аккаунт используется на другом устройстве")
-                    popup.open()
-                }
-            }
-            else {
-                console.log("login error " + xhr.status + ": " +  xhr.statusText)
-            }
-
-        }
-        xhr.send(JSON.stringify(json_request));
-    }
-
-    function getDisplayNameByLogin(login) {
-        var xhr = new XMLHttpRequest();
-        xhr.open("POST", "http://" + serverIP, false)
-        xhr.setRequestHeader("Content-type", "application/json")
-        xhr.responseType = "json"
-        let json_request = {"method": "get_display_name", "login": login}
-        try {
-           xhr.send(JSON.stringify(json_request))
-           return xhr.response["result"]
-        }
-        catch(err) {
-            console.log("getUserInfoByLogin request failed: " + err.message)
-        }
-    }
-
-    function uploadImage(login, image_base64) {
-        let xhr = new XMLHttpRequest();
-        xhr.responseType = "json"
-        xhr.open("POST", "http://" + serverIP)
-        xhr.setRequestHeader("Content-type", "application/json")
-        let json_request = {"method": "upload_user_image", "login": login, "image": image_base64}
-        xhr.onready = function(){
-            console.log("image for user: " + login + " sent")
-
-        }
-        xhr.send(JSON.stringify(json_request));
-    }
-
-    function uploadMarkerImage(id, imageBase64){
-        let xhr = new XMLHttpRequest();
-        xhr.responseType = 'json'
-        xhr.open("POST", "http://" + serverIP, true)
-        xhr.setRequestHeader("Content-type", "application/json")
-        let upload_place_image_request = {}
-        upload_place_image_request["method"] = "upload_marker_image"
-        upload_place_image_request["id"] = id
-        console.log("uploading image for marker: " + id + ", img size: " + imageBase64.length)
-        upload_place_image_request["image"] = imageBase64
-        xhr.onready = function(){
-            console.log("image for marker: " + id + " sent")
-        }
-        xhr.send(JSON.stringify(upload_place_image_request))
     }
 
     function delay(delayTime, cb) {

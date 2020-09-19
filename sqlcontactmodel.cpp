@@ -1,5 +1,5 @@
 #include "sqlcontactmodel.h"
-
+#include <prp_common/consts.h>
 #include <QDebug>
 #include <QSqlError>
 #include <QSqlQuery>
@@ -62,10 +62,9 @@ static void createTable()
     }
 }
 
-SqlContactModel::SqlContactModel(QString server_ip, QObject *parent)
+SqlContactModel::SqlContactModel(std::shared_ptr<RequestManager> request_manager, QObject *parent)
     : QSqlQueryModel(parent)
-    , m_web_ctrl(new QNetworkAccessManager(this))
-    , m_server_ip(std::move(server_ip))
+    , m_request_manager(std::move(request_manager))
 {
     createTable();
     updateContacts();
@@ -83,29 +82,7 @@ void SqlContactModel::setCurrentUserLogin(QString login)
         return;
     }
 
-    auto ask_user_state = [&] (const QString& login)
-    {
-        QUrl server_url = QUrl("http://" + m_server_ip);
-
-        QNetworkRequest request(server_url);
-
-        QJsonObject json;
-        json.insert("method", "get_user_status");
-        json.insert("login", login); //marker id
-        QJsonDocument jsonDoc(json);
-        QByteArray jsonData= jsonDoc.toJson();
-        request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
-        QNetworkReply *reply = m_web_ctrl->post(request, jsonData);
-        {
-             std::lock_guard<std::mutex> lock{m_replies_mtx};
-             m_replies.insert(reply, login);
-        }
-        QObject::connect(reply, &QNetworkReply::finished, this, &SqlContactModel::userStatusResponseReceived);
-
-    };
-
     connectToDatabase();
-
     m_current_user_login = std::move(login);
     QSqlQuery query;
     query.prepare("SELECT login FROM Contacts WHERE contact_owner=:owner");
@@ -113,12 +90,21 @@ void SqlContactModel::setCurrentUserLogin(QString login)
     if (!query.exec())
         qFatal("Contacts setCurrentUserLogin query failed: %s", qPrintable(query.lastError().text()));
     {
+        std::vector<std::future<QString>> m_statuses;
         std::lock_guard<std::mutex> lock{m_mtx};
         while (query.next())
         {
             QString login = query.value(0).toString();
             m_present_contacts.insert(login, false);
-            ask_user_state(login);
+            m_statuses.emplace_back(m_request_manager->GetUserStatus(login));
+        }
+        for (auto& status_future: m_statuses)
+        {
+            if (status_future.wait_for(std::chrono::milliseconds(10)) == std::future_status::ready)
+            {
+                std::lock_guard<std::mutex> lock_{m_mtx};
+                m_present_contacts[login] = status_future.get() == "online" ? true : false;
+            }
         }
     }
     updateContacts();
@@ -127,15 +113,29 @@ void SqlContactModel::setCurrentUserLogin(QString login)
     //QObject::connect(reply, &QNetworkReply::errorOccurred, this, &MarkerImageProvider::error);
 }
 
+QVariant SqlContactModel::data(const QModelIndex &index, int role) const
+{
+    if(role < Qt::UserRole)
+    {
+        return QSqlQueryModel::data(index, role);
+    }
+    QSqlRecord r = record(index.row());
+    return r.value(QString(hash.value(role))).toString();
+}
+
+QHash<int, QByteArray> SqlContactModel::roleNames() const
+{
+    return hash;
+}
+
 void SqlContactModel::updateContacts()
 {
     QSqlQuery query;
-   /* query.prepare("SELECT DISTINCT display_name, login, message as last_message, c1.recipient FROM Contacts, Conversations c1 "
+    /* query.prepare("SELECT DISTINCT display_name, login, message as last_message, c1.recipient FROM Contacts, Conversations c1 "
                   "WHERE author!=c1.recipient AND contact_owner=owner AND contact_owner=:c_owner AND owner=:c_owner AND login=c1.recipient AND timestamp >= "
                   "(SELECT MAX(timestamp) from Conversations c2 WHERE owner = :c_owner AND c2.recipient=c1.recipient)");*/
     query.prepare("SELECT display_name, login FROM Contacts WHERE contact_owner=:c_owner AND login!=:c_owner");
     query.bindValue(":c_owner", m_current_user_login);
-    //qDebug() <<
     qDebug() <<":c_owner"<< m_current_user_login;
     if (!query.exec())
         qFatal("Contacts updateContacts query failed: %s", qPrintable(query.lastError().text()));
@@ -162,26 +162,9 @@ void SqlContactModel::addContact(const QString &login, const QString& display_na
         std::lock_guard<std::mutex> lock{m_mtx};
         m_present_contacts.insert(login, false);
     }
-    /*auto ask_user_state = */[&] (const QString& login)
-    {
-        QUrl server_url = QUrl("http://" + m_server_ip);
-
-        QNetworkRequest request(server_url);
-
-        QJsonObject json;
-        json.insert("method", "get_user_status");
-        json.insert("login", login); //marker id
-        QJsonDocument jsonDoc(json);
-        QByteArray jsonData= jsonDoc.toJson();
-        request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
-        QNetworkReply *reply = m_web_ctrl->post(request, jsonData);
-        {
-             std::lock_guard<std::mutex> lock{m_replies_mtx};
-             m_replies.insert(reply, login);
-        }
-        QObject::connect(reply, &QNetworkReply::finished, this, &SqlContactModel::userStatusResponseReceived);
-
-    }(login);
+    auto status_fut = m_request_manager->GetUserStatus(login);
+    if (status_fut.wait_for(std::chrono::milliseconds(10)) == std::future_status::ready)
+        m_present_contacts[login] = status_fut.get() == consts::ONLINE ? true : false;
     updateContacts();
 }
 
@@ -224,34 +207,6 @@ bool SqlContactModel::isUserLoggedIn(const QString &login) const
         return false;
     }
     return it.value();
-}
-
-void SqlContactModel::userStatusResponseReceived()
-{
-    QNetworkReply* reply = qobject_cast<QNetworkReply*>(sender());
-    switch(reply->error())
-    {
-    case QNetworkReply::NoError:
-    {
-        qDebug() << "userStatusResponseReceived(): NoError";
-        QNetworkReply* reply = qobject_cast<QNetworkReply*>(sender());
-        const QString login = m_replies[reply];
-        QJsonDocument jsonResponse = QJsonDocument::fromJson(reply->readAll());
-        const QString result = jsonResponse["result"].toString();
-        qDebug() << "status response for user: " << login << ", res: " << result;
-        {
-            std::lock_guard<std::mutex> lock{m_replies_mtx};
-            m_replies.remove(reply);
-            std::lock_guard<std::mutex> lock_{m_mtx};
-            m_present_contacts[login] = result == "online" ? true : false;
-        }
-    }
-        break;
-
-    default:
-        qDebug() << "userStatusResponseReceived(): Error " << reply->errorString();
-        break;
-    }
 }
 
 void SqlContactModel::addUserImage(const QString &login, const QString &image)

@@ -11,12 +11,14 @@
 #include "markermodel.h"
 #include "sqlconversationmodel.h"
 #include "sqlcontactmodel.h"
-#include "qimageconverter.h"
+#include "helper_functions.h"
 #include "markerimageprovider.h"
 #include "contactimageprovider.h"
+#include "httphandler.h"
+#include "guiconnector.h"
 
 
-static QString g_server_ip {"178.150.141.36:1337"};
+static QString g_server_ip {"127.0.0.1:1337"};
 int main(int argc, char *argv[])
 {
 
@@ -47,14 +49,21 @@ int main(int argc, char *argv[])
 
     connectToDatabase();
 
-    auto contact_model = std::make_shared<SqlContactModel>(g_server_ip);
+    const auto mgr = std::make_shared<HttpHandler>(QUrl(QString("http://")+ g_server_ip));
+    mgr->PostConstruct();
+
+    auto contact_model = std::make_shared<SqlContactModel>(mgr);
     engine.rootContext()->setContextProperty("contactModel", contact_model.get());
+
+    GuiConnector gui_conn {mgr};
+    engine.rootContext()->setContextProperty("GUIConnector", &gui_conn);
+    qmlRegisterUncreatableType<GuiConnector>("GuiConnector", 1, 0, "GuiConnector",
+                                                 "Cannot create GuiConnector in QML");
 
     SqlConversationModel conversation_model;
     engine.rootContext()->setContextProperty("conversationModel", &conversation_model);
 
 
-    qmlRegisterType<QImageConverter>("Cometogether.converter", 1, 0, "BackendImageConverter");
 
     qmlRegisterType<QDownloader>("Cometogether.downloader", 1, 0, "BackendFileDonwloader");
 
@@ -63,10 +72,10 @@ int main(int argc, char *argv[])
     engine.addImageProvider(QLatin1String("marker_image_provider"), marker_provider);
 
 
-    auto  contact_provider = new ContactImageProvider {g_server_ip, contact_model };
-    engine.addImageProvider(QLatin1String("contact_image_provider"),
-                            contact_provider);
-    engine.rootContext()->setContextProperty("contact_image_provider", contact_provider);
+    //auto  contact_provider = new ContactImageProvider {g_server_ip, contact_model };
+  //  engine.addImageProvider(QLatin1String("contact_image_provider"),
+    //                        contact_provider);
+   // engine.rootContext()->setContextProperty("contact_image_provider", contact_provider);
 
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,
                      &app, [url](QObject *obj, const QUrl &objUrl) {

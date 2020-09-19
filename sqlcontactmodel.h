@@ -1,11 +1,11 @@
 #ifndef SQLCONTACTMODEL_H
 #define SQLCONTACTMODEL_H
 
+#include "requestmanager.h"
+
 #include <QSqlQueryModel>
 #include <QSqlRecord>
 #include <QVariantList>
-#include <unordered_set>
-
 #include <QSqlDatabase>
 #include <QSqlError>
 #include <QDir>
@@ -13,9 +13,11 @@
 #include <QStandardPaths>
 #include <QDebug>
 #include <QMap>
-#include <mutex>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
+
+#include <mutex>
+#include <unordered_set>
 
 void connectToDatabase();
 
@@ -23,27 +25,16 @@ void connectToDatabase();
 class SqlContactModel : public QSqlQueryModel
 {
     Q_OBJECT
-    QHash<int,QByteArray> hash;
+    QHash<int, QByteArray> hash;
     QString m_current_user_login;
     mutable std::mutex m_mtx;
-    std::mutex m_replies_mtx;
     QMap<QString, bool> m_present_contacts; // login -> is online
-    QNetworkAccessManager* m_web_ctrl;
-    QString m_server_ip;
-    QMap<QNetworkReply*, QString> m_replies; //reply -> login
+    std::shared_ptr<RequestManager> m_request_manager;
 public:
-    SqlContactModel(QString server_ip, QObject *parent = 0);
+    SqlContactModel(std::shared_ptr<RequestManager>, QObject *parent = 0);
     Q_INVOKABLE void setCurrentUserLogin(QString login);
-    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override
-    {
-        if(role < Qt::UserRole)
-        {
-                  return QSqlQueryModel::data(index, role);
-        }
-        QSqlRecord r = record(index.row());
-        return r.value(QString(hash.value(role))).toString();
-    }
-    QHash<int,QByteArray> roleNames() const override { return hash; }
+    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
+    QHash<int, QByteArray> roleNames() const override;
     void updateContacts();
 
     void addUserImage(const QString &login, const QString& image);
@@ -61,11 +52,6 @@ public:
 signals:
     void userLoggedIn(const QString& login);
     void userLogout(const QString& login);
-
-public slots:
-    void userStatusResponseReceived();
-
-
 };
 
 #endif // SQLCONTACTMODEL_H
